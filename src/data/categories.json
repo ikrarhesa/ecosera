@@ -1,8 +1,22 @@
 [
-  { "key": "kopi", "label": "Kopi" },
-  { "key": "snack", "label": "Snack" },
-  { "key": "minuman", "label": "Minuman" },
-  { "key": "kerajinan", "label": "Kerajinan" },
-  { "key": "sembako", "label": "Sembako" }
+  {
+    "key": "kopi",
+    "label": "Kopi"
+  },
+  {
+    "key": "snack",
+    "label": "Snack"
+  },
+  {
+    "key": "minuman",
+    "label": "Minuman"
+  },
+  {
+    "key": "kerajinan",
+    "label": "Kerajinan"
+  },
+  {
+    "key": "sembako",
+    "label": "Sembako"
+  }
 ]
-

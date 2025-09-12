@@ -1,2 +1,1 @@
-
-export const money = (n: number) => n.toLocaleString("id-ID");
+export const money = (n: number) => n.toLocaleString('id-ID');

@@ -1,13 +1,12 @@
+// src/pages/Cart.tsx
 import { useCart } from "../context/CartContext";
 import { ArrowLeft, Trash2, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { useToast } from "../context/ToastContext";
+import { money } from "../utils/money";
+import { SHOP_NAME, SHOP_WA } from "../utils/env";
 
-const SHOP_NAME = "Ecosera – UMKM Muara Enim";
-const SHOP_WA = "6281234567890"; // ganti ke nomor WA tujuan (62...) 
-
-const money = (n: number) => n.toLocaleString("id-ID");
 const fallbackImg =
   "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&h=300&q=70";
 
@@ -133,7 +132,7 @@ function CartItemRow({
         className="flex items-center gap-3 rounded-2xl bg-white/80 backdrop-blur border border-black/10 p-3 relative transition-transform duration-200 will-change-transform"
         style={{ transform: `translateX(${offset}px)` }}
         onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove} 
+        onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
         {/* Thumbnail */}
@@ -218,7 +217,6 @@ export default function Cart() {
           <button
             onClick={() => {
               if (items.length === 0) return;
-              // Konfirmasi hapus semua
               if (confirm("Kosongkan seluruh keranjang?")) {
                 clearCart();
                 show("Keranjang dikosongkan 🗑️");
@@ -273,7 +271,7 @@ export default function Cart() {
                   href={waLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-3 rounded-xl bg-primary text-white font-semibold"
+                  className="px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold"
                 >
                   Checkout WA
                 </a>

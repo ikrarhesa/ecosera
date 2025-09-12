@@ -1,4 +1,3 @@
-
 import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Product } from "../types/product";
