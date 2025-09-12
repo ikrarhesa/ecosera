@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { useToast } from "../context/ToastContext";
 
 const SHOP_NAME = "Ecosera – UMKM Muara Enim";
-const SHOP_WA = "6281234567890"; // ganti ke nomor WA tujuan (62...)
+const SHOP_WA = "6281234567890"; // ganti ke nomor WA tujuan (62...) 
 
 const money = (n: number) => n.toLocaleString("id-ID");
 const fallbackImg =
@@ -73,7 +73,6 @@ function ConfirmModal({
 
 /** Satu baris item keranjang dengan swipe-to-delete & qty stepper */
 function CartItemRow({
-  id,
   name,
   qty,
   price,
@@ -81,7 +80,6 @@ function CartItemRow({
   onRemoveConfirmed,
   onChangeQty,
 }: {
-  id: string;
   name: string;
   qty: number;
   price: number;
@@ -243,7 +241,6 @@ export default function Cart() {
             {items.map((i) => (
               <CartItemRow
                 key={i.id}
-                id={i.id}
                 name={i.name}
                 qty={i.qty}
                 price={i.price}
@@ -271,7 +268,7 @@ export default function Cart() {
                 <div>
                   <p className="text-xs text-slate-600">Subtotal</p>
                   <p className="text-xl font-bold">Rp {money(subtotal)}</p>
-                </div>
+                </div> 
                 <a
                   href={waLink}
                   target="_blank"
