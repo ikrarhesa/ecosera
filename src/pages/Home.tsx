@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Search, Star } from "lucide-react";
 import { PRODUCTS, type Product } from "./Home";
 
-const money = (n: number) => n.toLocaleString("id-ID");
+const money = (n: number) => n.toLocaleString("id-ID"); 
 
 function ProductCard({ p }: { p: Product }) {
   return (
