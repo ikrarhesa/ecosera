@@ -1,1 +1,3 @@
 
+export const SHOP_NAME = import.meta.env.VITE_SHOP_NAME ?? "Ecosera – UMKM Muara Enim";
+export const SHOP_WA   = import.meta.env.VITE_SHOP_WA   ?? "6281234567890"; // 62...
