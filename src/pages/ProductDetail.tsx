@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ShoppingCart, Minus, Plus, ArrowLeft } from "lucide-react";
+import { ShoppingCart, Minus, Plus, ArrowLeft, Heart } from "lucide-react";
 import { getProductById } from "../services/products";
 import { money } from "../utils/money";
 import { useCart } from "../context/CartContext";
@@ -38,7 +38,7 @@ export default function ProductDetail() {
           <h1 className="font-semibold text-center flex-1">{product.name}</h1>
           <div className="flex gap-2">
             <button className="p-2 bg-white border rounded">
-              <span className="h-5 w-5">❤️</span> {/* Heart Icon */}
+              <Heart className="h-5 w-5 text-rose-500" />
             </button>
             <button className="p-2 bg-white border rounded">
               <span className="h-5 w-5">🔗</span> {/* Share Icon */}
@@ -89,7 +89,7 @@ export default function ProductDetail() {
           <p className="text-sm text-gray-700">{product.description}</p>
         </div>
 
-        {/* Total */}
+        {/* Total Calculation */}
         <div className="mt-4 flex justify-between items-center text-sm text-gray-700">
           <span>Total</span>
           <span className="font-semibold">Rp {money(total)}</span>
