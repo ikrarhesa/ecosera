@@ -14,7 +14,8 @@ export default function ProductDetail() {
             'https://via.placeholder.com/350x350',
             'https://via.placeholder.com/350x350'
         ],
-        description: '13.5 oz can | $0.21/oz | Compare at $4.69'
+        description: '13.5 oz can | $0.21/oz | Compare at $4.69',
+        rating: 4.8
     };
 
     const handleIncrease = () => setQuantity(quantity + 1);
@@ -28,6 +29,9 @@ export default function ProductDetail() {
                 ))}
             </div>
             <div className="product-title">{product.title}</div>
+            <div className="product-rating">
+                <span>{product.rating} ⭐</span>
+            </div>
             <div className="product-price">
                 ${product.price.toFixed(2)} <span style={{ color: '#ff5a5f' }}>-{(product.discount * 100).toFixed(0)}%</span>
             </div>
@@ -37,7 +41,9 @@ export default function ProductDetail() {
                 <div className="quantity-display">{quantity}</div>
                 <button className="quantity-button" onClick={handleIncrease}>+</button>
             </div>
-            <button className="add-to-cart">Add to Cart</button>
+            <div className="add-to-cart-container">
+                <button className="add-to-cart">Add to Cart</button>
+            </div>
         </div>
     );
 }
