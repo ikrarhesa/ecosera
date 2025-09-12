@@ -198,69 +198,65 @@ function BottomDock() {
 }
 
 /* ===== Utils ===== */
-const rupiah = (n: number) =>
-  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
-
-function slugify(s: string) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-}
-
-/* ProductCard kadang butuh fields tertentu → pastikan ada */
-function normalizeProduct(p: any): any {
-  const out: any = { ...p };
-  if (!out.slug && out.name) out.slug = slugify(out.name);
-  if (!out.images) out.images = out.image ? [out.image] : [];
-  if (typeof out.price === "string") {
-    // coba parse "Rp 25.000" -> 25000
-    const parsed = Number(out.price.replace(/[^\d]/g, ""));
-    if (!Number.isNaN(parsed)) out.price = parsed;
+const parsePrice = (v: unknown): number => {
+  if (typeof v === "number") return v;
+  if (typeof v === "string") {
+    const n = Number(v.replace(/[^\d]/g, ""));
+    return Number.isFinite(n) ? n : 0;
   }
-  if (typeof out.price === "number" && !out.priceText) out.priceText = rupiah(out.price);
-  if (!out.thumbnail && out.image) out.thumbnail = out.image;
-  if (!out.location) out.location = "Muara Enim";
-  return out;
+  return 0;
+};
+
+const pickThumb = (p: any): string =>
+  p.thumb || p.thumbnail || p.image || (Array.isArray(p.images) ? p.images[0] : "") || "https://picsum.photos/seed/ecosera/600/600";
+
+/* Normalisasi ke shape ProductCard (id, name, thumb, rating, sold, price:number) */
+function toCardShape(p: any): Product {
+  return {
+    ...(p as Product),
+    id: p.id ?? p.slug ?? p._id ?? String(Math.random()).slice(2),
+    name: p.name ?? p.title ?? "Produk Lokal",
+    thumb: pickThumb(p),
+    rating: typeof p.rating === "number" ? p.rating : 4.7,
+    sold: typeof p.sold === "number" ? p.sold : 50,
+    price: parsePrice(p.price),
+  } as Product;
 }
 
-/* ===== Helper: filter by query & category (case-insensitive) ===== */
-function matches(p: Product, query: string, cat: CategoryKey | null) {
+/* ===== Filter by query & category (case-insensitive) ===== */
+function matches(p: any, query: string, cat: CategoryKey | null) {
   const q = query.trim().toLowerCase();
-  const name = (p as any).name?.toLowerCase?.() || "";
-  const category = ((p as any).category || (p as any)?.tags?.[0] || "").toLowerCase();
-
+  const name = (p.name || "").toLowerCase();
+  const category = (p.category || (p.tags?.[0] ?? "")).toLowerCase();
   const passQuery = q ? name.includes(q) || category.includes(q) : true;
   const passCat = cat ? category === cat.toLowerCase() : true;
   return passQuery && passCat;
 }
 
-/* ===== 12 Dummy fallback products (lengkap) ===== */
+/* ===== 12 Dummy fallback products — SUDAH SESUAI ProductCard ===== */
 const FALLBACK_PRODUCTS: Product[] = [
-  { id: "d-1",  name: "Kopi Robusta Semende 200g", category: "Kopi",     price: 25000, image: "https://images.unsplash.com/photo-1504630083234-14187a9df0f5?auto=format&fit=crop&w=800&q=70" },
-  { id: "d-2",  name: "Kopi Arabica Pagaralam 250g", category: "Kopi",   price: 38000, image: "https://images.unsplash.com/photo-1494314671902-399b18174975?auto=format&fit=crop&w=800&q=70" },
-  { id: "d-3",  name: "Keripik Pisang Coklat",       category: "Snack",   price: 16000, image: "https://images.unsplash.com/photo-1589308078053-832e8322b3f1?auto=format&fit=crop&w=800&q=70" },
-  { id: "d-4",  name: "Pempek Kapal Selam (isi 5)",  category: "Snack",   price: 45000, image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=800&q=70" },
-  { id: "d-5",  name: "Es Teh Manis Botan",          category: "Minuman", price: 10000, image: "https://images.unsplash.com/photo-1556679343-c7306c72bcf0?auto=format&fit=crop&w=800&q=70" },
-  { id: "d-6",  name: "Jus Jeruk Segar 350ml",       category: "Minuman", price: 14000, image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=70" },
-  { id: "d-7",  name: "Anyaman Purun Tas Mini",      category: "Kerajinan",price: 75000, image: "https://images.unsplash.com/photo-1612178537255-7b6c7b5f8e4d?auto=format&fit=crop&w=800&q=70" },
-  { id: "d-8",  name: "Topi Anyaman Purun",          category: "Kerajinan",price: 60000, image: "https://images.unsplash.com/photo-1542060748-10c28b62716a?auto=format&fit=crop&w=800&q=70" },
-  { id: "d-9",  name: "Kemplang Ikan Asli (200g)",   category: "Snack",   price: 28000, image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=70" },
-  { id: "d-10", name: "Kopi House Blend 250g",       category: "Kopi",    price: 35000, image: "https://images.unsplash.com/photo-1507133750040-4a8f57021524?auto=format&fit=crop&w=800&q=70" },
-  { id: "d-11", name: "Sirup Markisa Lokal",         category: "Minuman", price: 22000, image: "https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?auto=format&fit=crop&w=800&q=70" },
-  { id: "d-12", name: "Dompet Anyaman Purun",        category: "Kerajinan",price: 52000, image: "https://images.unsplash.com/photo-1582582429416-7530e7f3d20e?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-1",  name: "Kopi Robusta Semende 200g",   thumb: "https://images.unsplash.com/photo-1504630083234-14187a9df0f5?auto=format&fit=crop&w=800&q=70", rating: 4.8, sold: 120, price: 25000 },
+  { id: "d-2",  name: "Kopi Arabica Pagaralam 250g", thumb: "https://images.unsplash.com/photo-1494314671902-399b18174975?auto=format&fit=crop&w=800&q=70", rating: 4.9, sold: 96,  price: 38000 },
+  { id: "d-3",  name: "Keripik Pisang Coklat",       thumb: "https://images.unsplash.com/photo-1589308078053-832e8322b3f1?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 210, price: 16000 },
+  { id: "d-4",  name: "Pempek Kapal Selam (isi 5)",  thumb: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 340, price: 45000 },
+  { id: "d-5",  name: "Es Teh Manis Botan",          thumb: "https://images.unsplash.com/photo-1556679343-c7306c72bcf0?auto=format&fit=crop&w=800&q=70", rating: 4.5, sold: 150, price: 10000 },
+  { id: "d-6",  name: "Jus Jeruk Segar 350ml",       thumb: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 132, price: 14000 },
+  { id: "d-7",  name: "Anyaman Purun Tas Mini",      thumb: "https://images.unsplash.com/photo-1612178537255-7b6c7b5f8e4d?auto=format&fit=crop&w=800&q=70", rating: 4.8, sold: 85,  price: 75000 },
+  { id: "d-8",  name: "Topi Anyaman Purun",          thumb: "https://images.unsplash.com/photo-1542060748-10c28b62716a?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 71,  price: 60000 },
+  { id: "d-9",  name: "Kemplang Ikan Asli (200g)",   thumb: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 260, price: 28000 },
+  { id: "d-10", name: "Kopi House Blend 250g",       thumb: "https://images.unsplash.com/photo-1507133750040-4a8f57021524?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 110, price: 35000 },
+  { id: "d-11", name: "Sirup Markisa Lokal",         thumb: "https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?auto=format&fit=crop&w=800&q=70", rating: 4.5, sold: 90,  price: 22000 },
+  { id: "d-12", name: "Dompet Anyaman Purun",        thumb: "https://images.unsplash.com/photo-1582582429416-7530e7f3d20e?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 64,  price: 52000 },
 ];
 
-/* ===== Build displayed list with fallback (min 6) ===== */
-function buildDisplayed(
-  real: Product[],
-  query: string,
-  cat: CategoryKey | null,
-  minCount = 6
-) {
-  const filteredReal = real.filter((p) => matches(p, query, cat));
+/* ===== Build displayed list: gabung real + fallback, tetap filter, minimal 6 ===== */
+function buildDisplayed(real: Product[], query: string, cat: CategoryKey | null, minCount = 6) {
+  const filteredReal = real.filter((p: any) => matches(p, query, cat)).map(toCardShape);
   if (filteredReal.length >= minCount) return filteredReal;
 
   const names = new Set(filteredReal.map((p: any) => p.name?.toLowerCase?.()));
   const filteredFallback = FALLBACK_PRODUCTS.filter(
-    (p: any) => matches(p, query, cat) && !names.has(p.name?.toLowerCase?.())
+    (p) => matches(p, query, cat) && !names.has(p.name.toLowerCase())
   );
 
   const need = Math.max(0, minCount - filteredReal.length);
@@ -272,10 +268,9 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<CategoryKey | null>(null);
 
-  useEffect(() => { getFeaturedProducts().then(setProducts); }, []);
+  useEffect(() => { getFeaturedProducts().then((res) => setProducts(res.map(toCardShape))); }, []);
 
-  const displayedRaw = buildDisplayed(products, query, category, 6);
-  const displayed = displayedRaw.slice(0, 12).map(normalizeProduct);
+  const displayed = buildDisplayed(products, query, category, 6).slice(0, 12);
 
   return (
     <>
@@ -310,8 +305,8 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          {displayed.map((p: any) => (
-            <ProductCard key={p.id} p={p} />
+          {displayed.map((p) => (
+            <ProductCard key={p.id} p={p as Product} />
           ))}
         </div>
       </main>
