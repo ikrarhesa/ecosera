@@ -1,6 +1,6 @@
 // src/App.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
-import Shell from "./components/Shell";
+
 import Home from "./pages/Home";
 import Etalase from "./pages/Etalase";
 import ProductDetail from "./pages/ProductDetail";
