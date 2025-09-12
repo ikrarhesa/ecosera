@@ -105,7 +105,7 @@ export default function ProductDetail() {
               addToCart(product, qty);
               alert("Ditambahkan ke Keranjang ✅");
             }}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg"
+            className="px-6 py-3 bg-[#2254c5] text-white rounded-lg"
           >
             Tambah ke Keranjang
           </button>
