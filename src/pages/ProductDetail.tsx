@@ -1,3 +1,4 @@
+
 // src/pages/ProductDetail.tsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -6,34 +7,18 @@ import {
   Package,
   Minus,
   Plus,
-  MessageCircle,
   ShoppingCart,
+  Share2,
+  Heart,
 } from "lucide-react";
 
 import type { Product } from "../types/product";
 import { getProductById } from "../services/products";
 import { money } from "../utils/money";
-import { SHOP_WA, SHOP_NAME } from "../utils/env";
+import { SHOP_NAME } from "../utils/env";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
-
-/* ---------- Helpers ---------- */
-const safeShopWa = (typeof SHOP_WA === "string" ? SHOP_WA : "") || "";
-const buildWaMessage = (p: Product, qty: number) =>
-  encodeURIComponent(
-    [
-      `*${SHOP_NAME || "Toko"}*`,
-      "————————————",
-      `${p.name}`,
-      `Harga: Rp ${money(p.price)}`,
-      `Jumlah: ${qty}`,
-      "————————————",
-      "Saya tertarik. Mohon info ketersediaan & ongkir.",
-      "Nama:",
-      "Alamat:",
-      "Nomor HP:",
-    ].join("\n")
-  );
+import ShareSheet from "../components/ShareSheet"; // Import ShareSheet component
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -45,7 +30,10 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [qty, setQty] = useState(1);
+  const [shareOpen, setShareOpen] = useState(false); // State for ShareSheet
+  const [isFav, setIsFav] = useState(false);
 
+  // load data
   useEffect(() => {
     let alive = true;
     setLoading(true);
@@ -67,6 +55,27 @@ export default function ProductDetail() {
     };
   }, [id]);
 
+  // init favorite state
+  useEffect(() => {
+    if (!id) return;
+    const favs = JSON.parse(localStorage.getItem("favorites") || "{}");
+    setIsFav(Boolean(favs[id]));
+  }, [id]);
+
+  const product = data;
+  const total = (product?.price ?? 0) * qty;
+
+  function toggleFavorite() {
+    if (!id || !product) return;
+    const favs = JSON.parse(localStorage.getItem("favorites") || "{}");
+    const next = !favs[id];
+    favs[id] = next;
+    if (!next) delete favs[id];
+    localStorage.setItem("favorites", JSON.stringify(favs));
+    setIsFav(next);
+    show(next ? "Ditambahkan ke Favorit ❤️" : "Dihapus dari Favorit 💔");
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -75,7 +84,7 @@ export default function ProductDetail() {
     );
   }
 
-  if (err || !data) {
+  if (err || !product) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
@@ -83,16 +92,10 @@ export default function ProductDetail() {
             {err ? `Terjadi kesalahan: ${err}` : "Produk tidak ditemukan."}
           </p>
           <div className="flex gap-2 justify-center">
-            <button
-              onClick={() => nav(-1)}
-              className="px-4 py-2 rounded-lg bg-primary text-white"
-            >
+            <button onClick={() => nav(-1)} className="px-4 py-2 rounded-lg bg-primary text-white">
               Kembali
             </button>
-            <Link
-              to="/"
-              className="px-4 py-2 rounded-lg border border-slate-200"
-            >
+            <Link to="/" className="px-4 py-2 rounded-lg border border-slate-200">
               Beranda
             </Link>
           </div>
@@ -101,25 +104,17 @@ export default function ProductDetail() {
     );
   }
 
-  const product = data;
-  const total = (product.price ?? 0) * qty;
-  const wa =
-    safeShopWa
-      ? `https://wa.me/${safeShopWa}?text=${buildWaMessage(product, qty)}`
-      : `https://wa.me/?text=${buildWaMessage(product, qty)}`;
+  async function handleShare() {
+    setShareOpen(true); // Trigger ShareSheet modal
+  }
 
   return (
     <div className="min-h-screen bg-white text-ink pb-40">
       {/* ===== Media ===== */}
       <div className="mx-auto max-w-md md:max-w-lg lg:max-w-xl p-4">
         <div className="aspect-square rounded-2xl overflow-hidden border border-slate-100 bg-white">
-          {product.thumb ? (
-            <img
-              src={product.thumb}
-              alt={product.name}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
+          {product?.thumb ? (
+            <img src={product.thumb} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
           ) : (
             <div className="h-full w-full grid place-items-center bg-gradient-to-br from-primary/15 to-accent/10 text-primary">
               <Package className="h-16 w-16" />
@@ -130,10 +125,34 @@ export default function ProductDetail() {
 
       {/* ===== Info ===== */}
       <main className="max-w-md md:max-w-lg lg:max-w-xl mx-auto px-4">
-        <h1 className="text-lg font-bold leading-snug">{product.name}</h1>
-        <div className="mt-1 flex items-center gap-2 text-sm text-slate-600">
-          <Star className="h-4 w-4 text-amber-500" />
-          {product.rating} <span>•</span> <span>{product.sold}+ terjual</span>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-lg font-bold leading-snug">{product.name}</h1>
+            <div className="mt-1 flex items-center gap-2 text-sm text-slate-600">
+              <Star className="h-4 w-4 text-amber-500" />
+              {product.rating} <span>•</span> <span>{product.sold}+ terjual</span>
+            </div>
+          </div>
+
+          {/* Share & Favorite */}
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              onClick={handleShare}
+              className="rounded-xl p-2 border border-black/10 bg-white hover:bg-slate-50 active:scale-95 transition"
+              aria-label="Bagikan"
+            >
+              <Share2 className="h-5 w-5" />
+            </button>
+            <button
+              onClick={toggleFavorite}
+              className={`rounded-xl p-2 border border-black/10 bg-white hover:bg-slate-50 active:scale-95 transition ${
+                isFav ? "text-rose-500" : ""
+              }`}
+              aria-label="Favorit"
+            >
+              <Heart className={`h-5 w-5 ${isFav ? "fill-current" : ""}`} />
+            </button>
+          </div>
         </div>
 
         <div className="mt-3 flex items-end justify-between">
@@ -152,9 +171,7 @@ export default function ProductDetail() {
             >
               <Minus className="h-4 w-4" />
             </button>
-            <div className="min-w-10 text-center font-semibold select-none">
-              {qty}
-            </div>
+            <div className="min-w-10 text-center font-semibold select-none">{qty}</div>
             <button
               onClick={() => setQty((q) => Math.min(99, q + 1))}
               className="h-9 w-9 grid place-items-center rounded-lg border border-black/10 bg-white"
@@ -182,33 +199,25 @@ export default function ProductDetail() {
       </main>
 
       {/* ===== Sticky Action Bar ===== */}
-      <div className="fixed inset-x-0 bottom-0 z-[200] bg-white/95 backdrop-blur border-t border-white/60 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+      <div className="fixed inset-x-0 bottom-0 z-[220] bg-white/90 backdrop-blur-md border-t border-white/60 shadow-[0_-6px_24px_rgba(15,23,42,0.18)]">
         <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4 py-3">
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => {
-                addToCart(product, qty);
-                show("Ditambahkan ke keranjang ✅");
-                if (navigator?.vibrate) navigator.vibrate(10);
-              }}
-              className="h-12 rounded-xl bg-primary text-white font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              Tambah
-            </button>
-            <a
-              href={wa}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="h-12 rounded-xl border font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
-            >
-              <MessageCircle className="h-5 w-5" />
-              WhatsApp
-            </a>
-          </div>
+          <button
+            onClick={() => {
+              addToCart(product, qty);
+              show("Ditambahkan ke keranjang ✅");
+              if (navigator?.vibrate) navigator.vibrate(10);
+            }}
+            className="h-12 w-full rounded-xl bg-primary text-white font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            Tambah ke Keranjang
+          </button>
           <div className="h-[env(safe-area-inset-bottom)]" />
         </div>
       </div>
+
+      {/* ShareSheet Modal */}
+      <ShareSheet open={shareOpen} onClose={() => setShareOpen(false)} title="Bagikan produk" text={product.name} url={window.location.href} />
     </div>
   );
 }
