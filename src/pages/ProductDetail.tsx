@@ -1,240 +1,234 @@
 // src/pages/ProductDetail.tsx
-import React, { useMemo, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
-  ChevronLeft,
-  ShoppingCart,
+  ArrowLeft,
+  Heart,
+  Share2,
   Star,
-  MessageCircle,
+  Package,
   Minus,
   Plus,
+  MessageCircle,
+  ShoppingCart,
 } from "lucide-react";
+
+import { PRODUCTS } from "./Home";
+import { useCart } from "../context/CartContext";
+import { useToast } from "../context/ToastContext";
+
 import type { Product } from "../types/product";
-import { getFeaturedProducts } from "../services/products";
+import { getProductById } from "../services/products";
+import { money } from "../utils/money";
+import { SHOP_WA, SHOP_NAME } from "../utils/env";
 
-/** ===== Utils: data loader (replace with your real getProductById) ===== */
-function getProductById(id: string): Product | undefined {
-  // if you already have a real service, import & use it instead
-  const all = getFeaturedProducts ? getFeaturedProducts() : [];
-  return all.find((p: any) => String(p.id) === String(id));
-}
-
-/** ===== Replace with your real cart action ===== */
-function addToCart(product: Product, qty: number) {
-  // Wire this to your Cart Context/Redux/Supabase as needed.
-  // Fallback: simple localStorage cart so the UI works immediately.
-  const key = "ecosera_cart";
-  const raw = localStorage.getItem(key);
-  const items: Array<{ id: string | number; qty: number; product: Product }> =
-    raw ? JSON.parse(raw) : [];
-  const idx = items.findIndex((it) => String(it.id) === String(product.id));
-  if (idx >= 0) items[idx].qty += qty;
-  else items.push({ id: product.id!, qty, product });
-  localStorage.setItem(key, JSON.stringify(items));
-}
-
-const ProductDetail: React.FC = () => {
-  const { id = "" } = useParams();
-  const navigate = useNavigate();
-  const product: Product | undefined = useMemo(
-    () => getProductById(id),
-    [id]
+/* ---------- Helpers ---------- */
+const buildWaMessage = (p: Product, qty: number) =>
+  encodeURIComponent(
+    [
+      `*${SHOP_NAME}*`,
+      "————————————",
+      `${p.name}`,
+      `Harga: Rp ${money(p.price)}`,
+      `Jumlah: ${qty}`,
+      "————————————",
+      "Saya tertarik. Mohon info ketersediaan & ongkir.",
+      "Nama:",
+      "Alamat:",
+      "Nomor HP:",
+    ].join("\n")
   );
 
-  const [qty, setQty] = useState(1);
-  const [descOpen, setDescOpen] = useState(false);
+export default function ProductDetail() {
+  const { id } = useParams();
+  const nav = useNavigate();
 
-  if (!product) {
+  // data ringkas dari cache lokal (PRODUCTS) biar cepat render
+  const productLite = useMemo(() => PRODUCTS.find((p) => String(p.id) === String(id)), [id]);
+
+  // data detail dari service
+  const [p, setP] = useState<Product | null>(null);
+
+  const [qty, setQty] = useState(1);
+  const { addToCart } = useCart();
+  const { show } = useToast();
+
+  // unlock scroll bila sebelumnya ada modal
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "auto";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!id) return;
+    let alive = true;
+    getProductById(id).then((res) => {
+      if (alive) setP(res ?? null);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [id]);
+
+  if (!productLite) {
     return (
-      <div className="min-h-screen bg-white text-gray-900">
-        {/* Top Bar */}
-        <div className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b">
-          <div className="mx-auto max-w-md px-4 h-14 flex items-center gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              aria-label="Kembali"
-              className="p-2 -ml-2 rounded-xl hover:bg-gray-100 active:scale-95 transition"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-            <div className="font-semibold">Produk tidak ditemukan</div>
-          </div>
-        </div>
-        <div className="mx-auto max-w-md px-4 py-10">
-          Maaf, produk ini gak ketemu. Coba kembali ke beranda.
-          <div className="mt-4">
-            <Link
-              to="/"
-              className="inline-flex items-center px-4 py-2 rounded-xl bg-blue-600 text-white font-medium"
-            >
-              Ke Beranda
-            </Link>
-          </div>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center">
+          <p className="text-sm text-slate-600 mb-3">Produk tidak ditemukan.</p>
+          <button
+            onClick={() => nav(-1)}
+            className="px-4 py-2 rounded-lg bg-primary text-white"
+          >
+            Kembali
+          </button>
         </div>
       </div>
     );
   }
 
-  const {
-    name = "Produk",
-    price = 0,
-    image,
-    rating = 4.7 as any,
-    sold = 150 as any,
-    description = "Belum ada deskripsi produk. Tanyakan detail ke penjual ya!",
-  } = product as any;
+  // fallback pakai productLite kalau detail belum ada
+  const product: Product = {
+    ...productLite,
+    ...p,
+  } as Product;
 
-  const waText = encodeURIComponent(
-    `Halo, saya tertarik dengan ${name}.\n\nLink produk: ${window.location.href}\nJumlah: ${qty}\nApakah tersedia?`
-  );
-  const waHref = `https://wa.me/?text=${waText}`;
+  const total = (product.price ?? 0) * qty;
+  const wa = `https://wa.me/${SHOP_WA}?text=${buildWaMessage(product, qty)}`;
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      {/* ===== Top Navbar ===== */}
-      <div className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b">
-        <div className="mx-auto max-w-md px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate(-1)}
-              aria-label="Kembali"
-              className="p-2 -ml-2 rounded-xl hover:bg-gray-100 active:scale-95 transition"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-            <span className="font-semibold truncate max-w-[12ch]">
-              {name}
-            </span>
-          </div>
-          <Link
-            to="/cart"
-            className="p-2 rounded-xl hover:bg-gray-100 active:scale-95 transition"
-            aria-label="Buka Keranjang"
+    <div className="min-h-screen bg-white text-ink pb-28">
+      {/* ===== Navbar ===== */}
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-black/5">
+        <div className="mx-auto max-w-md md:max-w-lg lg:max-w-xl px-4 py-3 flex items-center justify-between">
+          <button
+            onClick={() => nav(-1)}
+            className="rounded-xl p-2 border border-black/10 bg-white hover:bg-white"
+            aria-label="Kembali"
           >
-            <ShoppingCart className="h-6 w-6" />
-          </Link>
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div className="font-semibold truncate max-w-[55%] text-center">
+            {product.name}
+          </div>
+          <div className="flex gap-2">
+            <button
+              className="rounded-xl p-2 border border-black/10 bg-white hover:bg-white"
+              aria-label="Bagikan"
+            >
+              <Share2 className="h-5 w-5" />
+            </button>
+            <button
+              className="rounded-xl p-2 border border-black/10 bg-white hover:bg-white"
+              aria-label="Favorit"
+            >
+              <Heart className="h-5 w-5" />
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* ===== Media ===== */}
-      <div className="mx-auto max-w-md">
-        <div className="aspect-[4/3] bg-gray-100">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={
-              image ||
-              "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=60"
-            }
-            alt={name}
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
+      <div className="mx-auto max-w-md md:max-w-lg lg:max-w-xl p-4">
+        <div className="aspect-square rounded-2xl overflow-hidden border border-slate-100 bg-white">
+          {product.thumb ? (
+            <img
+              src={product.thumb}
+              alt={product.name}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="h-full w-full grid place-items-center bg-gradient-to-br from-primary/15 to-accent/10 text-primary">
+              <Package className="h-16 w-16" />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ===== Body ===== */}
-      <div className="mx-auto max-w-md px-4 py-4">
-        {/* Title & meta */}
-        <h1 className="text-xl font-semibold">{name}</h1>
-
-        <div className="mt-1 flex items-center gap-3 text-sm text-gray-600">
-          <span className="inline-flex items-center gap-1">
-            <Star className="h-4 w-4 fill-amber-400 stroke-amber-400" />
-            {Number(rating).toFixed(1)}
-          </span>
-          <span className="w-1 h-1 rounded-full bg-gray-300" />
-          <span>{sold}+ terjual</span>
+      {/* ===== Info ===== */}
+      <main className="max-w-md md:max-w-lg lg:max-w-xl mx-auto px-4">
+        <h1 className="text-lg font-bold leading-snug">{product.name}</h1>
+        <div className="mt-1 flex items-center gap-2 text-sm text-slate-600">
+          <Star className="h-4 w-4 text-amber-500" />
+          {product.rating} <span>•</span> <span>{product.sold}+ terjual</span>
         </div>
 
-        {/* Price */}
-        <div className="mt-3 text-2xl font-bold tracking-tight">
-          {new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            maximumFractionDigits: 0,
-          }).format(Number(price) || 0)}
-        </div>
+        <div className="mt-3 flex items-end justify-between">
+          <div>
+            <p className="text-xs text-slate-600">Harga</p>
+            <p className="text-2xl font-extrabold">Rp {money(product.price)}</p>
+          </div>
 
-        {/* Quantity stepper */}
-        <div className="mt-4">
-          <div className="text-sm font-medium mb-2">Jumlah</div>
-          <div className="inline-flex items-center rounded-xl border overflow-hidden">
+          {/* Stepper */}
+          <div className="flex items-center gap-2">
             <button
-              className="px-3 py-2 active:scale-95 disabled:opacity-40"
               onClick={() => setQty((q) => Math.max(1, q - 1))}
-              disabled={qty <= 1}
+              className="h-9 w-9 grid place-items-center rounded-lg border border-black/10 bg-white"
               aria-label="Kurangi jumlah"
+              disabled={qty <= 1}
             >
-              <Minus className="h-5 w-5" />
+              <Minus className="h-4 w-4" />
             </button>
-            <div className="min-w-12 text-center font-semibold select-none">
+            <div className="min-w-10 text-center font-semibold select-none">
               {qty}
             </div>
             <button
-              className="px-3 py-2 active:scale-95"
               onClick={() => setQty((q) => Math.min(99, q + 1))}
+              className="h-9 w-9 grid place-items-center rounded-lg border border-black/10 bg-white"
               aria-label="Tambah jumlah"
             >
-              <Plus className="h-5 w-5" />
+              <Plus className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        {/* Description */}
-        <div className="mt-6 border rounded-2xl overflow-hidden">
-          <button
-            className="w-full text-left px-4 py-3 font-semibold flex items-center justify-between"
-            onClick={() => setDescOpen((v) => !v)}
-          >
-            Deskripsi
-            <span className="text-sm text-gray-500">
-              {descOpen ? "Sembunyikan" : "Lihat"}
-            </span>
-          </button>
-          <div
-            className={`px-4 pb-4 text-gray-700 text-sm transition-all ${
-              descOpen ? "block" : "hidden"
-            }`}
-          >
-            {description}
-          </div>
-        </div>
+        {/* Deskripsi */}
+        <section className="mt-4 rounded-2xl bg-white/80 backdrop-blur border border-black/10 p-4">
+          <h2 className="font-semibold">Deskripsi</h2>
+          <p className="mt-1 text-sm text-slate-700">
+            {product.description ||
+              "Produk UMKM Muara Enim. Bahan pilihan, produksi lokal, cocok untuk oleh-oleh dan kebutuhan harian. Kemasan rapi, siap kirim."}
+          </p>
+        </section>
 
-        {/* (Opsional) Info pengiriman / catatan */}
-        <div className="mt-4 text-xs text-gray-500">
-          Estimasi kirim 1–2 hari kerja. Tersedia COD/transfer sesuai toko.
+        {/* Total ringkas (opsional) */}
+        <div className="mt-4 flex items-center justify-between text-sm text-slate-700">
+          <span>Total</span>
+          <span className="font-semibold">Rp {money(total)}</span>
         </div>
-      </div>
+      </main>
 
-      {/* ===== Sticky Action Bar ===== */}
-      <div className="sticky bottom-0 z-20 bg-white/90 backdrop-blur border-t">
-        <div className="mx-auto max-w-md px-4 py-3">
+      {/* ===== Sticky Action Bar (dua tombol berdampingan) ===== */}
+      <div className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-white/60">
+        <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4 py-3">
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => {
                 addToCart(product, qty);
-                // feedback ringan
+                show("Ditambahkan ke keranjang ✅"); 
                 if (navigator?.vibrate) navigator.vibrate(10);
               }}
-              className="h-12 rounded-xl bg-blue-600 text-white font-semibold active:scale-[0.98] transition"
+              className="h-12 rounded-xl bg-primary text-white font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
             >
+              <ShoppingCart className="h-5 w-5" />
               Tambah ke Keranjang
             </button>
             <a
-              href={waHref}
+              href={wa}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="h-12 rounded-xl border font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
             >
               <MessageCircle className="h-5 w-5" />
               Tanya via WhatsApp
             </a>
           </div>
-          <div className="h-2" />
+          <div className="h-[env(safe-area-inset-bottom)]" />
         </div>
       </div>
     </div>
   );
-};
-
-export default ProductDetail;
+}
