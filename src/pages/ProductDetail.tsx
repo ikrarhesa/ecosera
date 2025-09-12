@@ -8,7 +8,6 @@ import {
   Minus,
   Plus,
   ShoppingCart,
-  Share2,
   Heart,
   ArrowLeft,
 } from "lucide-react";
@@ -126,14 +125,6 @@ export default function ProductDetail() {
             >
               <Heart className={`h-5 w-5 ${isFav ? "fill-current" : ""}`} />
             </button>
-            {/* Share button */}
-            <button
-              onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Check out this product: ${product.name}, ${window.location.href}`)}`, '_blank')}
-              className="rounded-xl p-2 border border-black/10 bg-white hover:bg-slate-50 active:scale-95 transition"
-              aria-label="Share"
-            >
-              <Share2 className="h-5 w-5" />
-            </button>
           </div>
         </div>
       </div>
@@ -206,13 +197,18 @@ export default function ProductDetail() {
       {/* Sticky Action Bar */}
       <div className="fixed inset-x-0 bottom-0 z-[220] bg-white/90 backdrop-blur-md border-t border-white/60 shadow-[0_-6px_24px_rgba(15,23,42,0.18)]">
         <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4 py-3">
-          <button
-            onClick={() => { addToCart(product, qty); show("Ditambahkan ke keranjang ✅"); }}
-            className="h-12 w-full rounded-xl bg-primary text-white font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
-          >
-            <ShoppingCart className="h-5 w-5" />
-            Tambah ke Keranjang
-          </button>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-2 justify-center">
+              <p className="font-semibold">Jumlah: {qty}</p>
+            </div>
+            <button
+              onClick={() => { addToCart(product, qty); show("Ditambahkan ke keranjang ✅"); }}
+              className="h-12 w-full rounded-xl bg-primary text-white font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              Tambah ke Keranjang
+            </button>
+          </div>
           <div className="h-[env(safe-area-inset-bottom)]" />
         </div>
       </div>
