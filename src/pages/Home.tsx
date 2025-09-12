@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Store, Search, Bell, MapPin,
+  Store, Search, MapPin,
   ChevronLeft, ChevronRight, ChevronRight as ArrowRight,
   Home as HomeIcon, Grid2X2, ShoppingCart, User, Plus
 } from "lucide-react";
@@ -18,47 +18,70 @@ const BANNERS: Banner[] = [
 ];
 
 /* ===== Tiny UI pieces ===== */
-function CategoryTabs() {
-  const tabs = ["Kopi", "Snack", "Minuman", "Kerajinan"];
-  const [active] = useState(0);
+type CategoryKey = "Kopi" | "Snack" | "Minuman" | "Kerajinan";
+const CATEGORY_LIST: CategoryKey[] = ["Kopi", "Snack", "Minuman", "Kerajinan"];
+
+function CategoryTabs({
+  value,
+  onChange,
+}: {
+  value: CategoryKey | null;
+  onChange: (v: CategoryKey | null) => void;
+}) {
   return (
     <div className="mt-3 flex items-center gap-2 overflow-x-auto no-scrollbar">
-      {tabs.map((t, i) => (
-        <button
-          key={t}
-          className={[
-            "shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-medium border",
-            i === active
-              ? "bg-blue-50 text-blue-700 border-blue-200"
-              : "bg-white text-slate-700 border-slate-200"
-          ].join(" ")}
-        >
-          {t}
-        </button>
-      ))}
+      {CATEGORY_LIST.map((t) => {
+        const active = value === t;
+        return (
+          <button
+            key={t}
+            onClick={() => onChange(active ? null : t)}
+            className={[
+              "shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-medium border transition",
+              active
+                ? "bg-blue-50 text-blue-700 border-blue-200"
+                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+            ].join(" ")}
+            aria-pressed={active}
+          >
+            {t}
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-function SearchBar() {
+function SearchBar({
+  query,
+  onQuery,
+  category,
+  onCategory,
+}: {
+  query: string;
+  onQuery: (v: string) => void;
+  category: CategoryKey | null;
+  onCategory: (v: CategoryKey | null) => void;
+}) {
   return (
     <div className="rounded-3xl bg-white border border-slate-100 p-3">
       <div className="flex items-center gap-2">
         <span className="inline-flex items-center gap-1.5 text-[12px] px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
           <MapPin className="h-3.5 w-3.5" /> Muara Enim
         </span>
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <label className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
-            placeholder="Search products…"
+            value={query}
+            onChange={(e) => onQuery(e.target.value)}
+            placeholder="Cari produk…"
             className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-[13px] outline-none focus:bg-white"
+            aria-label="Cari produk"
           />
-        </div>
-        <button className="rounded-xl p-2 bg-white border border-slate-200 hover:bg-slate-50">
-          <Bell className="h-5 w-5 text-slate-700" />
-        </button>
+        </label>
+        {/* 🔔 Notification icon DIHAPUS */}
       </div>
-      <CategoryTabs />
+      <CategoryTabs value={category} onChange={onCategory} />
     </div>
   );
 }
@@ -174,9 +197,40 @@ function BottomDock() {
   );
 }
 
+/* ===== Helper: filter by query & category (case-insensitive) ===== */
+function matches(p: Product, query: string, cat: CategoryKey | null) {
+  const q = query.trim().toLowerCase();
+  const name = (p.name || "").toLowerCase();
+  const category = (p.category || p?.tags?.[0] || "").toLowerCase();
+
+  const passQuery = q ? name.includes(q) || category.includes(q) : true;
+  const passCat = cat ? category === cat.toLowerCase() : true;
+  return passQuery && passCat;
+}
+
+/* ===== Placeholder card for minimum grid count ===== */
+function PlaceholderCard() {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-100 p-3 animate-pulse">
+      <div className="w-full h-28 bg-slate-100 rounded-md" />
+      <div className="mt-2 h-4 bg-slate-100 rounded w-3/4" />
+      <div className="mt-1 h-3 bg-slate-100 rounded w-1/2" />
+    </div>
+  );
+}
+
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<CategoryKey | null>(null);
+
   useEffect(() => { getFeaturedProducts().then(setProducts); }, []);
+
+  const filtered = products.filter((p) => matches(p, query, category));
+
+  // minimal 6 item tampil di grid
+  const MIN_ITEMS = 6;
+  const needPlaceholders = Math.max(0, MIN_ITEMS - filtered.length);
 
   return (
     <>
@@ -191,14 +245,18 @@ export default function Home() {
               <p className="font-semibold text-slate-900">Jelajahi produk lokal</p>
             </div>
           </div>
-          <button className="rounded-xl p-2 bg-white border border-slate-200 hover:bg-slate-50">
-            <Bell className="h-5 w-5 text-slate-700" />
-          </button>
+          {/* 🔔 Notification icon DIHAPUS dari header */}
         </div>
       </header>
 
       <main className="px-4 pb-28 pt-3 max-w-md md:max-w-lg lg:max-w-xl mx-auto bg-[#F6F8FC]">
-        <SearchBar />
+        <SearchBar
+          query={query}
+          onQuery={setQuery}
+          category={category}
+          onCategory={setCategory}
+        />
+
         <BannerCarousel />
 
         <div className="flex items-center justify-between mt-5 mb-2">
@@ -207,8 +265,13 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          {products.map((p) => (
+          {filtered.slice(0, Math.max(MIN_ITEMS, filtered.length)).map((p) => (
             <ProductCard key={p.id} p={p} />
+          ))}
+
+          {/* Jika kurang dari 6, isi dengan placeholder agar grid tetap penuh */}
+          {Array.from({ length: needPlaceholders }).map((_, idx) => (
+            <PlaceholderCard key={`ph-${idx}`} />
           ))}
         </div>
       </main>
