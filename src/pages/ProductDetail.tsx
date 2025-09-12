@@ -182,7 +182,7 @@ export default function ProductDetail() {
       </main>
 
       {/* ===== Sticky Action Bar ===== */}
-      <div className="fixed inset-x-0 bottom-0 z-[200] bg-white/95 backdrop-blur border-t border-white/60 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+      <div className="fixed inset-x-0 bottom-0 z-[220] bg-white/90 backdrop-blur-md border-t border-white/60 shadow-[0_-6px_24px_rgba(15,23,42,0.18)]">
         <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4 py-3">
           <div className="grid grid-cols-2 gap-3">
             <button
