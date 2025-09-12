@@ -1,25 +1,25 @@
+// src/pages/Cart.tsx
 import { useCart } from "../context/CartContext";
-import { ArrowLeft, Trash2, Minus, Plus } from "lucide-react";
+import { Trash2, Minus, Plus, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { useToast } from "../context/ToastContext";
+import { money } from "../utils/money";
+import { SHOP_NAME, SHOP_WA } from "../utils/env";
+import Navbar from "../components/Navbar";
 
-const SHOP_NAME = "Ecosera – UMKM Muara Enim";
-const SHOP_WA = "6281234567890"; // ganti ke nomor WA tujuan (62...)
-
-const money = (n: number) => n.toLocaleString("id-ID");
 const fallbackImg =
   "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&h=300&q=70";
 
 function buildWaMessage(
-  items: { name: string; qty: number; price: number }[],
+  items: { name: string; qty: number; price: number; sellerName?: string }[],
   subtotal: number
 ) {
   const lines = [
     `*${SHOP_NAME}*`,
     "————————————",
     ...items.map(
-      (i, idx) => `${idx + 1}) ${i.name} x${i.qty} = Rp ${money(i.price * i.qty)}`
+      (i, idx) => `${idx + 1}) ${i.name}${i.sellerName ? ` (${i.sellerName})` : ''} x${i.qty} = Rp ${money(i.price * i.qty)}`
     ),
     "————————————",
     `Subtotal: Rp ${money(subtotal)}`,
@@ -73,19 +73,19 @@ function ConfirmModal({
 
 /** Satu baris item keranjang dengan swipe-to-delete & qty stepper */
 function CartItemRow({
-  id,
   name,
   qty,
   price,
   thumb,
+  sellerName,
   onRemoveConfirmed,
   onChangeQty,
 }: {
-  id: string;
   name: string;
   qty: number;
   price: number;
   thumb?: string;
+  sellerName?: string;
   onRemoveConfirmed: () => void;
   onChangeQty: (q: number) => void;
 }) {
@@ -151,6 +151,12 @@ function CartItemRow({
         {/* Info + Stepper */}
         <div className="flex-1 min-w-0">
           <p className="font-medium line-clamp-2">{name}</p>
+          {sellerName && (
+            <div className="flex items-center gap-1">
+              <Store className="h-3 w-3 text-blue-600" />
+              <p className="text-[12px] text-blue-600 font-medium">{sellerName}</p>
+            </div>
+          )}
           <p className="text-[13px] text-slate-600">Rp {money(price)} / item</p>
 
           <div className="mt-2 flex items-center gap-2">
@@ -200,94 +206,91 @@ export default function Cart() {
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
   const waMsg = buildWaMessage(
-    items.map((i) => ({ name: i.name, qty: i.qty, price: i.price })),
+    items.map((i) => ({ name: i.name, qty: i.qty, price: i.price, sellerName: i.sellerName })),
     subtotal
   );
   const waLink = `https://wa.me/${SHOP_WA}?text=${waMsg}`;
 
   return (
-    <div className="min-h-screen pb-[9rem]">
-      {/* Header */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-black/5">
-        <div className="px-4 py-3 flex items-center justify-between">
-          <button
-            onClick={() => nav(-1)}
-            className="rounded-xl p-2 border border-black/10 bg-white hover:bg-white"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="font-semibold">Keranjang</div>
-          <button
-            onClick={() => {
-              if (items.length === 0) return;
-              // Konfirmasi hapus semua
-              if (confirm("Kosongkan seluruh keranjang?")) {
-                clearCart();
-                show("Keranjang dikosongkan 🗑️");
-              }
-            }}
-            className="rounded-xl p-2 border border-black/10 bg-white hover:bg-white"
-            title="Hapus semua"
-          >
-            <Trash2 className="h-5 w-5 text-red-500" />
-          </button>
-        </div>
-      </header>
-
-      {/* Items */}
-      <main className="px-4 pt-4">
-        {items.length === 0 ? (
-          <p className="text-slate-600 text-center mt-10">Keranjang kosong.</p>
-        ) : (
-          <div className="grid gap-3">
-            {items.map((i) => (
-              <CartItemRow
-                key={i.id}
-                id={i.id}
-                name={i.name}
-                qty={i.qty}
-                price={i.price}
-                thumb={i.thumb}
-                onRemoveConfirmed={() => {
-                  removeFromCart(i.id);
-                  show("Item dihapus dari keranjang");
-                }}
-                onChangeQty={(q) => {
-                  updateQty(i.id, q);
-                  if (q <= 0) show("Item dihapus dari keranjang");
-                }}
-              />
-            ))}
+    <>
+      <Navbar />
+      
+      <div className="min-h-screen bg-[#F6F8FC] pb-28">
+        {/* Header */}
+        <div className="px-4 pt-3 pb-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="font-semibold text-slate-900">Keranjang</div>
+            <button
+              onClick={() => {
+                if (items.length === 0) return;
+                if (confirm("Kosongkan seluruh keranjang?")) {
+                  clearCart();
+                  show("Keranjang dikosongkan 🗑️");
+                }
+              }}
+              className="rounded-xl p-2 border border-slate-200 bg-white hover:bg-slate-50"
+              title="Hapus semua"
+            >
+              <Trash2 className="h-5 w-5 text-red-500" />
+            </button>
           </div>
-        )}
-      </main>
+        </div>
 
-      {/* Sticky checkout */}
-      {items.length > 0 && (
-        <div className="fixed bottom-20 inset-x-0 z-40 pointer-events-none">
-          <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4">
-            <div className="rounded-2xl bg-white/95 backdrop-blur border border-white/40 shadow-[0_6px_24px_rgba(15,23,42,0.18)] p-3 pointer-events-auto">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-slate-600">Subtotal</p>
-                  <p className="text-xl font-bold">Rp {money(subtotal)}</p>
+        {/* Items */}
+        <main className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+          {items.length === 0 ? (
+            <p className="text-slate-600 text-center mt-10">Keranjang kosong.</p>
+          ) : (
+            <div className="grid gap-3">
+              {items.map((i) => (
+                <CartItemRow
+                  key={i.id}
+                  name={i.name}
+                  qty={i.qty}
+                  price={i.price}
+                  thumb={i.thumb}
+                  sellerName={i.sellerName}
+                  onRemoveConfirmed={() => {
+                    removeFromCart(i.id);
+                    show("Item dihapus dari keranjang");
+                  }}
+                  onChangeQty={(q) => {
+                    updateQty(i.id, q);
+                    if (q <= 0) show("Item dihapus dari keranjang");
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+
+        {/* Sticky checkout */}
+        {items.length > 0 && (
+          <div className="fixed bottom-20 inset-x-0 z-40 pointer-events-none">
+            <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4">
+              <div className="rounded-2xl bg-white/95 backdrop-blur border border-white/40 shadow-[0_6px_24px_rgba(15,23,42,0.18)] p-3 pointer-events-auto">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-slate-600">Subtotal</p>
+                    <p className="text-xl font-bold">Rp {money(subtotal)}</p>
+                  </div>
+                  <a
+                    href={waLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold"
+                  >
+                    Checkout WA
+                  </a>
                 </div>
-                <a
-                  href={waLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-3 rounded-xl bg-primary text-white font-semibold"
-                >
-                  Checkout WA
-                </a>
+                <p className="mt-2 text-[11px] text-slate-600">
+                  *Catatan:* Total belum termasuk ongkir. Admin akan konfirmasi via WhatsApp.
+                </p>
               </div>
-              <p className="mt-2 text-[11px] text-slate-600">
-                *Catatan:* Total belum termasuk ongkir. Admin akan konfirmasi via WhatsApp.
-              </p>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }
