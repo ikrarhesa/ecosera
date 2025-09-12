@@ -1,215 +1,114 @@
 
-// src/pages/ProductDetail.tsx
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import {
-  Star,
-  Package,
-  Minus,
-  Plus,
-  ShoppingCart,
-  Heart,
-  ArrowLeft,
-} from "lucide-react";
-
-import type { Product } from "../types/product";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { ShoppingCart, Minus, Plus, ArrowLeft } from "lucide-react";
 import { getProductById } from "../services/products";
 import { money } from "../utils/money";
-import { SHOP_NAME } from "../utils/env";
 import { useCart } from "../context/CartContext";
-import { useToast } from "../context/ToastContext";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const nav = useNavigate();
   const { addToCart } = useCart();
-  const { show } = useToast();
-
-  const [data, setData] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
+  const [product, setProduct] = useState(null);
   const [qty, setQty] = useState(1);
-  const [isFav, setIsFav] = useState(false);
 
-  // Load data
   useEffect(() => {
-    let alive = true;
-    setLoading(true);
-    setErr(null);
-    (async () => {
-      try {
-        if (!id) throw new Error("ID produk tidak valid");
-        const p = await getProductById(id);
-        if (!alive) return;
-        setData(p ?? null);
-      } catch (e: any) {
-        if (alive) setErr(e?.message || "Gagal memuat produk");
-      } finally {
-        if (alive) setLoading(false);
+    async function fetchProduct() {
+      if (id) {
+        const data = await getProductById(id);
+        setProduct(data);
       }
-    })();
-    return () => {
-      alive = false;
-    };
+    }
+    fetchProduct();
   }, [id]);
 
-  // Handle favorite state
-  useEffect(() => {
-    if (!id) return;
-    const favs = JSON.parse(localStorage.getItem("favorites") || "{}");
-    setIsFav(Boolean(favs[id]));
-  }, [id]);
+  if (!product) return <div>Loading...</div>;
 
-  const product = data;
-  const total = (product?.price ?? 0) * qty;
-
-  function toggleFavorite() {
-    if (!id || !product) return;
-    const favs = JSON.parse(localStorage.getItem("favorites") || "{}");
-    const next = !favs[id];
-    favs[id] = next;
-    if (!next) delete favs[id];
-    localStorage.setItem("favorites", JSON.stringify(favs));
-    setIsFav(next);
-    show(next ? "Ditambahkan ke Favorit â¤ï¸" : "Dihapus dari Favorit ðŸ’”");
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Memuat...
-      </div>
-    );
-  }
-
-  if (err || !product) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="text-center">
-          <p className="text-sm text-slate-600 mb-3">
-            {err ? `Terjadi kesalahan: ${err}` : "Produk tidak ditemukan."}
-          </p>
-          <div className="flex gap-2 justify-center">
-            <button onClick={() => nav(-1)} className="px-4 py-2 rounded-lg bg-primary text-white">
-              Kembali
-            </button>
-            <Link to="/" className="px-4 py-2 rounded-lg border border-slate-200">
-              Beranda
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const total = product.price * qty;
 
   return (
-    <div className="min-h-screen bg-white text-ink pb-40">
+    <div className="min-h-screen bg-white">
       {/* Back Button */}
-      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b">
-        <div className="mx-auto max-w-md px-4 py-3 flex items-center justify-between">
-          <button
-            onClick={() => nav(-1)}
-            className="rounded-xl p-2 border border-black/10 bg-white"
-            aria-label="Kembali"
-          >
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b">
+        <div className="flex justify-between items-center px-4 py-3">
+          <button onClick={() => nav(-1)} className="p-2 bg-white border rounded">
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <div className="font-semibold truncate max-w-[55%] text-center">
-            {product.name}
-          </div>
+          <h1 className="font-semibold text-center flex-1">{product.name}</h1>
           <div className="flex gap-2">
-            <button
-              onClick={toggleFavorite}
-              className={`rounded-xl p-2 border border-black/10 bg-white hover:bg-slate-50 active:scale-95 transition ${isFav ? "text-rose-500" : ""}`}
-              aria-label="Favorit"
-            >
-              <Heart className={`h-5 w-5 ${isFav ? "fill-current" : ""}`} />
+            <button className="p-2 bg-white border rounded">
+              <span className="h-5 w-5">❤️</span> {/* Heart Icon */}
+            </button>
+            <button className="p-2 bg-white border rounded">
+              <span className="h-5 w-5">🔗</span> {/* Share Icon */}
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Product Media */}
-      <div className="mx-auto max-w-md md:max-w-lg lg:max-w-xl p-4">
-        <div className="aspect-square rounded-2xl overflow-hidden border border-slate-100 bg-white">
-          {product?.thumb ? (
-            <img src={product.thumb} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
-          ) : (
-            <div className="h-full w-full grid place-items-center bg-gradient-to-br from-primary/15 to-accent/10 text-primary">
-              <Package className="h-16 w-16" />
-            </div>
-          )}
+      {/* Product Image */}
+      <div className="px-4 py-2">
+        <div className="aspect-square rounded-2xl overflow-hidden border bg-white">
+          <img src={product.thumb} alt={product.name} className="w-full h-full object-cover" />
         </div>
       </div>
 
-      {/* Product Info */}
-      <main className="max-w-md md:max-w-lg lg:max-w-xl mx-auto px-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-lg font-bold leading-snug">{product.name}</h1>
-            <div className="mt-1 flex items-center gap-2 text-sm text-slate-600">
-              <Star className="h-4 w-4 text-amber-500" />
-              {product.rating} <span>â€¢</span> <span>{product.sold}+ terjual</span>
-            </div>
-          </div>
+      {/* Product Information */}
+      <div className="px-4 py-2">
+        <h2 className="font-semibold text-lg">{product.name}</h2>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span>⭐ {product.rating}</span>
+          <span>{product.sold} terjual</span>
         </div>
-
-        <div className="mt-3 flex items-end justify-between">
+        <div className="mt-3 flex justify-between items-center">
           <div>
-            <p className="text-xs text-slate-600">Harga</p>
-            <p className="text-2xl font-extrabold">Rp {money(product.price)}</p>
+            <p className="text-xs text-gray-600">Harga</p>
+            <p className="text-xl font-bold">Rp {money(product.price)}</p>
           </div>
-
-          {/* Stepper */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setQty((q) => Math.max(1, q - 1))}
-              className="h-9 w-9 grid place-items-center rounded-lg border border-black/10 bg-white disabled:opacity-40"
-              aria-label="Kurangi jumlah"
-              disabled={qty <= 1}
+              className="p-2 bg-white border rounded"
             >
               <Minus className="h-4 w-4" />
             </button>
-            <div className="min-w-10 text-center font-semibold select-none">{qty}</div>
+            <span>{qty}</span>
             <button
               onClick={() => setQty((q) => Math.min(99, q + 1))}
-              className="h-9 w-9 grid place-items-center rounded-lg border border-black/10 bg-white"
-              aria-label="Tambah jumlah"
+              className="p-2 bg-white border rounded"
             >
               <Plus className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        {/* Product Description */}
-        <section className="mt-4 rounded-2xl bg-white/80 backdrop-blur border border-black/10 p-4">
-          <h2 className="font-semibold">Deskripsi</h2>
-          <p className="mt-1 text-sm text-slate-700">{product.description || "Produk UMKM Muara Enim. Bahan pilihan, produksi lokal, cocok untuk oleh-oleh dan kebutuhan harian. Kemasan rapi, siap kirim."}</p>
-        </section>
+        {/* Description */}
+        <div className="mt-3">
+          <h3 className="font-semibold">Deskripsi</h3>
+          <p className="text-sm text-gray-700">{product.description}</p>
+        </div>
 
-        {/* Total Calculation */}
-        <div className="mt-4 flex items-center justify-between text-sm text-slate-700">
+        {/* Total */}
+        <div className="mt-4 flex justify-between items-center text-sm text-gray-700">
           <span>Total</span>
           <span className="font-semibold">Rp {money(total)}</span>
         </div>
-      </main>
+      </div>
 
-      {/* Sticky Action Bar */}
-      <div className="fixed inset-x-0 bottom-0 z-[220] bg-white/90 backdrop-blur-md border-t border-white/60 shadow-[0_-6px_24px_rgba(15,23,42,0.18)]">
-        <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4 py-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2 justify-center">
-              <p className="font-semibold">Jumlah: {qty}</p>
-            </div>
-            <button
-              onClick={() => { addToCart(product, qty); show("Ditambahkan ke keranjang âœ…"); }}
-              className="h-12 w-full rounded-xl bg-primary text-white font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              Tambah ke Keranjang
-            </button>
-          </div>
-          <div className="h-[env(safe-area-inset-bottom)]" />
+      {/* Add to Cart Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white py-4 px-4 shadow-md">
+        <div className="flex justify-between items-center">
+          <p className="text-lg font-semibold">Jumlah: {qty}</p>
+          <button
+            onClick={() => {
+              addToCart(product, qty);
+              alert("Ditambahkan ke Keranjang ✅");
+            }}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg"
+          >
+            Tambah ke Keranjang
+          </button>
         </div>
       </div>
     </div>
