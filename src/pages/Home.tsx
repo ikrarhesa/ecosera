@@ -8,9 +8,6 @@ import { Link } from "react-router-dom";
 
 /* ===== Helpers ===== */
 const money = (n: number) => n.toLocaleString("id-ID");
-const img = (q: string, w = 1400, h = 560) =>
-  // ukuran fix biar stabil
-  `https://images.unsplash.com/photo-155${Math.floor(Math.random()*9)}?auto=format&fit=crop&w=${w}&h=${h}&q=70&ixlib=rb-4.0.3&${encodeURIComponent(q)}`;
 
 /* ===== Produk (Muara Enim) ===== */
 export type Product = {
@@ -55,7 +52,7 @@ function BannerCarousel() {
   const [i, setI] = useState(0);
   const touchX = useRef<number | null>(null);
 
-  const goto = (n: number) => setI((prev) => (n + BANNERS.length) % BANNERS.length);
+  const goto = (n: number) => setI((n + BANNERS.length) % BANNERS.length);
   const prev = () => goto(i - 1);
   const next = () => goto(i + 1);
 
@@ -149,11 +146,11 @@ export default function Home() {
               <Bell className="h-5 w-5" />
             </button>
           </div>
-        </div>
+        </div> 
       </header>
 
       {/* CONTENT */}
-      <main className="px-4 pb-24 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+      <main className="px-4 pb-24 pt-4 max-w-md md:max-w-lg lg-max-w-xl mx-auto">
         {/* Banner carousel */}
         <BannerCarousel />
 
