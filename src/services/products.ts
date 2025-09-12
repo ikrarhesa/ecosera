@@ -3,39 +3,69 @@ import type { Product } from "../types/product";
 let cache: Product[] | null = null;
 let indexById: Map<string, Product> | null = null;
 
-/** Load once from /data/products.json and cache (only available:true) */
+/** Normalisasi 1 item dari products.json agar aman dipakai di UI */
+function normalize(raw: any): Product {
+  // Stock bisa bernama lain di JSON
+  const stockRaw = raw.stock ?? raw.inventory ?? raw.qty ?? null;
+  const stockParsed = stockRaw == null ? 999 : Number.parseInt(String(stockRaw), 10);
+
+  const base: Product = {
+    id: String(raw.id),
+    name: String(raw.name),
+    price: Number(raw.price ?? 0),
+    unit: String(raw.unit ?? "pcs"),
+    // Default 999 kalau tidak ada di JSON supaya TIDAK dianggap habis
+    stock: Number.isFinite(stockParsed) ? stockParsed : 999,
+    image: String(raw.image ?? ""),
+    images: Array.isArray(raw.images) ? raw.images : [],
+    description: raw.description ?? "",
+    category: String(raw.category ?? "general"),
+    sellerName: raw.sellerName ?? raw.seller ?? "UMKM Lokal",
+    sellerPhone: raw.sellerPhone ?? raw.phone ?? "",
+    location: raw.location ?? "Muara Enim",
+    rating: Number(raw.rating ?? 4.8),
+    tags: Array.isArray(raw.tags) ? raw.tags : [],
+  };
+
+  // Bawa serta field opsional seperti featured/available tanpa mengubah tipe Product
+  const anyBase = base as any;
+  if (typeof raw.featured !== "undefined") anyBase.featured = !!raw.featured;
+  if (typeof raw.available !== "undefined") anyBase.available = raw.available !== false;
+
+  return base;
+}
+
+/** Load sekali dari /data/products.json dan cache (hanya available !== false) */
 export async function getAllProducts(): Promise<Product[]> {
   if (cache) return cache;
 
-  const data: Product[] = (await import("../data/products.json")).default as any;
-  // hanya produk available
-  cache = data.filter((p: any) => p?.available !== false);
+  const data: any[] = (await import("../data/products.json")).default as any[];
+  const filtered = data.filter((p: any) => p?.available !== false);
+  cache = filtered.map(normalize);
   indexById = new Map(cache.map(p => [p.id, p]));
   return cache;
 }
 
-/** Optional: panggil ini kalau kamu hot-replace data runtime */
+/** Paksa refresh cache saat penggantian data runtime (opsional) */
 export function invalidateProductsCache() {
   cache = null;
   indexById = null;
 }
 
-/** Featured flag dari JSON */
+/** Featured flag dari JSON (pakai properti opsional) */
 export async function getFeaturedProducts(): Promise<Product[]> {
   const all = await getAllProducts();
-  return all.filter((p: any) => !!p.featured);
+  return all.filter((p: any) => !!(p as any).featured);
 }
 
-/** Ambil by id. Konsisten return null jika tidak ada. */
+/** Ambil by id. Konsisten return null kalau tidak ada */
 export async function getProductById(id: string): Promise<Product | null> {
-  if (indexById) {
-    return indexById.get(id) ?? null;
-  }
+  if (indexById) return indexById.get(id) ?? null;
   const all = await getAllProducts();
   return all.find(p => p.id === id) ?? null;
 }
 
-/** Cari produk: nama, id, tags, category, sellerName, location */
+/** Pencarian nama/id/tag/kategori/seller/location */
 export async function searchProducts(q: string): Promise<Product[]> {
   const all = await getAllProducts();
   const s = (q ?? "").trim().toLowerCase();
@@ -46,63 +76,46 @@ export async function searchProducts(q: string): Promise<Product[]> {
   return all.filter(p =>
     contains(p.name) ||
     contains(p.id) ||
-    contains(p.category as any) ||
+    contains(p.category) ||
     contains(p.sellerName) ||
     contains(p.location) ||
     (p.tags?.some(t => (t ?? "").toLowerCase().includes(s)) ?? false)
   );
 }
 
-/**
- * Produk terkait berdasarkan kategori + kemiripan tag.
- * - Prioritas: kategori sama (+2 poin)
- * - Bonus: setiap tag sama +1 (maks 3)
- * - Featured & stok ikut mengurutkan
- */
+/** Produk terkait: kategori + kemiripan tags (maks 3 tag) + stok */
 export async function getRelatedProducts(
   category: string,
   excludeId?: string,
   limit = 8
 ): Promise<Product[]> {
   const all = await getAllProducts();
-
   const base = all.filter(p => p.id !== excludeId);
+  const main = excludeId ? all.find(x => x.id === excludeId) : null;
+  const mainTags = new Set((main?.tags ?? []).map(t => (t ?? "").toLowerCase()));
 
-  const score = (p: Product): number => {
+  const score = (p: Product) => {
     let sc = 0;
     if (category && p.category === category) sc += 2;
-
-    // cari shared tags kalau ada referensi produk utama
-    let shared = 0;
-    if (excludeId) {
-      const main = indexById?.get(excludeId) ?? all.find(x => x.id === excludeId);
-      if (main?.tags?.length && p.tags?.length) {
-        const set = new Set(main.tags.map(t => t.toLowerCase()));
-        for (const t of p.tags) {
-          if (set.has((t ?? "").toLowerCase())) {
-            shared++;
-            if (shared >= 3) break;
-          }
+    if (p.tags?.length && mainTags.size) {
+      let shared = 0;
+      for (const t of p.tags) {
+        if (mainTags.has((t ?? "").toLowerCase())) {
+          shared++;
+          if (shared >= 3) break;
         }
       }
+      sc += shared; // +1/tag sama (maks 3)
     }
-    sc += shared; // +1 per shared tag (maks 3)
-
-    // kecilkan skor jika out of stock
-    if ((p.stock ?? 0) <= 0) sc -= 2;
-
+    if ((p.stock ?? 0) <= 0) sc -= 2; // penalti kalau habis
     return sc;
   };
 
   return base
     .map(p => ({ p, s: score(p) }))
-    .filter(x => x.s > -2) // buang yang sangat tidak relevan
+    .filter(x => x.s > -2)
     .sort((a, b) => {
-      // sort by score desc, lalu featured, lalu stok, lalu rating
       if (b.s !== a.s) return b.s - a.s;
-      const fa = (a.p as any).featured ? 1 : 0;
-      const fb = (b.p as any).featured ? 1 : 0;
-      if (fb !== fa) return fb - fa;
       const sa = a.p.stock ?? 0;
       const sb = b.p.stock ?? 0;
       if (sb !== sa) return sb - sa;
@@ -114,7 +127,7 @@ export async function getRelatedProducts(
     .map(x => x.p);
 }
 
-/** Helper: ambil per kategori langsung (tanpa ranking tag) */
+/** Ambil langsung per kategori (tanpa ranking tag) */
 export async function getProductsByCategory(category: string, limit = 24): Promise<Product[]> {
   const all = await getAllProducts();
   return all.filter(p => p.category === category).slice(0, limit);
