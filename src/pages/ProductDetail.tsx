@@ -1,13 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react"; // Removed React import
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft, Heart, Share2, Star, MapPin, ChevronLeft, ChevronRight,
-  MessageCircle, ShoppingCart, ShieldCheck, Truck, PackageOpen, Check, Store
+  MessageCircle, ShoppingCart, ShieldCheck, Truck, PackageOpen, Check
 } from "lucide-react";
 import type { Product } from "../types/product";
 import { getProductById, getRelatedProducts, allImagesOf } from "../services/products";
-import { useCart } from "../context/CartContext";
-import { useToast } from "../context/ToastContext";
+import { addToCart } from "../services/cart";
 
 const ACCENT = "#2254c5";
 const PLACEHOLDER = "https://placehold.co/800x800/png?text=Ecosera";
@@ -18,8 +17,6 @@ const fmtIDR = (n: number) =>
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
-  const { show } = useToast();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -89,14 +86,8 @@ export default function ProductDetail() {
 
   const onAddToCart = () => {
     if (!product) return;
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      thumb: product.image,
-      sellerName: product.sellerName
-    }, qty);
-    show("Produk berhasil ditambahkan ke keranjang! 🛒");
+    addToCart({ product, quantity: qty });
+    navigate("/cart");
   };
 
   const images = useMemo(() => allImagesOf(product), [product]);
@@ -264,10 +255,7 @@ export default function ProductDetail() {
               {(product.sellerName ?? "UMKM")[0]}
             </div>
             <div>
-              <p className="text-sm font-semibold flex items-center gap-1">
-                <Store size={14} className="text-blue-600" />
-                {product.sellerName ?? "UMKM Lokal"}
-              </p>
+              <p className="text-sm font-semibold">{product.sellerName ?? "UMKM Lokal"}</p>
               <p className="text-xs text-gray-500 flex items-center gap-1">
                 <MapPin size={14} /> {product.location ?? "Muara Enim, Sumsel"}
               </p>

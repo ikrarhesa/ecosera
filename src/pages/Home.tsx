@@ -1,89 +1,61 @@
-import React, { useEffect, useState, useRef } from "react";  // Make sure React and hooks are imported
-import { Search, MapPin, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";  // Ensure all icons are correctly imported
+// src/pages/Home.tsx
+import React, { useState, useRef } from "react";
+import {
+  Store, Search, Bell, Star,
+  ChevronRight as ArrowRight
+} from "lucide-react";
 import { Link } from "react-router-dom";
-import ProductCard from "../components/ProductCard";
-import Navbar from "../components/Navbar";
-import { getFeaturedProducts } from "../services/products";
-import { Product } from "../types/product";  // Import Product type
 
-// Banner data
-type Banner = { id: string; title: string; subtitle: string; cta: string; href?: string; image: string; date?: string };
-const BANNERS: Banner[] = [
-  { id: "kopi", title: "Festival Kopi Semende", subtitle: "Diskon 20% minggu ini", cta: "Belanja Kopi", href: "/product/kopi-semendo", image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&h=560&q=70", date: "Minggu ini" },
-  { id: "kemplang", title: "Paket Kemplang Hemat", subtitle: "Bundling khas Sumsel", cta: "Lihat Paket", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1400&h=560&q=70", date: "Terbatas" },
-  { id: "purun", title: "Anyaman Purun Lokal", subtitle: "Edisi UMKM Muara Enim", cta: "Cek Kerajinan", image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1400&h=560&q=70", date: "Edisi Lokal" },
+/* ===== Helpers ===== */
+const money = (n: number) => n.toLocaleString("id-ID");
+const img = (q: string, w = 1400, h = 560) =>
+  // ukuran fix biar stabil
+  `https://images.unsplash.com/photo-155${Math.floor(Math.random()*9)}?auto=format&fit=crop&w=${w}&h=${h}&q=70&ixlib=rb-4.0.3&${encodeURIComponent(q)}`;
+
+/* ===== Produk (Muara Enim) ===== */
+export type Product = {
+  id: string; name: string; price: number; rating: number; sold: number; thumb?: string;
+};
+export const PRODUCTS: Product[] = [
+  { id: "kopi-semendo",  name: "Kopi Semendo Robusta 250g", price: 45000, rating: 4.9, sold: 320, thumb: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&h=800&q=70" },
+  { id: "gula-aren",     name: "Gula Aren Semende 500g",    price: 38000, rating: 4.8, sold: 210, thumb: "https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=800&h=800&q=70" },
+  { id: "kemplang",      name: "Kemplang Panggang 200g",    price: 29000, rating: 4.7, sold: 150, thumb: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&h=800&q=70" },
+  { id: "anyaman-purun", name: "Keranjang Anyaman Purun",   price: 69000, rating: 4.6, sold: 95,  thumb: "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?auto=format&fit=crop&w=800&h=800&q=70" },
+  { id: "dodol-kelapa",  name: "Dodol Kelapa Semende 250g", price: 27000, rating: 4.6, sold: 130, thumb: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70" },
 ];
 
-// Category Tabs
-type CategoryKey = "Kopi" | "Snack" | "Minuman" | "Kerajinan";
-const CATEGORY_LIST: CategoryKey[] = ["Kopi", "Snack", "Minuman", "Kerajinan"];
+/* ===== Banner data (full-width slider) ===== */
+type Banner = { id: string; title: string; subtitle: string; cta: string; href?: string; image: string };
+const BANNERS: Banner[] = [
+  { id: "kopi",    title: "Festival Kopi Semende",    subtitle: "Diskon 20% minggu ini", cta: "Belanja Kopi",    href: "/product/kopi-semendo-250g",  image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "kemplang",title: "Paket Kemplang Hemat",     subtitle: "Bundling khas Sumsel",  cta: "Lihat Paket",     image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "purun",   title: "Anyaman Purun Lokal",      subtitle: "Edisi UMKM Muara Enim", cta: "Cek Kerajinan",   image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "gula",    title: "Gula Aren Semende",        subtitle: "Manis alami tanpa pengawet", cta: "Coba Sekarang", image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "serai",   title: "Minyak Serai Wangi",       subtitle: "Aromaterapi & segar",   cta: "Beli Serai",      image: "https://images.unsplash.com/photo-1526318472351-c75fcf070305?auto=format&fit=crop&w=1400&h=560&q=70" },
+];
 
-function CategoryTabs({
-  value,
-  onChange,
-}: {
-  value: CategoryKey | null;
-  onChange: (v: CategoryKey | null) => void;
-}) {
+/* ===== UI kecil ===== */
+function ProductCard({ p }: { p: Product }) {
   return (
-    <div className="mt-3 flex items-center gap-2 overflow-x-auto no-scrollbar">
-      {CATEGORY_LIST.map((t) => {
-        const active = value === t;
-        return (
-          <button
-            key={t}
-            onClick={() => onChange(active ? null : t)}
-            className={[
-              "shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-medium border transition",
-              active
-                ? "bg-blue-50 text-blue-700 border-blue-200"
-                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-            ].join(" ")}
-            aria-pressed={active}
-          >
-            {t}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-// Search Bar
-function SearchBar({
-  query,
-  onQuery,
-  category,
-  onCategory,
-}: {
-  query: string;
-  onQuery: (v: string) => void;
-  category: CategoryKey | null;
-  onCategory: (v: CategoryKey | null) => void;
-}) {
-  return (
-    <div className="rounded-3xl bg-white border border-slate-100 p-3">
-      <div className="flex items-center gap-2">
-        <span className="inline-flex items-center gap-1.5 text-[12px] px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-          <MapPin className="h-3.5 w-3.5" /> Muara Enim
-        </span>
-        <label className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <input
-            value={query}
-            onChange={(e) => onQuery(e.target.value)}
-            placeholder="Cari produk…"
-            className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-[13px] outline-none focus:bg-white"
-            aria-label="Cari produk"
-          />
-        </label>
+    <Link to={`/product/${p.id}`} className="p-3 rounded-xl bg-white/70 border border-black/10 hover:bg-white">
+      <div className="aspect-square rounded-lg overflow-hidden">
+        <img src={p.thumb} alt={p.name} className="w-full h-full object-cover" loading="lazy"/>
       </div>
-      <CategoryTabs value={category} onChange={onCategory} />
-    </div>
+      <div className="mt-2">
+        <h4 className="font-medium text-sm line-clamp-2">{p.name}</h4>
+        <div className="flex items-center gap-1 mt-1">
+          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+          <span className="text-xs text-slate-600">{p.rating}</span>
+          <span className="text-xs text-slate-400">•</span>
+          <span className="text-xs text-slate-600">{p.sold} terjual</span>
+        </div>
+        <p className="font-semibold text-primary mt-1">Rp {money(p.price)}</p>
+      </div>
+    </Link>
   );
 }
 
-// Banner Carousel
+/* ===== Carousel Banner ===== */
 function BannerCarousel() {
   const [i, setI] = useState(0);
   const touchX = useRef<number | null>(null);
@@ -112,7 +84,6 @@ function BannerCarousel() {
               <img src={b.image} alt={b.title} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/25" />
               <div className="absolute left-4 right-4 bottom-4 text-white">
-                <div className="text-[11px] opacity-90">{b.date}</div>
                 <h3 className="text-lg font-bold leading-tight">{b.title}</h3>
                 <p className="text-xs opacity-90">{b.subtitle}</p>
                 <Link
@@ -126,20 +97,6 @@ function BannerCarousel() {
           ))}
         </div>
 
-        <button
-          onClick={prev}
-          className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 grid place-items-center rounded-full bg-white text-slate-900 shadow border border-slate-200"
-          aria-label="Sebelumnya"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <button
-          onClick={next}
-          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 grid place-items-center rounded-full bg-white text-slate-900 shadow border border-slate-200"
-          aria-label="Berikutnya"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
 
         <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
           {BANNERS.map((_, idx) => (
@@ -156,45 +113,47 @@ function BannerCarousel() {
   );
 }
 
-
-// Home Page Main Component
+/* ===== Page ===== */
 export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<CategoryKey | null>(null);
-
-  useEffect(() => {
-    getFeaturedProducts().then((res) => setProducts(res));  // Fixed
-  }, []);
-
-  const displayed = products.filter((product) => {
-    const matchesQuery = !query || product.name.toLowerCase().includes(query.toLowerCase());
-    const matchesCategory = !category || product.category.toLowerCase().includes(category.toLowerCase());
-    return matchesQuery && matchesCategory;
-  });
-
   return (
     <>
-      <Navbar showSearchBar={true}>
-        <SearchBar
-          query={query}
-          onQuery={setQuery}
-          category={category}
-          onCategory={setCategory}
-        />
-      </Navbar>
+      {/* NAVBAR */}
+      <header className="sticky top-0 z-20 bg-white/70 backdrop-blur border-b border-black/5">
+        <div className="px-4 py-3 flex items-center justify-between max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+          <div className="flex items-center gap-2">
+            <div className="h-9 w-9 rounded-xl grid place-items-center bg-primary/15">
+              <Store className="h-5 w-5 text-primary" />
+            </div>
+            <div className="leading-tight">
+              <p className="text-xs text-slate-600">Ecosera</p>
+              <p className="font-semibold">Etalase UMKM Muara Enim</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="rounded-xl p-2 border border-black/10 bg-white/70 hover:bg-white">
+              <Search className="h-5 w-5" />
+            </button>
+            <button className="rounded-xl p-2 border border-black/10 bg-white/70 hover:bg-white">
+              <Bell className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </header>
 
-      <main className="px-4 pb-28 pt-3 max-w-md md:max-w-lg lg:max-w-xl mx-auto bg-[#F6F8FC]">
+      {/* CONTENT */}
+      <main className="px-4 pb-24 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+        {/* Banner carousel */}
         <BannerCarousel />
 
-        <div className="flex items-center justify-between mt-5 mb-2">
-          <h3 className="font-semibold text-slate-900">Most Popular</h3>
-          <Link to="/etalase" className="text-sm text-blue-600 font-medium">See All</Link>
+        {/* Produk */}
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-semibold">Rekomendasi</h3>
+          <button className="text-sm text-primary">Lihat Semua</button>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          {displayed.map((p) => (
-            <ProductCard key={p.id} product={p} />
+          {PRODUCTS.map((p) => (
+            <ProductCard key={p.id} p={p} />
           ))}
         </div>
       </main>
