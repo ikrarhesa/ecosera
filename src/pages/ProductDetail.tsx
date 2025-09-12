@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Heart, Share2, Star, MapPin, MessageCircle, ShoppingCart, ShieldCheck, Truck, PackageOpen, Check } from "lucide-react";
+import {
+  ArrowLeft, Heart, Share2, Star, MapPin,
+  MessageCircle, ShoppingCart, ShieldCheck, Truck, PackageOpen, Check
+} from "lucide-react";
 import type { Product } from "../types/product";
 import { getProductById, getRelatedProducts } from "../services/products";
 import { addToCart } from "../services/cart";
@@ -38,25 +41,36 @@ export default function ProductDetail() {
     return () => { mounted = false; };
   }, [id]);
 
-  const outOfStock = useMemo(() => (product?.stock ?? 0) <= 0, [product]);
-  const total = useMemo(() => (product ? product.price * qty : 0), [product, qty]);
+  /** Jangan anggap undefined stock sebagai 0 (habis).
+   *  Hormati flag available:false kalau ada di JSON. */
+  const outOfStock = useMemo(() => {
+    if (!product) return false;
+    if (typeof (product as any).available === "boolean" && (product as any).available === false) {
+      return true;
+    }
+    if (product.stock == null) return false; // undefined => anggap tersedia
+    const n = Number(product.stock);
+    return Number.isFinite(n) ? n <= 0 : false;
+  }, [product]);
 
+  /** Batas jumlah mengikuti stok; kalau stok undefined, izinkan besar */
   const clampQty = (n: number) => {
-    const max = product?.stock ?? 1;
+    const max = product?.stock == null ? 999 : Number(product.stock);
     if (n < 1) return 1;
     if (n > max) return max;
     return n;
   };
+
+  const total = useMemo(() => (product ? product.price * qty : 0), [product, qty]);
 
   const onShare = async () => {
     if (!product) return;
     const url = window.location.href;
     const text = `Cek ${product.name} di Ecosera (${fmtIDR(product.price)}/${product.unit})`;
     if (navigator.share) {
-      try { await navigator.share({ title: product.name, text, url }); } catch {}
+      try { await navigator.share({ title: product.name, text, url }); } catch { /* noop */ }
     } else {
-      await navigator.clipboard.writeText(url);
-      alert("Link disalin ke clipboard ✅");
+      try { await navigator.clipboard.writeText(url); alert("Link disalin ke clipboard ✅"); } catch {}
     }
   };
 
@@ -77,7 +91,6 @@ export default function ProductDetail() {
   const onAddToCart = () => {
     if (!product) return;
     addToCart({ product, quantity: qty });
-    // Opsional: langsung ke cart
     navigate("/cart");
   };
 
@@ -157,7 +170,9 @@ export default function ProductDetail() {
             <Star className="fill-amber-400 stroke-amber-400" size={16} />
             <span>{product.rating?.toFixed(1) ?? "4.8"}</span>
             <span className="text-gray-400">•</span>
-            <span>Stok {product.stock}</span>
+            <span>
+              {product.stock == null ? "Stok tersedia" : `Stok ${product.stock}`}
+            </span>
           </div>
         </div>
 
@@ -205,7 +220,7 @@ export default function ProductDetail() {
                 onChange={(e) => setQty(clampQty(parseInt(e.target.value || "1", 10)))}
                 className="w-14 text-center border rounded-lg py-1"
                 min={1}
-                max={product.stock}
+                max={product.stock == null ? undefined : Number(product.stock)}
               />
               <button
                 onClick={() => setQty(q => clampQty(q + 1))}
