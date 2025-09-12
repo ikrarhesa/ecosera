@@ -1,7 +1,7 @@
 // src/pages/Home.tsx
 import React, { useState, useRef } from "react";
 import {
-  Store, Search, Bell, Star,
+  Store, Search, Bell, Star, 
   ChevronLeft, ChevronRight, ChevronRight as ArrowRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -146,7 +146,7 @@ export default function Home() {
               <Bell className="h-5 w-5" />
             </button>
           </div>
-        </div> 
+        </div>
       </header>
 
       {/* CONTENT */}
