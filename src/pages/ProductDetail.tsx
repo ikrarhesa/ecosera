@@ -1,6 +1,6 @@
 // src/pages/ProductDetail.tsx
-import React, { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft,
   Heart,
@@ -13,20 +13,19 @@ import {
   ShoppingCart,
 } from "lucide-react";
 
-import { PRODUCTS } from "./Home";
-import { useCart } from "../context/CartContext";
-import { useToast } from "../context/ToastContext";
-
 import type { Product } from "../types/product";
 import { getProductById } from "../services/products";
 import { money } from "../utils/money";
 import { SHOP_WA, SHOP_NAME } from "../utils/env";
+import { useCart } from "../context/CartContext";
+import { useToast } from "../context/ToastContext";
 
 /* ---------- Helpers ---------- */
+const safeShopWa = (typeof SHOP_WA === "string" ? SHOP_WA : "") || ""; // guard
 const buildWaMessage = (p: Product, qty: number) =>
   encodeURIComponent(
     [
-      `*${SHOP_NAME}*`,
+      `*${SHOP_NAME || "Toko"}*`,
       "————————————",
       `${p.name}`,
       `Harga: Rp ${money(p.price)}`,
@@ -42,61 +41,98 @@ const buildWaMessage = (p: Product, qty: number) =>
 export default function ProductDetail() {
   const { id } = useParams();
   const nav = useNavigate();
-
-  // data ringkas dari cache lokal (PRODUCTS) biar cepat render
-  const productLite = useMemo(() => PRODUCTS.find((p) => String(p.id) === String(id)), [id]);
-
-  // data detail dari service
-  const [p, setP] = useState<Product | null>(null);
-
-  const [qty, setQty] = useState(1);
   const { addToCart } = useCart();
   const { show } = useToast();
+
+  const [data, setData] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
+  const [qty, setQty] = useState(1);
 
   // unlock scroll bila sebelumnya ada modal
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "auto";
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    return () => (document.body.style.overflow = prev);
   }, []);
 
   useEffect(() => {
-    if (!id) return;
     let alive = true;
-    getProductById(id).then((res) => {
-      if (alive) setP(res ?? null);
-    });
+    setLoading(true);
+    setErr(null);
+    (async () => {
+      try {
+        if (!id) throw new Error("ID produk tidak valid");
+        const p = await getProductById(id);
+        if (!alive) return;
+        if (!p) {
+          setData(null);
+        } else {
+          setData(p);
+        }
+      } catch (e: any) {
+        if (alive) setErr(e?.message || "Gagal memuat produk");
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
     return () => {
       alive = false;
     };
   }, [id]);
 
-  if (!productLite) {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <div className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b">
+          <div className="mx-auto max-w-md px-4 h-14 flex items-center gap-2">
+            <button
+              onClick={() => nav(-1)}
+              className="rounded-xl p-2 border border-black/10 bg-white"
+              aria-label="Kembali"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <span className="font-semibold">Memuat…</span>
+          </div>
+        </div>
+        <div className="mx-auto max-w-md p-4">Memuat…</div>
+      </div>
+    );
+  }
+
+  if (err || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-sm text-slate-600 mb-3">Produk tidak ditemukan.</p>
-          <button
-            onClick={() => nav(-1)}
-            className="px-4 py-2 rounded-lg bg-primary text-white"
-          >
-            Kembali
-          </button>
+          <p className="text-sm text-slate-600 mb-3">
+            {err ? `Terjadi kesalahan: ${err}` : "Produk tidak ditemukan."}
+          </p>
+          <div className="flex items-center justify-center gap-2">
+            <button
+              onClick={() => nav(-1)}
+              className="px-4 py-2 rounded-lg bg-primary text-white"
+            >
+              Kembali
+            </button>
+            <Link
+              to="/"
+              className="px-4 py-2 rounded-lg border border-slate-200"
+            >
+              Beranda
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
-  // fallback pakai productLite kalau detail belum ada
-  const product: Product = {
-    ...productLite,
-    ...p,
-  } as Product;
-
+  const product = data as Product;
   const total = (product.price ?? 0) * qty;
-  const wa = `https://wa.me/${SHOP_WA}?text=${buildWaMessage(product, qty)}`;
+  const wa =
+    safeShopWa
+      ? `https://wa.me/${safeShopWa}?text=${buildWaMessage(product, qty)}`
+      : `https://wa.me/?text=${buildWaMessage(product, qty)}`;
 
   return (
     <div className="min-h-screen bg-white text-ink pb-28">
@@ -105,7 +141,7 @@ export default function ProductDetail() {
         <div className="mx-auto max-w-md md:max-w-lg lg:max-w-xl px-4 py-3 flex items-center justify-between">
           <button
             onClick={() => nav(-1)}
-            className="rounded-xl p-2 border border-black/10 bg-white hover:bg-white"
+            className="rounded-xl p-2 border border-black/10 bg-white"
             aria-label="Kembali"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -115,13 +151,13 @@ export default function ProductDetail() {
           </div>
           <div className="flex gap-2">
             <button
-              className="rounded-xl p-2 border border-black/10 bg-white hover:bg-white"
+              className="rounded-xl p-2 border border-black/10 bg-white"
               aria-label="Bagikan"
             >
               <Share2 className="h-5 w-5" />
             </button>
             <button
-              className="rounded-xl p-2 border border-black/10 bg-white hover:bg-white"
+              className="rounded-xl p-2 border border-black/10 bg-white"
               aria-label="Favorit"
             >
               <Heart className="h-5 w-5" />
@@ -166,7 +202,7 @@ export default function ProductDetail() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setQty((q) => Math.max(1, q - 1))}
-              className="h-9 w-9 grid place-items-center rounded-lg border border-black/10 bg-white"
+              className="h-9 w-9 grid place-items-center rounded-lg border border-black/10 bg-white disabled:opacity-40"
               aria-label="Kurangi jumlah"
               disabled={qty <= 1}
             >
@@ -194,21 +230,21 @@ export default function ProductDetail() {
           </p>
         </section>
 
-        {/* Total ringkas (opsional) */}
+        {/* Total ringkas */}
         <div className="mt-4 flex items-center justify-between text-sm text-slate-700">
           <span>Total</span>
           <span className="font-semibold">Rp {money(total)}</span>
         </div>
       </main>
 
-      {/* ===== Sticky Action Bar (dua tombol berdampingan) ===== */}
+      {/* ===== Sticky Action Bar ===== */}
       <div className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-white/60">
         <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4 py-3">
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => {
                 addToCart(product, qty);
-                show("Ditambahkan ke keranjang ✅"); 
+                show("Ditambahkan ke keranjang ✅");
                 if (navigator?.vibrate) navigator.vibrate(10);
               }}
               className="h-12 rounded-xl bg-primary text-white font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
