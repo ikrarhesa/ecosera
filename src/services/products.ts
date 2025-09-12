@@ -3,11 +3,51 @@ import type { Product } from "../types/product";
 let cache: Product[] | null = null;
 let indexById: Map<string, Product> | null = null;
 
+const PLACEHOLDER =
+  "https://placehold.co/800x800/png?text=Ecosera";
+
+/** Kumpulkan semua kemungkinan field gambar dari JSON lalu dedupe & bersihkan */
+function collectImages(raw: any): string[] {
+  const buckets: (string | undefined | null | string[])[] = [
+    raw.images,
+    raw.photos,
+    raw.gallery,
+    raw.thumbnails,
+    raw.pictures,
+    [raw.thumbnail],
+    [raw.cover],
+    [raw.image],
+    [raw.img],
+    [raw.url],
+    [raw.photo],
+  ];
+
+  const flat = buckets
+    .flat()
+    .filter(Boolean) as string[];
+
+  // trim & dedupe
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const s of flat) {
+    const v = String(s).trim();
+    if (!v) continue;
+    if (!seen.has(v)) {
+      seen.add(v);
+      out.push(v);
+    }
+  }
+  return out;
+}
+
 /** Normalisasi 1 item dari products.json agar aman dipakai di UI */
 function normalize(raw: any): Product {
   // Stock bisa bernama lain di JSON
   const stockRaw = raw.stock ?? raw.inventory ?? raw.qty ?? null;
   const stockParsed = stockRaw == null ? 999 : Number.parseInt(String(stockRaw), 10);
+
+  const imgs = collectImages(raw);
+  const primary = imgs[0] ?? PLACEHOLDER;
 
   const base: Product = {
     id: String(raw.id),
@@ -16,8 +56,8 @@ function normalize(raw: any): Product {
     unit: String(raw.unit ?? "pcs"),
     // Default 999 kalau tidak ada di JSON supaya TIDAK dianggap habis
     stock: Number.isFinite(stockParsed) ? stockParsed : 999,
-    image: String(raw.image ?? ""),
-    images: Array.isArray(raw.images) ? raw.images : [],
+    image: primary,
+    images: imgs,
     description: raw.description ?? "",
     category: String(raw.category ?? "general"),
     sellerName: raw.sellerName ?? raw.seller ?? "UMKM Lokal",
@@ -27,12 +67,24 @@ function normalize(raw: any): Product {
     tags: Array.isArray(raw.tags) ? raw.tags : [],
   };
 
-  // Bawa serta field opsional seperti featured/available tanpa mengubah tipe Product
+  // Bawa serta flag opsional
   const anyBase = base as any;
   if (typeof raw.featured !== "undefined") anyBase.featured = !!raw.featured;
   if (typeof raw.available !== "undefined") anyBase.available = raw.available !== false;
 
   return base;
+}
+
+/** Helper untuk komponen */
+export function primaryImageOf(p?: Product | null): string {
+  if (!p) return PLACEHOLDER;
+  return p.images?.[0] || p.image || PLACEHOLDER;
+}
+
+export function allImagesOf(p?: Product | null): string[] {
+  if (!p) return [PLACEHOLDER];
+  const arr = (p.images && p.images.length ? p.images : (p.image ? [p.image] : []));
+  return arr.length ? arr : [PLACEHOLDER];
 }
 
 /** Load sekali dari /data/products.json dan cache (hanya available !== false) */
