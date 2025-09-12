@@ -1,3 +1,4 @@
+
 // src/pages/ProductDetail.tsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -185,7 +186,8 @@ export default function ProductDetail() {
         <section className="mt-4 rounded-2xl bg-white/80 backdrop-blur border border-black/10 p-4">
           <h2 className="font-semibold">Deskripsi</h2>
           <p className="mt-1 text-sm text-slate-700">
-            {product.description || "Produk UMKM Muara Enim. Bahan pilihan, produksi lokal, cocok untuk oleh-oleh dan kebutuhan harian. Kemasan rapi, siap kirim."}
+            {product.description ||
+              "Produk UMKM Muara Enim. Bahan pilihan, produksi lokal, cocok untuk oleh-oleh dan kebutuhan harian. Kemasan rapi, siap kirim."}
           </p>
         </section>
 

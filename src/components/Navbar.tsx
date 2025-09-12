@@ -16,15 +16,15 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-[200] bg-white/70 backdrop-blur-md border-t border-white/40 shadow-[0_-6px_24px_rgba(15,23,42,0.10)]">
-      <div className="mx-auto max-w-md md:max-w-lg lg:max-w-xl flex justify-around py-2">
+    <nav className="fixed bottom-0 inset-x-0 z-[200] bg-white/70 backdrop-blur-md border-t border-white/40 shadow-[0_-6px_24px_rgba(15,23,42,0.10)] sm:max-w-md sm:w-full rounded-full">
+      <div className="mx-auto flex justify-around py-2">
         {nav.map(({ to, icon: Icon, label, badge }) => {
           const active = pathname === to;
           return (
             <Link
               key={to}
               to={to}
-              className={
+              className={ 
                 "relative flex flex-col items-center justify-center flex-1 py-2 transition " +
                 (active ? "text-primary font-semibold" : "text-slate-600")
               }
