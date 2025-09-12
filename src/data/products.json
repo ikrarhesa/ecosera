@@ -1,1 +1,27 @@
+[
+  {
+    "id": "kopi-semendo",
+    "name": "Kopi Semendo Robusta 250g",
+    "price": 45000,
+    "rating": 4.9,
+    "sold": 320,
+    "thumb": "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&h=800&q=70",
+    "category": "kopi",
+    "tags": ["kopi", "semendo", "robusta"],
+    "featured": true,
+    "available": true
+  },
+  {
+    "id": "gula-aren",
+    "name": "Gula Aren Semende 500g",
+    "price": 38000,
+    "rating": 4.8,
+    "sold": 210,
+    "thumb": "https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=800&h=800&q=70",
+    "category": "sembako",
+    "tags": ["gula", "aren", "semende"],
+    "featured": true,
+    "available": true"
+  }
+]
 
