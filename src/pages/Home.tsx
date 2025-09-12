@@ -201,22 +201,47 @@ function BottomDock() {
 function matches(p: Product, query: string, cat: CategoryKey | null) {
   const q = query.trim().toLowerCase();
   const name = (p.name || "").toLowerCase();
-  const category = (p.category || p?.tags?.[0] || "").toLowerCase();
+  const category = (p.category || (p as any)?.tags?.[0] || "").toLowerCase();
 
   const passQuery = q ? name.includes(q) || category.includes(q) : true;
   const passCat = cat ? category === cat.toLowerCase() : true;
   return passQuery && passCat;
 }
 
-/* ===== Placeholder card for minimum grid count ===== */
-function PlaceholderCard() {
-  return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-3 animate-pulse">
-      <div className="w-full h-28 bg-slate-100 rounded-md" />
-      <div className="mt-2 h-4 bg-slate-100 rounded w-3/4" />
-      <div className="mt-1 h-3 bg-slate-100 rounded w-1/2" />
-    </div>
+/* ===== 12 Dummy fallback products (lokal, lengkap nama+gambar+harga) ===== */
+const FALLBACK_PRODUCTS: Product[] = [
+  { id: "d-1",  name: "Kopi Robusta Semende 200g", category: "Kopi",      price: "Rp 25.000", image: "https://images.unsplash.com/photo-1504630083234-14187a9df0f5?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-2",  name: "Kopi Arabica Pagaralam 250g", category: "Kopi",    price: "Rp 38.000", image: "https://images.unsplash.com/photo-1494314671902-399b18174975?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-3",  name: "Keripik Pisang Coklat",       category: "Snack",    price: "Rp 16.000", image: "https://images.unsplash.com/photo-1589308078053-832e8322b3f1?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-4",  name: "Pempek Kapal Selam (isi 5)",  category: "Snack",    price: "Rp 45.000", image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-5",  name: "Es Teh Manis Botan",          category: "Minuman",  price: "Rp 10.000", image: "https://images.unsplash.com/photo-1556679343-c7306c72bcf0?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-6",  name: "Jus Jeruk Segar 350ml",       category: "Minuman",  price: "Rp 14.000", image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-7",  name: "Anyaman Purun Tas Mini",      category: "Kerajinan",price: "Rp 75.000", image: "https://images.unsplash.com/photo-1612178537255-7b6c7b5f8e4d?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-8",  name: "Topi Anyaman Purun",          category: "Kerajinan",price: "Rp 60.000", image: "https://images.unsplash.com/photo-1542060748-10c28b62716a?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-9",  name: "Kemplang Ikan Asli (200g)",   category: "Snack",    price: "Rp 28.000", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-10", name: "Kopi House Blend 250g",        category: "Kopi",    price: "Rp 35.000", image: "https://images.unsplash.com/photo-1507133750040-4a8f57021524?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-11", name: "Sirup Markisa Lokal",          category: "Minuman",  price: "Rp 22.000", image: "https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?auto=format&fit=crop&w=800&q=70" },
+  { id: "d-12", name: "Dompet Anyaman Purun",         category: "Kerajinan",price: "Rp 52.000", image: "https://images.unsplash.com/photo-1582582429416-7530e7f3d20e?auto=format&fit=crop&w=800&q=70" },
+];
+
+/* ===== Build displayed list with fallback (min 6) ===== */
+function buildDisplayed(
+  real: Product[],
+  query: string,
+  cat: CategoryKey | null,
+  minCount = 6
+) {
+  const filteredReal = real.filter((p) => matches(p, query, cat));
+  if (filteredReal.length >= minCount) return filteredReal;
+
+  // Ambil fallback yang match query & kategori dan belum ada di real (by name)
+  const names = new Set(filteredReal.map((p) => (p as any).name?.toLowerCase()));
+  const filteredFallback = FALLBACK_PRODUCTS.filter(
+    (p) => matches(p as Product, query, cat) && !names.has((p as any).name?.toLowerCase())
   );
+
+  const need = Math.max(0, minCount - filteredReal.length);
+  return [...filteredReal, ...filteredFallback.slice(0, need)];
 }
 
 export default function Home() {
@@ -226,11 +251,7 @@ export default function Home() {
 
   useEffect(() => { getFeaturedProducts().then(setProducts); }, []);
 
-  const filtered = products.filter((p) => matches(p, query, category));
-
-  // minimal 6 item tampil di grid
-  const MIN_ITEMS = 6;
-  const needPlaceholders = Math.max(0, MIN_ITEMS - filtered.length);
+  const displayed = buildDisplayed(products, query, category, 6);
 
   return (
     <>
@@ -265,13 +286,8 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          {filtered.slice(0, Math.max(MIN_ITEMS, filtered.length)).map((p) => (
+          {displayed.map((p) => (
             <ProductCard key={p.id} p={p} />
-          ))}
-
-          {/* Jika kurang dari 6, isi dengan placeholder agar grid tetap penuh */}
-          {Array.from({ length: needPlaceholders }).map((_, idx) => (
-            <PlaceholderCard key={`ph-${idx}`} />
           ))}
         </div>
       </main>
