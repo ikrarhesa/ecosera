@@ -207,14 +207,20 @@ const parsePrice = (v: unknown): number => {
   return 0;
 };
 
+const slugify = (s: string) =>
+  s?.toLowerCase()?.replace(/[^a-z0-9]+/g, "-")?.replace(/(^-|-$)/g, "") || "produk";
+
+/** pilih thumbnail dengan fallback */
 const pickThumb = (p: any): string =>
   p.thumb || p.thumbnail || p.image || (Array.isArray(p.images) ? p.images[0] : "") || "https://picsum.photos/seed/ecosera/600/600";
 
-/** Normalisasi ke shape ProductCard (id, name, thumb, rating, sold, price:number) */
+/** Normalisasi ke shape ProductCard dan pakai ID slug supaya link ke /product/:id hidup */
 function toCardShape(p: any): Product {
+  const name = p.name ?? p.title ?? "Produk Lokal";
+  const idSlug = p.id ?? p.slug ?? slugify(name);
   return {
-    id: p.id ?? p.slug ?? p._id ?? String(Math.random()).slice(2),
-    name: p.name ?? p.title ?? "Produk Lokal",
+    id: idSlug,                                        // <-- penting: id dijadikan slug
+    name,
     price: parsePrice(p.price),
     rating: typeof p.rating === "number" ? p.rating : 4.7,
     sold: typeof p.sold === "number" ? p.sold : 50,
@@ -236,31 +242,26 @@ function matches(p: Product, query: string, cat: CategoryKey | null) {
   return passQuery && passCat;
 }
 
-/** 12 Dummy fallback products — SUDAH sesuai ProductCard */
+/** 12 Dummy fallback products — ID sudah slug supaya /product/:id valid */
 const FALLBACK_PRODUCTS: Product[] = [
-  { id: "d-1",  name: "Kopi Robusta Semende 200g",   thumb: "https://images.unsplash.com/photo-1504630083234-14187a9df0f5?auto=format&fit=crop&w=800&q=70", rating: 4.8, sold: 120, price: 25000, category: "Kopi" },
-  { id: "d-2",  name: "Kopi Arabica Pagaralam 250g", thumb: "https://images.unsplash.com/photo-1494314671902-399b18174975?auto=format&fit=crop&w=800&q=70", rating: 4.9, sold: 96,  price: 38000, category: "Kopi" },
-  { id: "d-3",  name: "Keripik Pisang Coklat",       thumb: "https://images.unsplash.com/photo-1589308078053-832e8322b3f1?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 210, price: 16000, category: "Snack" },
-  { id: "d-4",  name: "Pempek Kapal Selam (isi 5)",  thumb: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 340, price: 45000, category: "Snack" },
-  { id: "d-5",  name: "Es Teh Manis Botan",          thumb: "https://images.unsplash.com/photo-1556679343-c7306c72bcf0?auto=format&fit=crop&w=800&q=70", rating: 4.5, sold: 150, price: 10000, category: "Minuman" },
-  { id: "d-6",  name: "Jus Jeruk Segar 350ml",       thumb: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 132, price: 14000, category: "Minuman" },
-  { id: "d-7",  name: "Anyaman Purun Tas Mini",      thumb: "https://images.unsplash.com/photo-1612178537255-7b6c7b5f8e4d?auto=format&fit=crop&w=800&q=70", rating: 4.8, sold: 85,  price: 75000, category: "Kerajinan" },
-  { id: "d-8",  name: "Topi Anyaman Purun",          thumb: "https://images.unsplash.com/photo-1542060748-10c28b62716a?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 71,  price: 60000, category: "Kerajinan" },
-  { id: "d-9",  name: "Kemplang Ikan Asli (200g)",   thumb: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 260, price: 28000, category: "Snack" },
-  { id: "d-10", name: "Kopi House Blend 250g",       thumb: "https://images.unsplash.com/photo-1507133750040-4a8f57021524?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 110, price: 35000, category: "Kopi" },
-  { id: "d-11", name: "Sirup Markisa Lokal",         thumb: "https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?auto=format&fit=crop&w=800&q=70", rating: 4.5, sold: 90,  price: 22000, category: "Minuman" },
-  { id: "d-12", name: "Dompet Anyaman Purun",        thumb: "https://images.unsplash.com/photo-1582582429416-7530e7f3d20e?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 64,  price: 52000, category: "Kerajinan" },
+  { id: "kopi-robusta-semende-200g",   name: "Kopi Robusta Semende 200g",   thumb: "https://images.unsplash.com/photo-1504630083234-14187a9df0f5?auto=format&fit=crop&w=800&q=70", rating: 4.8, sold: 120, price: 25000, category: "Kopi" },
+  { id: "kopi-arabica-pagaralam-250g", name: "Kopi Arabica Pagaralam 250g", thumb: "https://images.unsplash.com/photo-1494314671902-399b18174975?auto=format&fit=crop&w=800&q=70", rating: 4.9, sold: 96,  price: 38000, category: "Kopi" },
+  { id: "keripik-pisang-coklat",       name: "Keripik Pisang Coklat",       thumb: "https://images.unsplash.com/photo-1589308078053-832e8322b3f1?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 210, price: 16000, category: "Snack" },
+  { id: "pempek-kapal-selam-isi-5",    name: "Pempek Kapal Selam (isi 5)",  thumb: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 340, price: 45000, category: "Snack" },
+  { id: "es-teh-manis-botan",          name: "Es Teh Manis Botan",          thumb: "https://images.unsplash.com/photo-1556679343-c7306c72bcf0?auto=format&fit=crop&w=800&q=70", rating: 4.5, sold: 150, price: 10000, category: "Minuman" },
+  { id: "jus-jeruk-segar-350ml",       name: "Jus Jeruk Segar 350ml",       thumb: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 132, price: 14000, category: "Minuman" },
+  { id: "anyaman-purun-tas-mini",      name: "Anyaman Purun Tas Mini",      thumb: "https://images.unsplash.com/photo-1612178537255-7b6c7b5f8e4d?auto=format&fit=crop&w=800&q=70", rating: 4.8, sold: 85,  price: 75000, category: "Kerajinan" },
+  { id: "topi-anyaman-purun",          name: "Topi Anyaman Purun",          thumb: "https://images.unsplash.com/photo-1542060748-10c28b62716a?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 71,  price: 60000, category: "Kerajinan" },
+  { id: "kemplang-ikan-asli-200g",     name: "Kemplang Ikan Asli (200g)",   thumb: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 260, price: 28000, category: "Snack" },
+  { id: "kopi-house-blend-250g",       name: "Kopi House Blend 250g",       thumb: "https://images.unsplash.com/photo-1507133750040-4a8f57021524?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 110, price: 35000, category: "Kopi" },
+  { id: "sirup-markisa-lokal",         name: "Sirup Markisa Lokal",         thumb: "https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?auto=format&fit=crop&w=800&q=70", rating: 4.5, sold: 90,  price: 22000, category: "Minuman" },
+  { id: "dompet-anyaman-purun",        name: "Dompet Anyaman Purun",        thumb: "https://images.unsplash.com/photo-1582582429416-7530e7f3d20e?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 64,  price: 52000, category: "Kerajinan" },
 ];
 
-/** Bangun list ditampilkan: normalisasi, filter ringan, penuhi minimal 6 dengan fallback tanpa filter, max 12 */
+/** Bangun list ditampilkan: normalisasi, filter, penuhi minimal 6 dengan fallback, max 12 */
 function buildDisplayed(allReal: Product[], query: string, cat: CategoryKey | null) {
-  // 1) normalisasi semua produk real (API)
   const real = allReal.map(toCardShape);
-
-  // 2) filter ringan (by query & category)
   let out = real.filter((p) => matches(p, query, cat));
-
-  // 3) kalau kurang dari 6 → tambahkan fallback TANPA filter agar pasti tembus 6
   if (out.length < 6) {
     const existingIds = new Set(out.map((p) => p.id));
     for (const fb of FALLBACK_PRODUCTS) {
@@ -268,8 +269,6 @@ function buildDisplayed(allReal: Product[], query: string, cat: CategoryKey | nu
       if (!existingIds.has(fb.id)) out.push(fb);
     }
   }
-
-  // 4) batas atas 12 item
   return out.slice(0, 12);
 }
 
