@@ -133,7 +133,7 @@ function CartItemRow({
         className="flex items-center gap-3 rounded-2xl bg-white/80 backdrop-blur border border-black/10 p-3 relative transition-transform duration-200 will-change-transform"
         style={{ transform: `translateX(${offset}px)` }}
         onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
+        onTouchMove={onTouchMove} 
         onTouchEnd={onTouchEnd}
       >
         {/* Thumbnail */}
@@ -268,7 +268,7 @@ export default function Cart() {
                 <div>
                   <p className="text-xs text-slate-600">Subtotal</p>
                   <p className="text-xl font-bold">Rp {money(subtotal)}</p>
-                </div> 
+                </div>
                 <a
                   href={waLink}
                   target="_blank"
