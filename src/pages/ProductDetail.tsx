@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
-  ArrowLeft, Heart, Share2, Star, MapPin,
+  ArrowLeft, Heart, Share2, Star, MapPin, ChevronLeft, ChevronRight,
   MessageCircle, ShoppingCart, ShieldCheck, Truck, PackageOpen, Check
 } from "lucide-react";
 import type { Product } from "../types/product";
-import { getProductById, getRelatedProducts } from "../services/products";
+import { getProductById, getRelatedProducts, allImagesOf } from "../services/products";
 import { addToCart } from "../services/cart";
 
 const ACCENT = "#2254c5";
@@ -22,6 +22,10 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [related, setRelated] = useState<Product[]>([]);
 
+  // --- Gallery state ---
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const [idx, setIdx] = useState(0);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -30,6 +34,7 @@ export default function ProductDetail() {
       if (!mounted) return;
       setProduct(p);
       setQty(1);
+      setIdx(0);
       if (p) {
         const rel = await getRelatedProducts(p.category, p.id, 10);
         setRelated(rel);
@@ -94,6 +99,26 @@ export default function ProductDetail() {
     navigate("/cart");
   };
 
+  // --- Slider helpers ---
+  const images = useMemo(() => allImagesOf(product), [product]);
+
+  const goTo = (i: number) => {
+    const el = galleryRef.current;
+    if (!el) return;
+    const clamped = Math.max(0, Math.min(i, images.length - 1));
+    el.scrollTo({ left: clamped * el.clientWidth, behavior: "smooth" });
+    setIdx(clamped);
+  };
+  const prev = () => goTo(idx - 1);
+  const next = () => goTo(idx + 1);
+
+  const onScroll = () => {
+    const el = galleryRef.current;
+    if (!el) return;
+    const current = Math.round(el.scrollLeft / el.clientWidth);
+    if (current !== idx) setIdx(current);
+  };
+
   if (loading) {
     return (
       <div className="mx-auto w-full max-w-md min-h-screen bg-white">
@@ -138,24 +163,83 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* Gallery */}
-      <div className="relative aspect-square w-full overflow-hidden bg-gray-50">
-        <img
-          src={product.images?.[0] || product.image}
-          alt={product.name}
-          className="h-full w-full object-cover"
-          loading="eager"
-        />
-        {product.tags?.length ? (
-          <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-            {product.tags.slice(0, 3).map(t => (
-              <span key={t} className="rounded-full bg-white/90 px-2 py-1 text-xs border">
-                {t}
-              </span>
+      {/* Gallery Slider */}
+      <div className="relative w-full bg-gray-50">
+        <div
+          ref={galleryRef}
+          onScroll={onScroll}
+          className="w-full overflow-x-auto snap-x snap-mandatory scroll-smooth"
+          style={{ scrollbarWidth: "none" }}
+        >
+          <div className="flex w-full">
+            {images.map((src, i) => (
+              <div key={i} className="snap-center shrink-0 w-full aspect-square overflow-hidden bg-gray-100">
+                <img
+                  src={src}
+                  alt={`${product.name} - gambar ${i + 1}`}
+                  className="h-full w-full object-cover"
+                  loading={i === 0 ? "eager" : "lazy"}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = "https://placehold.co/800x800/png?text=Ecosera"; }}
+                />
+              </div>
             ))}
           </div>
-        ) : null}
+        </div>
+
+        {/* Arrows */}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={prev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 border grid place-items-center"
+              aria-label="Sebelumnya"
+            >
+              <ChevronLeft />
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 border grid place-items-center"
+              aria-label="Selanjutnya"
+            >
+              <ChevronRight />
+            </button>
+          </>
+        )}
+
+        {/* Dots */}
+        {images.length > 1 && (
+          <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center gap-1.5">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                className={`h-1.5 rounded-full ${i === idx ? "w-5" : "w-2.5"} transition-all`}
+                style={{ backgroundColor: i === idx ? ACCENT : "rgba(255,255,255,0.8)" }}
+                aria-label={`Ke gambar ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* Thumbnails */}
+      {images.length > 1 && (
+        <div className="mt-2 px-3">
+          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+            {images.map((src, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                className={`h-16 w-16 rounded-lg overflow-hidden border ${i === idx ? "ring-2" : ""}`}
+                style={{ ringColor: ACCENT }}
+                aria-label={`Pilih gambar ${i + 1}`}
+              >
+                <img src={src} alt={`thumb ${i + 1}`} className="h-full w-full object-cover" loading="lazy" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <div className="px-4 pb-32">
