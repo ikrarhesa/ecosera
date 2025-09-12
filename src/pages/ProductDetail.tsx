@@ -71,7 +71,7 @@ export default function ProductDetail() {
     if (!next) delete favs[id];
     localStorage.setItem("favorites", JSON.stringify(favs));
     setIsFav(next);
-    show(next ? "Ditambahkan ke Favorit ❤️" : "Dihapus dari Favorit 💔");
+    show(next ? "Ditambahkan ke Favorit â¤ï¸" : "Dihapus dari Favorit ðŸ’”");
   }
 
   if (loading) {
@@ -149,7 +149,7 @@ export default function ProductDetail() {
             <h1 className="text-lg font-bold leading-snug">{product.name}</h1>
             <div className="mt-1 flex items-center gap-2 text-sm text-slate-600">
               <Star className="h-4 w-4 text-amber-500" />
-              {product.rating} <span>•</span> <span>{product.sold}+ terjual</span>
+              {product.rating} <span>â€¢</span> <span>{product.sold}+ terjual</span>
             </div>
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function ProductDetail() {
               <p className="font-semibold">Jumlah: {qty}</p>
             </div>
             <button
-              onClick={() => { addToCart(product, qty); show("Ditambahkan ke keranjang ✅"); }}
+              onClick={() => { addToCart(product, qty); show("Ditambahkan ke keranjang âœ…"); }}
               className="h-12 w-full rounded-xl bg-primary text-white font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
             >
               <ShoppingCart className="h-5 w-5" />
