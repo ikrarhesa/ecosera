@@ -8,7 +8,7 @@ import Cart from "./pages/Cart";
 
 export default function App() {
   return (
-    <Shell>
+    
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/etalase" element={<Etalase />} />
@@ -16,6 +16,6 @@ export default function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Shell>
+    
   );
 }
