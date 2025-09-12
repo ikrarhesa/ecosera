@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ShoppingCart, Minus, Plus, ArrowLeft } from "lucide-react";
+import { ShoppingCart, Minus, Plus, ArrowLeft, Heart } from "lucide-react";
 import { getProductById } from "../services/products";
 import { money } from "../utils/money";
 import { useCart } from "../context/CartContext";
@@ -28,19 +28,19 @@ export default function ProductDetail() {
   const total = product.price * qty;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-24">
       {/* Back Button */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b">
         <div className="flex justify-between items-center px-4 py-3">
-          <button onClick={() => nav(-1)} className="p-2 bg-white border rounded">
+          <button onClick={() => nav(-1)} className="p-2 bg-white border rounded-lg">
             <ArrowLeft className="h-5 w-5" />
           </button>
           <h1 className="font-semibold text-center flex-1">{product.name}</h1>
           <div className="flex gap-2">
-            <button className="p-2 bg-white border rounded">
-              <span className="h-5 w-5">❤️</span> {/* Heart Icon */}
+            <button className="p-2 bg-white border rounded-lg">
+              <Heart className="h-5 w-5 text-rose-500" />
             </button>
-            <button className="p-2 bg-white border rounded">
+            <button className="p-2 bg-white border rounded-lg">
               <span className="h-5 w-5">🔗</span> {/* Share Icon */}
             </button>
           </div>
@@ -69,14 +69,14 @@ export default function ProductDetail() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setQty((q) => Math.max(1, q - 1))}
-              className="p-2 bg-white border rounded"
+              className="p-2 bg-white border rounded-lg"
             >
               <Minus className="h-4 w-4" />
             </button>
             <span>{qty}</span>
             <button
               onClick={() => setQty((q) => Math.min(99, q + 1))}
-              className="p-2 bg-white border rounded"
+              className="p-2 bg-white border rounded-lg"
             >
               <Plus className="h-4 w-4" />
             </button>
@@ -89,7 +89,7 @@ export default function ProductDetail() {
           <p className="text-sm text-gray-700">{product.description}</p>
         </div>
 
-        {/* Total */}
+        {/* Total Calculation */}
         <div className="mt-4 flex justify-between items-center text-sm text-gray-700">
           <span>Total</span>
           <span className="font-semibold">Rp {money(total)}</span>
@@ -105,7 +105,7 @@ export default function ProductDetail() {
               addToCart(product, qty);
               alert("Ditambahkan ke Keranjang ✅");
             }}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg"
+            className="px-6 py-3 bg-[#2254c5] text-white rounded-lg w-full"
           >
             Tambah ke Keranjang
           </button>
