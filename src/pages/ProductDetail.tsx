@@ -2,9 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
-  ArrowLeft,
-  Heart,
-  Share2,
   Star,
   Package,
   Minus,
@@ -21,7 +18,7 @@ import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
 
 /* ---------- Helpers ---------- */
-const safeShopWa = (typeof SHOP_WA === "string" ? SHOP_WA : "") || ""; // guard
+const safeShopWa = (typeof SHOP_WA === "string" ? SHOP_WA : "") || "";
 const buildWaMessage = (p: Product, qty: number) =>
   encodeURIComponent(
     [
@@ -49,13 +46,6 @@ export default function ProductDetail() {
   const [err, setErr] = useState<string | null>(null);
   const [qty, setQty] = useState(1);
 
-  // unlock scroll bila sebelumnya ada modal
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "auto";
-    return () => (document.body.style.overflow = prev);
-  }, []);
-
   useEffect(() => {
     let alive = true;
     setLoading(true);
@@ -65,11 +55,7 @@ export default function ProductDetail() {
         if (!id) throw new Error("ID produk tidak valid");
         const p = await getProductById(id);
         if (!alive) return;
-        if (!p) {
-          setData(null);
-        } else {
-          setData(p);
-        }
+        setData(p ?? null);
       } catch (e: any) {
         if (alive) setErr(e?.message || "Gagal memuat produk");
       } finally {
@@ -83,20 +69,8 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
-        <div className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b">
-          <div className="mx-auto max-w-md px-4 h-14 flex items-center gap-2">
-            <button
-              onClick={() => nav(-1)}
-              className="rounded-xl p-2 border border-black/10 bg-white"
-              aria-label="Kembali"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <span className="font-semibold">Memuat…</span>
-          </div>
-        </div>
-        <div className="mx-auto max-w-md p-4">Memuat…</div>
+      <div className="min-h-screen flex items-center justify-center">
+        Memuat…
       </div>
     );
   }
@@ -108,7 +82,7 @@ export default function ProductDetail() {
           <p className="text-sm text-slate-600 mb-3">
             {err ? `Terjadi kesalahan: ${err}` : "Produk tidak ditemukan."}
           </p>
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex gap-2 justify-center">
             <button
               onClick={() => nav(-1)}
               className="px-4 py-2 rounded-lg bg-primary text-white"
@@ -127,7 +101,7 @@ export default function ProductDetail() {
     );
   }
 
-  const product = data as Product;
+  const product = data;
   const total = (product.price ?? 0) * qty;
   const wa =
     safeShopWa
@@ -135,37 +109,7 @@ export default function ProductDetail() {
       : `https://wa.me/?text=${buildWaMessage(product, qty)}`;
 
   return (
-    <div className="min-h-screen bg-white text-ink pt-[56px] pb-28">
-      {/* ===== Navbar ===== */}
-      <header className="sticky top-[56px] z-[100] bg-white/80 backdrop-blur border-b border-black/5">
-        <div className="mx-auto max-w-md md:max-w-lg lg:max-w-xl px-4 py-3 flex items-center justify-between">
-          <button
-            onClick={() => nav(-1)}
-            className="rounded-xl p-2 border border-black/10 bg-white"
-            aria-label="Kembali"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="font-semibold truncate max-w-[55%] text-center">
-            {product.name}
-          </div>
-          <div className="flex gap-2">
-            <button
-              className="rounded-xl p-2 border border-black/10 bg-white"
-              aria-label="Bagikan"
-            >
-              <Share2 className="h-5 w-5" />
-            </button>
-            <button
-              className="rounded-xl p-2 border border-black/10 bg-white"
-              aria-label="Favorit"
-            >
-              <Heart className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-white text-ink pb-40">
       {/* ===== Media ===== */}
       <div className="mx-auto max-w-md md:max-w-lg lg:max-w-xl p-4">
         <div className="aspect-square rounded-2xl overflow-hidden border border-slate-100 bg-white">
@@ -238,7 +182,7 @@ export default function ProductDetail() {
       </main>
 
       {/* ===== Sticky Action Bar ===== */}
-      <div className="fixed inset-x-0 bottom-0 z-[120] bg-white/90 backdrop-blur border-t border-white/60 shadow-[0_-8px_24px_rgba(2,6,23,0.12)]">
+      <div className="fixed inset-x-0 bottom-0 z-[200] bg-white/95 backdrop-blur border-t border-white/60 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
         <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4 py-3">
           <div className="grid grid-cols-2 gap-3">
             <button
@@ -250,7 +194,7 @@ export default function ProductDetail() {
               className="h-12 rounded-xl bg-primary text-white font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
             >
               <ShoppingCart className="h-5 w-5" />
-              Tambah ke Keranjang
+              Tambah
             </button>
             <a
               href={wa}
@@ -259,7 +203,7 @@ export default function ProductDetail() {
               className="h-12 rounded-xl border font-semibold inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
             >
               <MessageCircle className="h-5 w-5" />
-              Tanya via WhatsApp
+              WhatsApp
             </a>
           </div>
           <div className="h-[env(safe-area-inset-bottom)]" />
