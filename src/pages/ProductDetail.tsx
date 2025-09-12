@@ -135,9 +135,9 @@ export default function ProductDetail() {
       : `https://wa.me/?text=${buildWaMessage(product, qty)}`;
 
   return (
-    <div className="min-h-screen bg-white text-ink pb-28">
+    <div className="min-h-screen bg-white text-ink pt-[56px] pb-28">
       {/* ===== Navbar ===== */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-black/5">
+      <header className="sticky top-[56px] z-[100] bg-white/80 backdrop-blur border-b border-black/5">
         <div className="mx-auto max-w-md md:max-w-lg lg:max-w-xl px-4 py-3 flex items-center justify-between">
           <button
             onClick={() => nav(-1)}
@@ -238,7 +238,7 @@ export default function ProductDetail() {
       </main>
 
       {/* ===== Sticky Action Bar ===== */}
-      <div className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-white/60">
+      <div className="fixed inset-x-0 bottom-0 z-[120] bg-white/90 backdrop-blur border-t border-white/60 shadow-[0_-8px_24px_rgba(2,6,23,0.12)]">
         <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4 py-3">
           <div className="grid grid-cols-2 gap-3">
             <button
