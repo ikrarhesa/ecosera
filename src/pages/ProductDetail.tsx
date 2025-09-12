@@ -126,6 +126,14 @@ export default function ProductDetail() {
             >
               <Heart className={`h-5 w-5 ${isFav ? "fill-current" : ""}`} />
             </button>
+            {/* Share button */}
+            <button
+              onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Check out this product: ${product.name}, ${window.location.href}`)}`, '_blank')}
+              className="rounded-xl p-2 border border-black/10 bg-white hover:bg-slate-50 active:scale-95 transition"
+              aria-label="Share"
+            >
+              <Share2 className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </div>
