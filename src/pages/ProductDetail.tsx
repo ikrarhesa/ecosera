@@ -15,7 +15,8 @@ export default function ProductDetail() {
             'https://via.placeholder.com/350x350'
         ],
         description: '13.5 oz can | $0.21/oz | Compare at $4.69',
-        rating: 4.8
+        rating: 4.8,
+        productLocation: 'Local Eco Product from Ecosera'
     };
 
     const handleIncrease = () => setQuantity(quantity + 1);
@@ -32,6 +33,7 @@ export default function ProductDetail() {
             <div className="product-rating">
                 <span>{product.rating} ⭐</span>
             </div>
+            <div className="product-location">{product.productLocation}</div>
             <div className="product-price">
                 ${product.price.toFixed(2)} <span style={{ color: '#ff5a5f' }}>-{(product.discount * 100).toFixed(0)}%</span>
             </div>
