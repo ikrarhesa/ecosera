@@ -3,46 +3,44 @@ import type { Product } from "../types/product";
 let cache: Product[] | null = null;
 let indexById: Map<string, Product> | null = null;
 
-const PLACEHOLDER =
-  "https://placehold.co/800x800/png?text=Ecosera";
+const PLACEHOLDER = "https://placehold.co/800x800/png?text=Ecosera";
 
-/** Kumpulkan semua kemungkinan field gambar dari JSON lalu dedupe & bersihkan */
+/** Loader JSON yang robust: import() -> fetch() -> [] */
+async function loadProductsJSON(): Promise<any[]> {
+  try {
+    const mod: any = await import("../data/products.json");
+    return (mod?.default ?? mod) as any[];
+  } catch (e) {
+    try {
+      const res = await fetch("/data/products.json", { cache: "no-store" });
+      if (res.ok) return (await res.json()) as any[];
+    } catch {}
+    console.error("Failed to load products.json", e);
+    return [];
+  }
+}
+
+/** Kumpulkan semua kemungkinan field gambar, lalu dedupe */
 function collectImages(raw: any): string[] {
-  const buckets: (string | undefined | null | string[])[] = [
-    raw.images,
-    raw.photos,
-    raw.gallery,
-    raw.thumbnails,
-    raw.pictures,
-    [raw.thumbnail],
-    [raw.cover],
-    [raw.image],
-    [raw.img],
-    [raw.url],
-    [raw.photo],
+  const buckets: (string | string[] | null | undefined)[] = [
+    raw.images, raw.photos, raw.gallery, raw.thumbnails, raw.pictures,
+    raw.media, raw.assets,
+    raw.images?.urls, // kadang nested
+    [raw.thumbnail], [raw.cover], [raw.image], [raw.img], [raw.url], [raw.photo],
   ];
-
-  const flat = buckets
-    .flat()
-    .filter(Boolean) as string[];
-
-  // trim & dedupe
+  const flat = buckets.flat().filter(Boolean) as string[];
   const seen = new Set<string>();
   const out: string[] = [];
   for (const s of flat) {
     const v = String(s).trim();
     if (!v) continue;
-    if (!seen.has(v)) {
-      seen.add(v);
-      out.push(v);
-    }
+    if (!seen.has(v)) { seen.add(v); out.push(v); }
   }
   return out;
 }
 
-/** Normalisasi 1 item dari products.json agar aman dipakai di UI */
+/** Normalisasi 1 item */
 function normalize(raw: any): Product {
-  // Stock bisa bernama lain di JSON
   const stockRaw = raw.stock ?? raw.inventory ?? raw.qty ?? null;
   const stockParsed = stockRaw == null ? 999 : Number.parseInt(String(stockRaw), 10);
 
@@ -54,7 +52,6 @@ function normalize(raw: any): Product {
     name: String(raw.name),
     price: Number(raw.price ?? 0),
     unit: String(raw.unit ?? "pcs"),
-    // Default 999 kalau tidak ada di JSON supaya TIDAK dianggap habis
     stock: Number.isFinite(stockParsed) ? stockParsed : 999,
     image: primary,
     images: imgs,
@@ -67,64 +64,52 @@ function normalize(raw: any): Product {
     tags: Array.isArray(raw.tags) ? raw.tags : [],
   };
 
-  // Bawa serta flag opsional
-  const anyBase = base as any;
-  if (typeof raw.featured !== "undefined") anyBase.featured = !!raw.featured;
-  if (typeof raw.available !== "undefined") anyBase.available = raw.available !== false;
+  // pass-through flags opsional
+  (base as any).featured = !!raw.featured;
+  if (typeof raw.available !== "undefined") (base as any).available = raw.available !== false;
 
   return base;
 }
 
-/** Helper untuk komponen */
+/** Helpers untuk komponen */
 export function primaryImageOf(p?: Product | null): string {
   if (!p) return PLACEHOLDER;
-  return p.images?.[0] || p.image || PLACEHOLDER;
+  return (p.images && p.images[0]) || p.image || PLACEHOLDER;
 }
-
 export function allImagesOf(p?: Product | null): string[] {
   if (!p) return [PLACEHOLDER];
-  const arr = (p.images && p.images.length ? p.images : (p.image ? [p.image] : []));
+  const arr = p.images?.length ? p.images : (p.image ? [p.image] : []);
   return arr.length ? arr : [PLACEHOLDER];
 }
 
 /** Load sekali dari /data/products.json dan cache (hanya available !== false) */
 export async function getAllProducts(): Promise<Product[]> {
   if (cache) return cache;
-
-  const data: any[] = (await import("../data/products.json")).default as any[];
+  const data = await loadProductsJSON();
   const filtered = data.filter((p: any) => p?.available !== false);
   cache = filtered.map(normalize);
   indexById = new Map(cache.map(p => [p.id, p]));
   return cache;
 }
 
-/** Paksa refresh cache saat penggantian data runtime (opsional) */
-export function invalidateProductsCache() {
-  cache = null;
-  indexById = null;
-}
+export function invalidateProductsCache() { cache = null; indexById = null; }
 
-/** Featured flag dari JSON (pakai properti opsional) */
 export async function getFeaturedProducts(): Promise<Product[]> {
   const all = await getAllProducts();
   return all.filter((p: any) => !!(p as any).featured);
 }
 
-/** Ambil by id. Konsisten return null kalau tidak ada */
 export async function getProductById(id: string): Promise<Product | null> {
   if (indexById) return indexById.get(id) ?? null;
   const all = await getAllProducts();
   return all.find(p => p.id === id) ?? null;
 }
 
-/** Pencarian nama/id/tag/kategori/seller/location */
 export async function searchProducts(q: string): Promise<Product[]> {
   const all = await getAllProducts();
   const s = (q ?? "").trim().toLowerCase();
   if (!s) return all;
-
   const contains = (v?: string) => (v ? v.toLowerCase().includes(s) : false);
-
   return all.filter(p =>
     contains(p.name) ||
     contains(p.id) ||
@@ -135,12 +120,7 @@ export async function searchProducts(q: string): Promise<Product[]> {
   );
 }
 
-/** Produk terkait: kategori + kemiripan tags (maks 3 tag) + stok */
-export async function getRelatedProducts(
-  category: string,
-  excludeId?: string,
-  limit = 8
-): Promise<Product[]> {
+export async function getRelatedProducts(category: string, excludeId?: string, limit = 8): Promise<Product[]> {
   const all = await getAllProducts();
   const base = all.filter(p => p.id !== excludeId);
   const main = excludeId ? all.find(x => x.id === excludeId) : null;
@@ -152,14 +132,11 @@ export async function getRelatedProducts(
     if (p.tags?.length && mainTags.size) {
       let shared = 0;
       for (const t of p.tags) {
-        if (mainTags.has((t ?? "").toLowerCase())) {
-          shared++;
-          if (shared >= 3) break;
-        }
+        if (mainTags.has((t ?? "").toLowerCase())) { shared++; if (shared >= 3) break; }
       }
-      sc += shared; // +1/tag sama (maks 3)
+      sc += shared;
     }
-    if ((p.stock ?? 0) <= 0) sc -= 2; // penalti kalau habis
+    if ((p.stock ?? 0) <= 0) sc -= 2;
     return sc;
   };
 
@@ -168,18 +145,15 @@ export async function getRelatedProducts(
     .filter(x => x.s > -2)
     .sort((a, b) => {
       if (b.s !== a.s) return b.s - a.s;
-      const sa = a.p.stock ?? 0;
-      const sb = b.p.stock ?? 0;
+      const sa = a.p.stock ?? 0, sb = b.p.stock ?? 0;
       if (sb !== sa) return sb - sa;
-      const ra = a.p.rating ?? 0;
-      const rb = b.p.rating ?? 0;
+      const ra = a.p.rating ?? 0, rb = b.p.rating ?? 0;
       return rb - ra;
     })
     .slice(0, limit)
     .map(x => x.p);
 }
 
-/** Ambil langsung per kategori (tanpa ranking tag) */
 export async function getProductsByCategory(category: string, limit = 24): Promise<Product[]> {
   const all = await getAllProducts();
   return all.filter(p => p.category === category).slice(0, limit);
