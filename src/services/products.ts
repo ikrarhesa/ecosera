@@ -5,18 +5,14 @@ let indexById: Map<string, Product> | null = null;
 
 const PLACEHOLDER = "https://placehold.co/800x800/png?text=Ecosera";
 
-/** Loader JSON yang robust: import() -> fetch() -> [] */
+/** Load products.json from the src/data directory */
 async function loadProductsJSON(): Promise<any[]> {
   try {
-    const mod: any = await import("../data/products.json");
-    return (mod?.default ?? mod) as any[];
+    const mod: any = await import("../data/products.json");  // Dynamically import JSON
+    return mod.default || mod;  // Return the default export if it exists
   } catch (e) {
-    try {
-      const res = await fetch("/data/products.json", { cache: "no-store" });
-      if (res.ok) return (await res.json()) as any[];
-    } catch {}
     console.error("Failed to load products.json", e);
-    return [];
+    return [];  // Return an empty array if there's an error
   }
 }
 
