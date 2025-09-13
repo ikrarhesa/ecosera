@@ -113,6 +113,12 @@ export function allImagesOf(p?: Product | null): string[] {
   return arr.length ? arr : [PLACEHOLDER];
 }
 
+// Function to get the primary image of a product
+export function primaryImageOf(p?: Product | null): string {
+  if (!p) return PLACEHOLDER;
+  return p.image || (p.images?.[0]) || PLACEHOLDER;
+}
+
 // Exporting additional required functions
 export async function getFeaturedProducts(): Promise<Product[]> {
   const all = await getAllProducts();

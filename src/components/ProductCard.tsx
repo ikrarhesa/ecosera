@@ -1,32 +1,55 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Store, Star } from "lucide-react";
 import type { Product } from "../types/product";
 import { primaryImageOf } from "../services/products";
 
-const ACCENT = "#2254c5";
-const fmtIDR = (n: number) =>
-  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
+const money = (n: number) => n.toLocaleString("id-ID");
 
 export default function ProductCard({ product }: { product: Product }) {
   const img = primaryImageOf(product);
 
   return (
-    <Link to={`/product/${product.id}`} className="rounded-2xl border overflow-hidden bg-white">
-      <div className="aspect-square w-full bg-gray-100">
+    <Link to={`/product/${product.id}`} className="p-3 rounded-xl bg-white/70 border border-black/10 hover:bg-white">
+      <div className="aspect-square rounded-lg overflow-hidden">
         <img
           src={img}
           alt={product.name}
-          className="h-full w-full object-cover"
+          className="w-full h-full object-cover"
           loading="lazy"
           onError={(e) => { (e.currentTarget as HTMLImageElement).src = "https://placehold.co/800x800/png?text=Ecosera"; }}
         />
       </div>
-      <div className="p-3">
-        <h3 className="text-sm font-medium line-clamp-2">{product.name}</h3>
-        <div className="mt-1 text-[13px] text-gray-600">{product.location ?? "Muara Enim"}</div>
-        <div className="mt-1 text-base font-semibold" style={{ color: ACCENT }}>
-          {fmtIDR(product.price)} <span className="text-xs text-gray-500">/ {product.unit}</span>
-        </div>
+      <div className="mt-2">
+        <h4 className="font-medium text-sm line-clamp-2">{product.name}</h4>
+        
+        {/* Shop name with icon */}
+        {product.sellerName && (
+          <div className="flex items-center gap-1 mt-1">
+            <Store className="h-3 w-3 text-blue-600" />
+            <span className="text-xs text-blue-600 font-medium">{product.sellerName}</span>
+          </div>
+        )}
+        
+        {/* Rating and sold info */}
+        {(product.rating || (product as any).sold) && (
+          <div className="flex items-center gap-1 mt-1">
+            {product.rating && (
+              <>
+                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                <span className="text-xs text-slate-600">{product.rating}</span>
+              </>
+            )}
+            {(product as any).sold && (
+              <>
+                {product.rating && <span className="text-xs text-slate-400">•</span>}
+                <span className="text-xs text-slate-600">{(product as any).sold} terjual</span>
+              </>
+            )}
+          </div>
+        )}
+        
+        <p className="font-semibold text-blue-600 mt-1">Rp {money(product.price)}</p>
       </div>
     </Link>
   );

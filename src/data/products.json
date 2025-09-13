@@ -16,7 +16,15 @@
       "robusta"
     ],
     "featured": true,
-    "available": true
+    "available": true,
+    "stock": 50,
+    "unit": "pack",
+    "image": "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&h=800&q=70",
+    "images": [
+      "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&h=800&q=70",
+      "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=800&h=800&q=70"
+    ],
+    "description": "Kopi Robusta premium dari pegunungan Semendo. Diolah secara tradisional dengan cita rasa yang khas dan aroma yang harum. Cocok untuk pecinta kopi yang menyukai rasa bold dan karakter yang kuat."
   },
   {
     "id": "gula-aren",
@@ -35,7 +43,15 @@
       "semende"
     ],
     "featured": true,
-    "available": true
+    "available": true,
+    "stock": 120,
+    "unit": "pack",
+    "image": "https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=800&h=800&q=70",
+    "images": [
+      "https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=800&h=800&q=70",
+      "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?auto=format&fit=crop&w=800&h=800&q=70"
+    ],
+    "description": "Gula aren murni dari pohon aren Semende yang diproses secara tradisional. Memiliki rasa manis alami yang khas dan aroma yang harum. Cocok untuk membuat aneka kue dan minuman tradisional."
   },
   {
     "id": "kemplang",
@@ -53,7 +69,15 @@
       "ikan"
     ],
     "featured": true,
-    "available": true
+    "available": true,
+    "stock": 75,
+    "unit": "pack",
+    "image": "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&h=800&q=70",
+    "images": [
+      "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&h=800&q=70",
+      "https://images.unsplash.com/photo-1593504049359-74330189a345?auto=format&fit=crop&w=800&h=800&q=70"
+    ],
+    "description": "Kemplang panggang asli Palembang dengan tekstur renyah dan rasa ikan yang gurih. Dibuat dengan cara tradisional menggunakan ikan segar dan bumbu pilihan."
   },
   {
     "id": "anyaman-purun",
@@ -71,7 +95,15 @@
       "anyaman"
     ],
     "featured": false,
-    "available": true
+    "available": true,
+    "stock": 25,
+    "unit": "pcs",
+    "image": "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?auto=format&fit=crop&w=800&h=800&q=70",
+    "images": [
+      "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?auto=format&fit=crop&w=800&h=800&q=70",
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&h=800&q=70"
+    ],
+    "description": "Keranjang anyaman purun berkualitas tinggi buatan tangan pengrajin lokal. Terbuat dari serat purun alami yang kuat dan tahan lama. Cocok untuk penyimpanan atau sebagai dekorasi rumah dengan sentuhan tradisional."
   },
   {
     "id": "dodol-kelapa",
@@ -89,7 +121,15 @@
       "kelapa"
     ],
     "featured": true,
-    "available": true
+    "available": true,
+    "stock": 80,
+    "unit": "pack",
+    "image": "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70",
+    "images": [
+      "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70",
+      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&h=800&q=70"
+    ],
+    "description": "Dodol kelapa tradisional khas Semende dengan tekstur kenyal dan rasa kelapa yang autentik. Dibuat dari kelapa segar pilihan dan gula aren asli. Camilan manis yang cocok untuk segala usia."
   },
   {
     "id": "serai-wangi",
@@ -106,6 +146,41 @@
       "serai"
     ],
     "featured": false,
-    "available": true
+    "available": true,
+    "stock": 40,
+    "unit": "bottle",
+    "image": "https://images.unsplash.com/photo-1526318472351-c75fcf070305?auto=format&fit=crop&w=800&h=800&q=70",
+    "images": [
+      "https://images.unsplash.com/photo-1526318472351-c75fcf070305?auto=format&fit=crop&w=800&h=800&q=70",
+      "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&h=800&q=70"
+    ],
+    "description": "Minyak serai wangi murni hasil destilasi daun serai segar. Memiliki aroma yang menenangkan dan khasiat aromaterapi alami. Cocok untuk relaksasi, mengusir serangga, atau sebagai minyak pijat."
+  },
+  {
+    "id": "kerupuk-palembang",
+    "name": "Kerupuk Palembang 250g",
+    "price": 25000,
+    "rating": 4.8,
+    "sold": 180,
+    "thumb": "https://images.unsplash.com/photo-1593504049359-74330189a345?auto=format&fit=crop&w=800&h=800&q=70",
+    "category": "snack",
+    "sellerName": "Kemplang Palembang Asli",
+    "sellerPhone": "6281234567892",
+    "location": "Muara Enim, Sumsel",
+    "tags": [
+      "kerupuk",
+      "palembang",
+      "ikan"
+    ],
+    "featured": true,
+    "available": true,
+    "stock": 100,
+    "unit": "pack",
+    "image": "https://images.unsplash.com/photo-1593504049359-74330189a345?auto=format&fit=crop&w=800&h=800&q=70",
+    "images": [
+      "https://images.unsplash.com/photo-1593504049359-74330189a345?auto=format&fit=crop&w=800&h=800&q=70",
+      "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&h=800&q=70"
+    ],
+    "description": "Kerupuk Palembang asli dengan cita rasa tradisional. Terbuat dari ikan segar pilihan dan bumbu rempah khas Palembang. Renyah dan gurih, cocok untuk camilan atau pelengkap makan."
   }
 ]

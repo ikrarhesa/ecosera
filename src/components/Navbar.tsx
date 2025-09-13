@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Store, Home as HomeIcon, Grid2X2, ShoppingCart, User, Plus } from "lucide-react";
+import { Store, Home as HomeIcon, Package, ShoppingCart, User, Plus } from "lucide-react";
 
 interface NavbarProps {
   showSearchBar?: boolean;
@@ -62,8 +62,8 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
                   isActive("/etalase") ? "text-blue-600" : "text-slate-700"
                 }`}
               >
-                <Grid2X2 className="h-5 w-5" />
-                <span>Explore</span>
+                <Package className="h-5 w-5" />
+                <span>Etalase</span>
               </Link>
 
               {/* Central Add Product Button - Inside navbar */}

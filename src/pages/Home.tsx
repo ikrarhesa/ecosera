@@ -5,6 +5,9 @@ import {
   ChevronRight as ArrowRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import ProductCard from "../components/ProductCard";
+import type { Product } from "../types/product";
 
 /* ===== Helpers ===== */
 const money = (n: number) => n.toLocaleString("id-ID");
@@ -13,15 +16,97 @@ const img = (q: string, w = 1400, h = 560) =>
   `https://images.unsplash.com/photo-155${Math.floor(Math.random()*9)}?auto=format&fit=crop&w=${w}&h=${h}&q=70&ixlib=rb-4.0.3&${encodeURIComponent(q)}`;
 
 /* ===== Produk (Muara Enim) ===== */
-export type Product = {
-  id: string; name: string; price: number; rating: number; sold: number; thumb?: string;
-};
-export const PRODUCTS: Product[] = [
-  { id: "kopi-semendo",  name: "Kopi Semendo Robusta 250g", price: 45000, rating: 4.9, sold: 320, thumb: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&h=800&q=70" },
-  { id: "gula-aren",     name: "Gula Aren Semende 500g",    price: 38000, rating: 4.8, sold: 210, thumb: "https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=800&h=800&q=70" },
-  { id: "kemplang",      name: "Kemplang Panggang 200g",    price: 29000, rating: 4.7, sold: 150, thumb: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&h=800&q=70" },
-  { id: "anyaman-purun", name: "Keranjang Anyaman Purun",   price: 69000, rating: 4.6, sold: 95,  thumb: "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?auto=format&fit=crop&w=800&h=800&q=70" },
-  { id: "dodol-kelapa",  name: "Dodol Kelapa Semende 250g", price: 27000, rating: 4.6, sold: 130, thumb: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70" },
+const PRODUCTS: Product[] = [
+  { 
+    id: "kopi-semendo", 
+    name: "Kopi Semendo Robusta 250g", 
+    price: 45000, 
+    rating: 4.9, 
+    stock: 999,
+    unit: "pack",
+    image: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&h=800&q=70",
+    images: ["https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&h=800&q=70"],
+    description: "Kopi robusta asli dari daerah Semendo dengan cita rasa khas",
+    category: "kopi",
+    sellerName: "Kebun Kopi Semendo",
+    sellerPhone: "6281234567890",
+    location: "Muara Enim, Sumsel",
+    tags: ["kopi", "semendo", "robusta"],
+    featured: true,
+    available: true
+  },
+  { 
+    id: "gula-aren", 
+    name: "Gula Aren Semende 500g", 
+    price: 38000, 
+    rating: 4.8, 
+    stock: 999,
+    unit: "pack",
+    image: "https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=800&h=800&q=70",
+    images: ["https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=800&h=800&q=70"],
+    description: "Gula aren murni tanpa campuran bahan kimia",
+    category: "sembako",
+    sellerName: "Gula Aren Tradisional",
+    sellerPhone: "6281234567891",
+    location: "Muara Enim, Sumsel",
+    tags: ["gula", "aren", "semende"],
+    featured: true,
+    available: true
+  },
+  { 
+    id: "kemplang", 
+    name: "Kemplang Panggang 200g", 
+    price: 29000, 
+    rating: 4.7, 
+    stock: 999,
+    unit: "pack",
+    image: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&h=800&q=70",
+    images: ["https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&h=800&q=70"],
+    description: "Kemplang panggang khas Palembang yang renyah",
+    category: "snack",
+    sellerName: "Kemplang Palembang Asli",
+    sellerPhone: "6281234567892",
+    location: "Muara Enim, Sumsel",
+    tags: ["kemplang", "ikan"],
+    featured: true,
+    available: true
+  },
+  { 
+    id: "anyaman-purun", 
+    name: "Keranjang Anyaman Purun", 
+    price: 69000, 
+    rating: 4.6, 
+    stock: 999,
+    unit: "pcs",
+    image: "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?auto=format&fit=crop&w=800&h=800&q=70",
+    images: ["https://images.unsplash.com/photo-1594633313593-bab3825d0caf?auto=format&fit=crop&w=800&h=800&q=70"],
+    description: "Keranjang anyaman dari purun berkualitas tinggi",
+    category: "kerajinan",
+    sellerName: "Kerajinan Purun Lokal",
+    sellerPhone: "6281234567893",
+    location: "Muara Enim, Sumsel",
+    tags: ["purun", "anyaman"],
+    featured: false,
+    available: true
+  },
+  { 
+    id: "dodol-kelapa", 
+    name: "Dodol Kelapa Semende 250g", 
+    price: 27000, 
+    rating: 4.6, 
+    stock: 999,
+    unit: "pack",
+    image: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70",
+    images: ["https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70"],
+    description: "Dodol kelapa manis dan lembut khas Semende",
+    category: "snack",
+    sellerName: "Dodol Kelapa Semende",
+    sellerPhone: "6281234567894",
+    location: "Muara Enim, Sumsel",
+    tags: ["dodol", "kelapa"],
+    featured: true,
+    available: true
+  },
 ];
 
 /* ===== Banner data (full-width slider) ===== */
@@ -34,26 +119,6 @@ const BANNERS: Banner[] = [
   { id: "serai",   title: "Minyak Serai Wangi",       subtitle: "Aromaterapi & segar",   cta: "Beli Serai",      image: "https://images.unsplash.com/photo-1526318472351-c75fcf070305?auto=format&fit=crop&w=1400&h=560&q=70" },
 ];
 
-/* ===== UI kecil ===== */
-function ProductCard({ p }: { p: Product }) {
-  return (
-    <Link to={`/product/${p.id}`} className="p-3 rounded-xl bg-white/70 border border-black/10 hover:bg-white">
-      <div className="aspect-square rounded-lg overflow-hidden">
-        <img src={p.thumb} alt={p.name} className="w-full h-full object-cover" loading="lazy"/>
-      </div>
-      <div className="mt-2">
-        <h4 className="font-medium text-sm line-clamp-2">{p.name}</h4>
-        <div className="flex items-center gap-1 mt-1">
-          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          <span className="text-xs text-slate-600">{p.rating}</span>
-          <span className="text-xs text-slate-400">•</span>
-          <span className="text-xs text-slate-600">{p.sold} terjual</span>
-        </div>
-        <p className="font-semibold text-primary mt-1">Rp {money(p.price)}</p>
-      </div>
-    </Link>
-  );
-}
 
 /* ===== Carousel Banner ===== */
 function BannerCarousel() {
@@ -97,7 +162,6 @@ function BannerCarousel() {
           ))}
         </div>
 
-
         <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
           {BANNERS.map((_, idx) => (
             <button
@@ -117,46 +181,26 @@ function BannerCarousel() {
 export default function Home() {
   return (
     <>
-      {/* NAVBAR */}
-      <header className="sticky top-0 z-20 bg-white/70 backdrop-blur border-b border-black/5">
-        <div className="px-4 py-3 flex items-center justify-between max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-          <div className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-xl grid place-items-center bg-primary/15">
-              <Store className="h-5 w-5 text-primary" />
-            </div>
-            <div className="leading-tight">
-              <p className="text-xs text-slate-600">Ecosera</p>
-              <p className="font-semibold">Etalase UMKM Muara Enim</p>
-            </div>
+      <Navbar />
+      
+      <div className="min-h-screen bg-[#F6F8FC] pb-28">
+        <main className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+          {/* Banner carousel */}
+          <BannerCarousel />
+
+          {/* Produk */}
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold">Rekomendasi</h3>
+            <button className="text-sm text-blue-600">Lihat Semua</button>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="rounded-xl p-2 border border-black/10 bg-white/70 hover:bg-white">
-              <Search className="h-5 w-5" />
-            </button>
-            <button className="rounded-xl p-2 border border-black/10 bg-white/70 hover:bg-white">
-              <Bell className="h-5 w-5" />
-            </button>
+
+          <div className="grid grid-cols-2 gap-3">
+            {PRODUCTS.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
           </div>
-        </div>
-      </header>
-
-      {/* CONTENT */}
-      <main className="px-4 pb-24 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-        {/* Banner carousel */}
-        <BannerCarousel />
-
-        {/* Produk */}
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold">Rekomendasi</h3>
-          <button className="text-sm text-primary">Lihat Semua</button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          {PRODUCTS.map((p) => (
-            <ProductCard key={p.id} p={p} />
-          ))}
-        </div>
-      </main>
+        </main>
+      </div>
     </>
   );
 }

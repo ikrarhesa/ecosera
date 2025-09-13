@@ -1,4 +1,3 @@
-import React from "react";
 import { User, MapPin, Phone, Mail, Settings, Heart, Package, Star } from "lucide-react";
 import Navbar from "../components/Navbar";
 

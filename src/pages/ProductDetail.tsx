@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft, Heart, Share2, Star, MapPin, ChevronLeft, ChevronRight,
@@ -6,7 +6,8 @@ import {
 } from "lucide-react";
 import type { Product } from "../types/product";
 import { getProductById, getRelatedProducts, allImagesOf } from "../services/products";
-import { addToCart } from "../services/cart";
+import { useToast } from "../context/ToastContext";
+import { useCart } from "../context/CartContext";
 
 const ACCENT = "#2254c5";
 const PLACEHOLDER = "https://placehold.co/800x800/png?text=Ecosera";
@@ -17,6 +18,8 @@ const fmtIDR = (n: number) =>
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { show } = useToast();
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,7 +39,7 @@ export default function ProductDetail() {
       setProduct(p);
       setQty(1);
       setIdx(0);
-      if (p) setRelated(await getRelatedProducts(p.category, p.id, 10));
+      if (p) setRelated(await getRelatedProducts(p.category || "default", p.id, 10));
       else setRelated([]);
       setLoading(false);
     })();
@@ -86,8 +89,14 @@ export default function ProductDetail() {
 
   const onAddToCart = () => {
     if (!product) return;
-    addToCart({ product, quantity: qty });
-    navigate("/cart");
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      thumb: product.image,
+      sellerName: product.sellerName
+    }, qty);
+    show("Produk berhasil ditambahkan ke keranjang! 🛒");
   };
 
   const images = useMemo(() => allImagesOf(product), [product]);
