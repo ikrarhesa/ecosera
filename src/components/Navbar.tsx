@@ -21,13 +21,12 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
     <>
       {/* Top Header */}
       <div className="sticky top-0 z-20">
-        <div className="max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-          <header 
-            className="mx-4 mt-3 relative overflow-hidden" 
-            style={{
-              background: 'linear-gradient(129deg, rgba(34, 84, 197, 1) 28%, rgba(69, 193, 255, 1) 100%)'
-            }}
-          >
+        <header 
+          className="w-full relative overflow-hidden" 
+          style={{
+            background: 'linear-gradient(129deg, rgba(34, 84, 197, 1) 28%, rgba(69, 193, 255, 1) 100%)'
+          }}
+        >
             {/* Pattern Background */}
             <div 
               className="absolute inset-0 opacity-20 bg-cover bg-center bg-no-repeat"
@@ -67,8 +66,7 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
                 </button>
               </div>
             </div>
-          </header>
-        </div>
+        </header>
       </div>
         
       {/* Optional Additional Content */}

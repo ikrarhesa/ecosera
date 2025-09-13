@@ -191,7 +191,7 @@ function BannerCarousel() {
   };
 
   return (
-    <section className="mt-4">
+    <section className="mt-2">
       <div className="relative overflow-hidden rounded-3xl h-48 border border-slate-100 bg-white">
         <div
           className="whitespace-nowrap h-full transition-transform duration-500 ease-out"
@@ -239,12 +239,12 @@ export default function Home() {
       <Navbar />
       
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
-        <main className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+        <main className="px-4 pt-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
           {/* Banner carousel */}
           <BannerCarousel />
 
           {/* Produk */}
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-4 mt-6">
             <h3 className="font-semibold">Rekomendasi</h3>
             <button className="text-sm text-blue-600">Lihat Semua</button>
           </div>
