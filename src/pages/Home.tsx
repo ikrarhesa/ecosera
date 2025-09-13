@@ -1,7 +1,7 @@
 // src/pages/Home.tsx
 import React, { useState, useRef, useMemo } from "react";
 import {
-  Store, Search, Bell, Star,
+  Store, Search, Bell, Star, Filter, ChevronDown,
   ChevronRight as ArrowRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -20,11 +20,36 @@ const CATEGORIES = [
   { id: "all", name: "Semua", count: 0 },
   { id: "makanan", name: "Makanan", count: 0 },
   { id: "minuman", name: "Minuman", count: 0 },
-  { id: "kerajinan", name: "Kerajinan Tangan", count: 0 },
+  { id: "kerajinan", name: "Kerajinan", count: 0 },
   { id: "fashion", name: "Fashion", count: 0 },
   { id: "kopi", name: "Kopi", count: 0 },
   { id: "snack", name: "Snack", count: 0 },
   { id: "sembako", name: "Sembako", count: 0 }
+];
+
+/* ===== Sort Options ===== */
+const SORT_OPTIONS = [
+  { id: "default", name: "Default" },
+  { id: "price-low", name: "Harga Terendah" },
+  { id: "price-high", name: "Harga Tertinggi" },
+  { id: "rating", name: "Rating Tertinggi" },
+  { id: "newest", name: "Terbaru" }
+];
+
+const DISTANCE_OPTIONS = [
+  { id: "all", name: "Semua Jarak" },
+  { id: "0-5", name: "0-5 km" },
+  { id: "5-10", name: "5-10 km" },
+  { id: "10-20", name: "10-20 km" },
+  { id: "20+", name: "20+ km" }
+];
+
+const PRICE_RANGES = [
+  { id: "all", name: "Semua Harga", min: 0, max: Infinity },
+  { id: "0-50k", name: "Rp 0 - 50k", min: 0, max: 50000 },
+  { id: "50k-100k", name: "Rp 50k - 100k", min: 50000, max: 100000 },
+  { id: "100k-200k", name: "Rp 100k - 200k", min: 100000, max: 200000 },
+  { id: "200k+", name: "Rp 200k+", min: 200000, max: Infinity }
 ];
 
 /* ===== Produk (Muara Enim) ===== */
@@ -247,6 +272,10 @@ function BannerCarousel() {
 /* ===== Page ===== */
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("default");
+  const [distance, setDistance] = useState("all");
+  const [priceRange, setPriceRange] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
 
   // Calculate category counts
   const categoriesWithCounts = useMemo(() => {
@@ -259,13 +288,47 @@ export default function Home() {
     });
   }, []);
 
-  // Filter products based on selected category
+  // Filter and sort products
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === "all") {
-      return PRODUCTS;
+    let filtered = [...PRODUCTS];
+
+    // Filter by category
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(product => product.category === selectedCategory);
     }
-    return PRODUCTS.filter(product => product.category === selectedCategory);
-  }, [selectedCategory]);
+
+    // Filter by price range
+    if (priceRange !== "all") {
+      const range = PRICE_RANGES.find(r => r.id === priceRange);
+      if (range) {
+        filtered = filtered.filter(product => 
+          product.price >= range.min && product.price <= range.max
+        );
+      }
+    }
+
+    // Sort products
+    switch (sortBy) {
+      case "price-low":
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case "price-high":
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+      case "rating":
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      case "newest":
+        // Assuming newer products have higher IDs or we can add a date field
+        filtered.sort((a, b) => b.id.localeCompare(a.id));
+        break;
+      default:
+        // Keep original order
+        break;
+    }
+
+    return filtered;
+  }, [selectedCategory, sortBy, priceRange]);
 
   return (
     <>
@@ -276,15 +339,27 @@ export default function Home() {
           {/* Banner carousel */}
           <BannerCarousel />
 
-          {/* Category Filters */}
+          {/* Category Filters - Horizontal Scrollable */}
           <div className="mb-4 mt-6">
-            <h3 className="font-semibold mb-3">Kategori</h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold">Kategori</h3>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50"
+              >
+                <Filter className="h-4 w-4" />
+                Filter
+                <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+              </button>
+            </div>
+            
+            {/* Horizontal scrollable categories */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
               {categoriesWithCounts.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
                     selectedCategory === category.id
                       ? "bg-blue-600 text-white"
                       : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
@@ -303,6 +378,59 @@ export default function Home() {
                 </button>
               ))}
             </div>
+
+            {/* Advanced Filters */}
+            {showFilters && (
+              <div className="mt-4 p-4 bg-white rounded-xl border border-slate-200 space-y-4">
+                {/* Sort Options */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Urutkan</label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
+                  >
+                    {SORT_OPTIONS.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Distance Options */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Jarak</label>
+                  <select
+                    value={distance}
+                    onChange={(e) => setDistance(e.target.value)}
+                    className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
+                  >
+                    {DISTANCE_OPTIONS.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Price Range */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Rentang Harga</label>
+                  <select
+                    value={priceRange}
+                    onChange={(e) => setPriceRange(e.target.value)}
+                    className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
+                  >
+                    {PRICE_RANGES.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Produk */}
