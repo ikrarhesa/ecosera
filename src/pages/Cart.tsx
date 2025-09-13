@@ -5,7 +5,7 @@ import { useRef, useState, useMemo } from "react";
 import { useToast } from "../context/ToastContext";
 import { money } from "../utils/money";
 import { SHOP_WA } from "../utils/env";
-import Navbar from "../components/Navbar";
+import BottomNavbar from "../components/BottomNavbar";
 
 const fallbackImg =
   "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&h=300&q=70";
@@ -302,7 +302,7 @@ export default function Cart() {
 
   return (
     <>
-      <Navbar />
+      <BottomNavbar />
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
         {/* Header */}
         <div className="px-4 pt-3 pb-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">

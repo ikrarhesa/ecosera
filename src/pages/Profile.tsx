@@ -1,11 +1,11 @@
 import { User, MapPin, Phone, Mail, Settings, Heart, Package, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import BottomNavbar from "../components/BottomNavbar";
 
 export default function Profile() {
   return (
     <>
-      <Navbar />
+      <BottomNavbar />
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
 
       {/* Header */}
