@@ -83,7 +83,7 @@ function BannerCarousel() {
   };
 
   return (
-    <section className="mt-2">
+    <section className="mt-1">
       <div className="relative overflow-hidden rounded-3xl h-48 border border-slate-100 bg-white">
         <div
           className="whitespace-nowrap h-full transition-transform duration-500 ease-out"
@@ -214,13 +214,13 @@ export default function Home() {
       />
       
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
-        <main className="px-4 pt-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+        <main className="px-4 pt-1 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
           {/* Banner carousel */}
           <BannerCarousel />
 
           {/* Category Filters - Horizontal Scrollable */}
-          <div className="mb-4 mt-6">
-            <div className="flex items-center justify-between mb-3">
+          <div className="mb-3 mt-3">
+            <div className="flex items-center justify-between mb-2">
               <h3 className="font-semibold">Kategori</h3>
             </div>
             
@@ -315,7 +315,7 @@ export default function Home() {
           )}
 
           {/* Produk */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold">
               {searchQuery.trim() 
                 ? `Hasil pencarian "${searchQuery}"` 
