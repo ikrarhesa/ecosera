@@ -32,23 +32,9 @@ export default function Profile() {
                 <User className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
-                        <h2 className="font-semibold text-white">Ikrar Hesa Prasetya</h2>
+                <h2 className="font-semibold text-white">Ikrar Hesa Prasetya</h2>
                 <p className="text-sm text-white/80">Pelanggan Ecosera</p>
               </div>
-            <div className="flex gap-2">
-              <Link
-                to="/e-learning"
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
-              >
-                E-learning
-              </Link>
-              <Link
-                to="/admin-dashboard"
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
-              >
-                Dashboard Admin
-              </Link>
-            </div>
             </div>
           
             <div className="space-y-2">
@@ -62,8 +48,24 @@ export default function Profile() {
               </div>
               <div className="flex items-center gap-2 text-sm text-white/90">
                 <Mail className="h-4 w-4" />
-                <span>john.doe@email.com</span>
+                <span>hesa@axora.com</span>
               </div>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex gap-2 mt-4">
+              <Link
+                to="/e-learning"
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
+              >
+                E-learning
+              </Link>
+              <Link
+                to="/admin-dashboard"
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
+              >
+                Dashboard Admin
+              </Link>
             </div>
           </div>
         </div>
