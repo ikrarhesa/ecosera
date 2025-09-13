@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Store, Home as HomeIcon, Package, ShoppingCart, User, Plus } from "lucide-react";
+import { Store, Home as HomeIcon, Package, ShoppingCart, User, Plus, Search } from "lucide-react";
 
 interface NavbarProps {
   showSearchBar?: boolean;
@@ -20,26 +20,49 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
   return (
     <>
       {/* Top Header */}
-      <header className="sticky top-0 z-20 bg-[#F6F8FC] bg-gradient-to-b from-white to-[#F6F8FC]">
-        <div className="px-4 pt-3 pb-2 flex items-center justify-between max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-          <div className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-xl grid place-items-center bg-blue-50 border border-blue-100">
-              <Store className="h-5 w-5 text-blue-700" />
+      <div className="sticky top-0 z-20">
+        <div className="max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+          <header 
+            className="mx-4 mt-3 rounded-2xl" 
+            style={{
+              background: 'linear-gradient(129deg, rgba(34, 84, 197, 1) 28%, rgba(69, 193, 255, 1) 100%)'
+            }}
+          >
+            <div className="px-4 pt-3 pb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-9 w-9 rounded-xl grid place-items-center bg-white/20 border border-white/30">
+                  <Store className="h-5 w-5 text-white" />
+                </div>
+                <div className="leading-tight">
+                  <p className="text-[11px] text-white/80">Ecosera</p>
+                  <p className="font-semibold text-white">Jelajahi produk lokal</p>
+                </div>
+              </div>
             </div>
-            <div className="leading-tight">
-              <p className="text-[11px] text-slate-500">Ecosera</p>
-              <p className="font-semibold text-slate-900">Jelajahi produk lokal</p>
+            
+            {/* Search Bar */}
+            <div className="px-4 pb-3">
+              <div className="relative max-w-sm mx-auto">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4 text-slate-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Cari produk, kategori, atau merek..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-white/90 backdrop-blur-sm border border-white/20 rounded-xl text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
+                />
+              </div>
             </div>
-          </div>
+          </header>
         </div>
+      </div>
         
-        {/* Optional Search Bar */}
-        {showSearchBar && children && (
-          <div className="px-4 pb-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-            {children}
-          </div>
-        )}
-      </header>
+      {/* Optional Additional Content */}
+      {showSearchBar && children && (
+        <div className="px-4 pb-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+          {children}
+        </div>
+      )}
 
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 inset-x-0 z-40">
@@ -101,3 +124,4 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
     </>
   );
 }
+
