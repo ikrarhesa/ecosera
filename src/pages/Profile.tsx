@@ -1,4 +1,5 @@
 import { User, MapPin, Phone, Mail, Settings, Heart, Package, Star } from "lucide-react";
+import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
 export default function Profile() {
@@ -26,10 +27,16 @@ export default function Profile() {
             <div className="h-12 w-12 rounded-full bg-blue-50 grid place-items-center">
               <User className="h-6 w-6 text-blue-600" />
             </div>
-            <div>
+            <div className="flex-1">
               <h2 className="font-semibold text-slate-900">John Doe</h2>
               <p className="text-sm text-slate-600">Pelanggan Ecosera</p>
             </div>
+            <Link
+              to="/e-learning"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              E-learning
+            </Link>
           </div>
           
           <div className="space-y-2">

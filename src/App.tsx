@@ -7,6 +7,8 @@ import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import AddProduct from "./pages/AddProduct";
+import ELearning from "./pages/ELearning";
+import ModuleDetail from "./pages/ModuleDetail";
 
 export default function App() {
   return (
@@ -17,6 +19,8 @@ export default function App() {
       <Route path="/cart" element={<Cart />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/add-product" element={<AddProduct />} />
+      <Route path="/e-learning" element={<ELearning />} />
+      <Route path="/e-learning/:moduleId" element={<ModuleDetail />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
