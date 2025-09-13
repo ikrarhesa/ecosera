@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="decorativePattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+      <!-- Transparent background to show gradient through -->
+      <rect width="200" height="200" fill="transparent"/>
+      
+      <!-- Decorative pattern elements in light blue/white -->
+      <g fill="#B8E6E6" opacity="0.7">
+        <!-- Flowing vines and scrolls -->
+        <path d="M20 40 Q40 20 60 40 Q80 60 100 40 Q120 20 140 40 Q160 60 180 40" stroke="#B8E6E6" stroke-width="3" fill="none"/>
+        <path d="M20 80 Q40 60 60 80 Q80 100 100 80 Q120 60 140 80 Q160 100 180 80" stroke="#B8E6E6" stroke-width="2" fill="none"/>
+        <path d="M20 120 Q40 100 60 120 Q80 140 100 120 Q120 100 140 120 Q160 140 180 120" stroke="#B8E6E6" stroke-width="2.5" fill="none"/>
+        
+        <!-- Four-petal flowers -->
+        <g>
+          <circle cx="30" cy="30" r="8" fill="none" stroke="#B8E6E6" stroke-width="1.5"/>
+          <circle cx="30" cy="30" r="4" fill="#B8E6E6"/>
+          <path d="M26 30 L34 30 M30 26 L30 34" stroke="#B8E6E6" stroke-width="1"/>
+        </g>
+        
+        <g>
+          <circle cx="170" cy="30" r="8" fill="none" stroke="#B8E6E6" stroke-width="1.5"/>
+          <circle cx="170" cy="30" r="4" fill="#B8E6E6"/>
+          <path d="M166 30 L174 30 M170 26 L170 34" stroke="#B8E6E6" stroke-width="1"/>
+        </g>
+        
+        <g>
+          <circle cx="30" cy="170" r="8" fill="none" stroke="#B8E6E6" stroke-width="1.5"/>
+          <circle cx="30" cy="170" r="4" fill="#B8E6E6"/>
+          <path d="M26 170 L34 170 M30 166 L30 174" stroke="#B8E6E6" stroke-width="1"/>
+        </g>
+        
+        <g>
+          <circle cx="170" cy="170" r="8" fill="none" stroke="#B8E6E6" stroke-width="1.5"/>
+          <circle cx="170" cy="170" r="4" fill="#B8E6E6"/>
+          <path d="M166 170 L174 170 M170 166 L170 174" stroke="#B8E6E6" stroke-width="1"/>
+        </g>
+        
+        <!-- Diamond shapes with internal lines -->
+        <g>
+          <path d="M100 20 L110 30 L100 40 L90 30 Z" fill="#B8E6E6"/>
+          <path d="M95 30 L105 30 M100 25 L100 35" stroke="#2D5A5A" stroke-width="0.5"/>
+        </g>
+        
+        <g>
+          <path d="M100 160 L110 170 L100 180 L90 170 Z" fill="#B8E6E6"/>
+          <path d="M95 170 L105 170 M100 165 L100 175" stroke="#2D5A5A" stroke-width="0.5"/>
+        </g>
+        
+        <!-- Plus signs -->
+        <g>
+          <rect x="48" y="48" width="4" height="8" fill="#B8E6E6"/>
+          <rect x="46" y="50" width="8" height="4" fill="#B8E6E6"/>
+        </g>
+        
+        <g>
+          <rect x="148" y="48" width="4" height="8" fill="#B8E6E6"/>
+          <rect x="146" y="50" width="8" height="4" fill="#B8E6E6"/>
+        </g>
+        
+        <g>
+          <rect x="48" y="148" width="4" height="8" fill="#B8E6E6"/>
+          <rect x="46" y="150" width="8" height="4" fill="#B8E6E6"/>
+        </g>
+        
+        <g>
+          <rect x="148" y="148" width="4" height="8" fill="#B8E6E6"/>
+          <rect x="146" y="150" width="8" height="4" fill="#B8E6E6"/>
+        </g>
+        
+        <!-- Leaf clusters with veins -->
+        <g>
+          <path d="M50 60 Q55 55 60 60 Q55 65 50 60" fill="#B8E6E6"/>
+          <path d="M52 60 L58 60 M55 57 L55 63" stroke="#2D5A5A" stroke-width="0.5"/>
+        </g>
+        
+        <g>
+          <path d="M140 60 Q145 55 150 60 Q145 65 140 60" fill="#B8E6E6"/>
+          <path d="M142 60 L148 60 M145 57 L145 63" stroke="#2D5A5A" stroke-width="0.5"/>
+        </g>
+        
+        <g>
+          <path d="M50 140 Q55 135 60 140 Q55 145 50 140" fill="#B8E6E6"/>
+          <path d="M52 140 L58 140 M55 137 L55 143" stroke="#2D5A5A" stroke-width="0.5"/>
+        </g>
+        
+        <g>
+          <path d="M140 140 Q145 135 150 140 Q145 145 140 140" fill="#B8E6E6"/>
+          <path d="M142 140 L148 140 M145 137 L145 143" stroke="#2D5A5A" stroke-width="0.5"/>
+        </g>
+        
+        <!-- Small scattered dots -->
+        <circle cx="25" cy="25" r="1" fill="#B8E6E6"/>
+        <circle cx="175" cy="25" r="1" fill="#B8E6E6"/>
+        <circle cx="25" cy="175" r="1" fill="#B8E6E6"/>
+        <circle cx="175" cy="175" r="1" fill="#B8E6E6"/>
+        <circle cx="50" cy="25" r="1" fill="#B8E6E6"/>
+        <circle cx="150" cy="25" r="1" fill="#B8E6E6"/>
+        <circle cx="50" cy="175" r="1" fill="#B8E6E6"/>
+        <circle cx="150" cy="175" r="1" fill="#B8E6E6"/>
+        <circle cx="25" cy="50" r="1" fill="#B8E6E6"/>
+        <circle cx="175" cy="50" r="1" fill="#B8E6E6"/>
+        <circle cx="25" cy="150" r="1" fill="#B8E6E6"/>
+        <circle cx="175" cy="150" r="1" fill="#B8E6E6"/>
+        <circle cx="100" cy="10" r="1" fill="#B8E6E6"/>
+        <circle cx="100" cy="190" r="1" fill="#B8E6E6"/>
+        <circle cx="10" cy="100" r="1" fill="#B8E6E6"/>
+        <circle cx="190" cy="100" r="1" fill="#B8E6E6"/>
+      </g>
+    </pattern>
+  </defs>
+  
+  <rect width="400" height="200" fill="url(#decorativePattern)"/>
+</svg>
