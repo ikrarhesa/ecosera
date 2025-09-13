@@ -32,7 +32,7 @@ export default function Profile() {
                 <User className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="font-semibold text-white">John Doe</h2>
+                        <h2 className="font-semibold text-white">Ikrar Hesa Prasetya</h2>
                 <p className="text-sm text-white/80">Pelanggan Ecosera</p>
               </div>
             <div className="flex gap-2">
