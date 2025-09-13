@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Play, Clock, BookOpen, ArrowLeft } from "lucide-react";
-import Navbar from "../components/Navbar";
+import BottomNavbar from "../components/BottomNavbar";
 
 // Module data
 const MODULES = [
@@ -59,10 +59,10 @@ const MODULES = [
 
 export default function ELearning() {
   return (
-    <div className="min-h-screen bg-[#F6F8FC] pb-28">
-      <Navbar />
-      
-      <div className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+    <>
+      <BottomNavbar />
+      <div className="min-h-screen bg-[#F6F8FC] pb-28">
+        <div className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <Link 
@@ -157,7 +157,8 @@ export default function ELearning() {
             </Link>
           ))}
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
