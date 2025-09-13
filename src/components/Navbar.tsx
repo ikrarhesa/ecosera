@@ -1,13 +1,24 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Store, Home as HomeIcon, Package, ShoppingCart, User, Plus, Search, MessageCircle } from "lucide-react";
+import { Store, Home as HomeIcon, Package, ShoppingCart, User, Plus, Search, MessageCircle, Filter } from "lucide-react";
 
 interface NavbarProps {
   showSearchBar?: boolean;
   children?: React.ReactNode;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  showFilter?: boolean;
+  onFilterClick?: () => void;
 }
 
-export default function Navbar({ showSearchBar = false, children }: NavbarProps) {
+export default function Navbar({ 
+  showSearchBar = false, 
+  children, 
+  searchQuery = "", 
+  onSearchChange,
+  showFilter = false,
+  onFilterClick 
+}: NavbarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -56,9 +67,21 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
                   <input
                     type="text"
                     placeholder="Cari produk, kategori, atau merek..."
+                    value={searchQuery}
+                    onChange={(e) => onSearchChange?.(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-white/90 backdrop-blur-sm border border-white/20 rounded-xl text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent relative z-0"
                   />
                 </div>
+                
+                {/* Filter Icon - only show when searching */}
+                {showFilter && (
+                  <button 
+                    onClick={onFilterClick}
+                    className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors flex-shrink-0"
+                  >
+                    <Filter className="h-5 w-5 text-white" />
+                  </button>
+                )}
                 
                 {/* Chat Icon */}
                 <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors flex-shrink-0">

@@ -276,6 +276,8 @@ export default function Home() {
   const [distance, setDistance] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   // Calculate category counts
   const categoriesWithCounts = useMemo(() => {
@@ -291,6 +293,17 @@ export default function Home() {
   // Filter and sort products
   const filteredProducts = useMemo(() => {
     let filtered = [...PRODUCTS];
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(product => 
+        product.name.toLowerCase().includes(query) ||
+        product.description.toLowerCase().includes(query) ||
+        product.tags?.some(tag => tag.toLowerCase().includes(query)) ||
+        product.sellerName.toLowerCase().includes(query)
+      );
+    }
 
     // Filter by category
     if (selectedCategory !== "all") {
@@ -328,11 +341,16 @@ export default function Home() {
     }
 
     return filtered;
-  }, [selectedCategory, sortBy, priceRange]);
+  }, [selectedCategory, sortBy, priceRange, searchQuery]);
 
   return (
     <>
-      <Navbar />
+      <Navbar 
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        showFilter={searchQuery.trim().length > 0}
+        onFilterClick={() => setShowFilters(!showFilters)}
+      />
       
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
         <main className="px-4 pt-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
@@ -343,14 +361,6 @@ export default function Home() {
           <div className="mb-4 mt-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold">Kategori</h3>
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50"
-              >
-                <Filter className="h-4 w-4" />
-                Filter
-                <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
-              </button>
             </div>
             
             {/* Horizontal scrollable categories */}
@@ -378,65 +388,80 @@ export default function Home() {
                 </button>
               ))}
             </div>
-
-            {/* Advanced Filters */}
-            {showFilters && (
-              <div className="mt-4 p-4 bg-white rounded-xl border border-slate-200 space-y-4">
-                {/* Sort Options */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Urutkan</label>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
-                  >
-                    {SORT_OPTIONS.map((option) => (
-                      <option key={option.id} value={option.id}>
-                        {option.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Distance Options */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Jarak</label>
-                  <select
-                    value={distance}
-                    onChange={(e) => setDistance(e.target.value)}
-                    className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
-                  >
-                    {DISTANCE_OPTIONS.map((option) => (
-                      <option key={option.id} value={option.id}>
-                        {option.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Price Range */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Rentang Harga</label>
-                  <select
-                    value={priceRange}
-                    onChange={(e) => setPriceRange(e.target.value)}
-                    className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
-                  >
-                    {PRICE_RANGES.map((option) => (
-                      <option key={option.id} value={option.id}>
-                        {option.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
           </div>
+
+          {/* Advanced Filters - Only show when searching */}
+          {searchQuery.trim().length > 0 && showFilters && (
+            <div className="mb-4 p-4 bg-white rounded-xl border border-slate-200 space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium text-slate-900">Filter Hasil Pencarian</h4>
+                <button
+                  onClick={() => setShowFilters(false)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  ×
+                </button>
+              </div>
+              
+              {/* Sort Options */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Urutkan</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
+                >
+                  {SORT_OPTIONS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Distance Options */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Jarak</label>
+                <select
+                  value={distance}
+                  onChange={(e) => setDistance(e.target.value)}
+                  className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
+                >
+                  {DISTANCE_OPTIONS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Price Range */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Rentang Harga</label>
+                <select
+                  value={priceRange}
+                  onChange={(e) => setPriceRange(e.target.value)}
+                  className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
+                >
+                  {PRICE_RANGES.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
 
           {/* Produk */}
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">
-              {selectedCategory === "all" ? "Rekomendasi" : categoriesWithCounts.find(c => c.id === selectedCategory)?.name}
+              {searchQuery.trim() 
+                ? `Hasil pencarian "${searchQuery}"` 
+                : selectedCategory === "all" 
+                  ? "Rekomendasi" 
+                  : categoriesWithCounts.find(c => c.id === selectedCategory)?.name
+              }
             </h3>
             <span className="text-sm text-slate-600">{filteredProducts.length} produk</span>
           </div>
