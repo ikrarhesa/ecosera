@@ -1,5 +1,5 @@
 // src/pages/Home.tsx
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
   Store, Search, Bell, Star,
   ChevronRight as ArrowRight
@@ -14,6 +14,18 @@ const money = (n: number) => n.toLocaleString("id-ID");
 const img = (q: string, w = 1400, h = 560) =>
   // ukuran fix biar stabil
   `https://images.unsplash.com/photo-155${Math.floor(Math.random()*9)}?auto=format&fit=crop&w=${w}&h=${h}&q=70&ixlib=rb-4.0.3&${encodeURIComponent(q)}`;
+
+/* ===== Categories ===== */
+const CATEGORIES = [
+  { id: "all", name: "Semua", count: 0 },
+  { id: "makanan", name: "Makanan", count: 0 },
+  { id: "minuman", name: "Minuman", count: 0 },
+  { id: "kerajinan", name: "Kerajinan Tangan", count: 0 },
+  { id: "fashion", name: "Fashion", count: 0 },
+  { id: "kopi", name: "Kopi", count: 0 },
+  { id: "snack", name: "Snack", count: 0 },
+  { id: "sembako", name: "Sembako", count: 0 }
+];
 
 /* ===== Produk (Muara Enim) ===== */
 const PRODUCTS: Product[] = [
@@ -234,6 +246,27 @@ function BannerCarousel() {
 
 /* ===== Page ===== */
 export default function Home() {
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  // Calculate category counts
+  const categoriesWithCounts = useMemo(() => {
+    return CATEGORIES.map(category => {
+      if (category.id === "all") {
+        return { ...category, count: PRODUCTS.length };
+      }
+      const count = PRODUCTS.filter(product => product.category === category.id).length;
+      return { ...category, count };
+    });
+  }, []);
+
+  // Filter products based on selected category
+  const filteredProducts = useMemo(() => {
+    if (selectedCategory === "all") {
+      return PRODUCTS;
+    }
+    return PRODUCTS.filter(product => product.category === selectedCategory);
+  }, [selectedCategory]);
+
   return (
     <>
       <Navbar />
@@ -243,17 +276,54 @@ export default function Home() {
           {/* Banner carousel */}
           <BannerCarousel />
 
+          {/* Category Filters */}
+          <div className="mb-4 mt-6">
+            <h3 className="font-semibold mb-3">Kategori</h3>
+            <div className="flex flex-wrap gap-2">
+              {categoriesWithCounts.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    selectedCategory === category.id
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  {category.name}
+                  {category.count > 0 && (
+                    <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${
+                      selectedCategory === category.id
+                        ? "bg-blue-500 text-white"
+                        : "bg-slate-100 text-slate-600"
+                    }`}>
+                      {category.count}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Produk */}
-          <div className="flex items-center justify-between mb-4 mt-6">
-            <h3 className="font-semibold">Rekomendasi</h3>
-            <button className="text-sm text-blue-600">Lihat Semua</button>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold">
+              {selectedCategory === "all" ? "Rekomendasi" : categoriesWithCounts.find(c => c.id === selectedCategory)?.name}
+            </h3>
+            <span className="text-sm text-slate-600">{filteredProducts.length} produk</span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            {PRODUCTS.map((p) => (
+            {filteredProducts.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
+
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-slate-600">Tidak ada produk dalam kategori ini</p>
+            </div>
+          )}
         </main>
       </div>
     </>
