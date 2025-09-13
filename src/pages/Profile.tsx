@@ -1,9 +1,12 @@
 import { User, MapPin, Phone, Mail, Settings, Heart, Package, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 export default function Profile() {
   return (
-    <div className="min-h-screen bg-[#F6F8FC] pb-28">
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-[#F6F8FC] pb-28">
 
       {/* Header */}
       <div className="px-4 pt-3 pb-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
@@ -115,6 +118,7 @@ export default function Profile() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
