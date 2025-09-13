@@ -107,6 +107,60 @@ const PRODUCTS: Product[] = [
     featured: true,
     available: true
   },
+  { 
+    id: "batik-kujur-kain", 
+    name: "Batik Kujur Kain 2 meter", 
+    price: 125000, 
+    rating: 4.9, 
+    stock: 25,
+    unit: "meter",
+    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&h=800&q=70",
+    images: ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&h=800&q=70"],
+    description: "Batik Kujur tradisional khas Muara Enim dengan motif klasik yang elegan",
+    category: "kerajinan",
+    sellerName: "Batik Muara Enim",
+    sellerPhone: "6281234567896",
+    location: "Muara Enim, Sumsel",
+    tags: ["batik", "kujur", "kain"],
+    featured: true,
+    available: true
+  },
+  { 
+    id: "batik-kujur-baju", 
+    name: "Baju Batik Kujur Wanita", 
+    price: 180000, 
+    rating: 4.8, 
+    stock: 15,
+    unit: "pcs",
+    image: "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=800&h=800&q=70",
+    images: ["https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=800&h=800&q=70"],
+    description: "Baju batik kujur wanita dengan desain modern dan motif tradisional",
+    category: "fashion",
+    sellerName: "Batik Muara Enim",
+    sellerPhone: "6281234567896",
+    location: "Muara Enim, Sumsel",
+    tags: ["batik", "kujur", "baju", "wanita"],
+    featured: true,
+    available: true
+  },
+  { 
+    id: "batik-kujur-selendang", 
+    name: "Selendang Batik Kujur", 
+    price: 75000, 
+    rating: 4.7, 
+    stock: 20,
+    unit: "pcs",
+    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&h=800&q=70",
+    images: ["https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&h=800&q=70"],
+    description: "Selendang batik kujur dengan motif tradisional yang cantik",
+    category: "fashion",
+    sellerName: "Batik Muara Enim",
+    sellerPhone: "6281234567896",
+    location: "Muara Enim, Sumsel",
+    tags: ["batik", "kujur", "selendang"],
+    featured: false,
+    available: true
+  },
 ];
 
 /* ===== Banner data (full-width slider) ===== */
@@ -116,6 +170,7 @@ const BANNERS: Banner[] = [
   { id: "kemplang",title: "Paket Kemplang Hemat",     subtitle: "Bundling khas Sumsel",  cta: "Lihat Paket",     image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1400&h=560&q=70" },
   { id: "purun",   title: "Anyaman Purun Lokal",      subtitle: "Edisi UMKM Muara Enim", cta: "Cek Kerajinan",   image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1400&h=560&q=70" },
   { id: "gula",    title: "Gula Aren Semendo",        subtitle: "Manis alami tanpa pengawet", cta: "Coba Sekarang", image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "batik",   title: "Batik Kujur Muara Enim",   subtitle: "Koleksi batik tradisional", cta: "Lihat Koleksi", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1400&h=560&q=70" },
   { id: "serai",   title: "Minyak Serai Wangi",       subtitle: "Aromaterapi & segar",   cta: "Beli Serai",      image: "https://images.unsplash.com/photo-1526318472351-c75fcf070305?auto=format&fit=crop&w=1400&h=560&q=70" },
 ];
 

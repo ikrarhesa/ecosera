@@ -182,5 +182,87 @@
       "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&h=800&q=70"
     ],
     "description": "Kerupuk Palembang asli dengan cita rasa tradisional. Terbuat dari ikan segar pilihan dan bumbu rempah khas Palembang. Renyah dan gurih, cocok untuk camilan atau pelengkap makan."
+  },
+  {
+    "id": "batik-kujur-kain",
+    "name": "Batik Kujur Kain 2 meter",
+    "price": 125000,
+    "rating": 4.9,
+    "sold": 45,
+    "thumb": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&h=800&q=70",
+    "category": "kerajinan",
+    "sellerName": "Batik Muara Enim",
+    "sellerPhone": "6281234567896",
+    "location": "Muara Enim, Sumsel",
+    "tags": [
+      "batik",
+      "kujur",
+      "kain"
+    ],
+    "featured": true,
+    "available": true,
+    "stock": 25,
+    "unit": "meter",
+    "image": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&h=800&q=70",
+    "images": [
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&h=800&q=70",
+      "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=800&h=800&q=70"
+    ],
+    "description": "Batik Kujur tradisional khas Muara Enim dengan motif klasik yang elegan. Ditenun dengan teknik tradisional menggunakan pewarna alami. Cocok untuk acara formal maupun casual dengan kualitas premium."
+  },
+  {
+    "id": "batik-kujur-baju",
+    "name": "Baju Batik Kujur Wanita",
+    "price": 180000,
+    "rating": 4.8,
+    "sold": 32,
+    "thumb": "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=800&h=800&q=70",
+    "category": "fashion",
+    "sellerName": "Batik Muara Enim",
+    "sellerPhone": "6281234567896",
+    "location": "Muara Enim, Sumsel",
+    "tags": [
+      "batik",
+      "kujur",
+      "baju",
+      "wanita"
+    ],
+    "featured": true,
+    "available": true,
+    "stock": 15,
+    "unit": "pcs",
+    "image": "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=800&h=800&q=70",
+    "images": [
+      "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=800&h=800&q=70",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&h=800&q=70"
+    ],
+    "description": "Baju batik kujur wanita dengan desain modern dan motif tradisional. Terbuat dari kain batik kujur asli dengan potongan yang elegan dan nyaman dipakai. Tersedia dalam berbagai ukuran."
+  },
+  {
+    "id": "batik-kujur-selendang",
+    "name": "Selendang Batik Kujur",
+    "price": 75000,
+    "rating": 4.7,
+    "sold": 28,
+    "thumb": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&h=800&q=70",
+    "category": "fashion",
+    "sellerName": "Batik Muara Enim",
+    "sellerPhone": "6281234567896",
+    "location": "Muara Enim, Sumsel",
+    "tags": [
+      "batik",
+      "kujur",
+      "selendang"
+    ],
+    "featured": false,
+    "available": true,
+    "stock": 20,
+    "unit": "pcs",
+    "image": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&h=800&q=70",
+    "images": [
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&h=800&q=70",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&h=800&q=70"
+    ],
+    "description": "Selendang batik kujur dengan motif tradisional yang cantik. Bahan lembut dan ringan, cocok untuk aksesori pelengkap outfit batik atau pakaian modern. Desain serbaguna dan mudah dipadukan."
   }
 ]
