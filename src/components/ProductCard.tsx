@@ -27,7 +27,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {product.sellerName && (
           <div className="flex items-center gap-1 mt-1">
             <Store className="h-3 w-3 text-blue-600" />
-            <span className="text-xs text-blue-600 font-medium">{product.sellerName}</span>
+            <span className="text-xs text-blue-600 font-medium truncate">{product.sellerName}</span>
           </div>
         )}
         
