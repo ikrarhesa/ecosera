@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ProductCard from "../components/ProductCard";
 import type { Product } from "../types/product";
+import { getAllProducts } from "../services/products";
 
 /* ===== Helpers ===== */
 const money = (n: number) => n.toLocaleString("id-ID");
@@ -52,153 +53,7 @@ const PRICE_RANGES = [
   { id: "200k+", name: "Rp 200k+", min: 200000, max: Infinity }
 ];
 
-/* ===== Produk (Muara Enim) ===== */
-const PRODUCTS: Product[] = [
-  { 
-    id: "kopi-semendo", 
-    name: "Kopi Semendo Robusta 250g", 
-    price: 45000, 
-    rating: 4.9, 
-    stock: 999,
-    unit: "pack",
-    image: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&h=800&q=70",
-    images: ["https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&h=800&q=70"],
-    description: "Kopi robusta asli dari daerah Semendo dengan cita rasa khas",
-    category: "kopi",
-    sellerName: "Kebun Kopi Semendo",
-    sellerPhone: "6281234567890",
-    location: "Muara Enim, Sumsel",
-    tags: ["kopi", "semendo", "robusta"],
-    featured: true,
-    available: true
-  },
-  { 
-    id: "gula-aren", 
-    name: "Gula Aren Semendo 500g", 
-    price: 38000, 
-    rating: 4.8, 
-    stock: 999,
-    unit: "pack",
-    image: "https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=800&h=800&q=70",
-    images: ["https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=800&h=800&q=70"],
-    description: "Gula aren murni tanpa campuran bahan kimia",
-    category: "sembako",
-    sellerName: "Gula Aren Tradisional",
-    sellerPhone: "6281234567891",
-    location: "Muara Enim, Sumsel",
-    tags: ["gula", "aren", "semendo"],
-    featured: true,
-    available: true
-  },
-  { 
-    id: "kemplang", 
-    name: "Kemplang Panggang 200g", 
-    price: 29000, 
-    rating: 4.7, 
-    stock: 999,
-    unit: "pack",
-    image: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&h=800&q=70",
-    images: ["https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&h=800&q=70"],
-    description: "Kemplang panggang khas Palembang yang renyah",
-    category: "snack",
-    sellerName: "Kemplang Palembang Asli",
-    sellerPhone: "6281234567892",
-    location: "Muara Enim, Sumsel",
-    tags: ["kemplang", "ikan"],
-    featured: true,
-    available: true
-  },
-  { 
-    id: "anyaman-purun", 
-    name: "Keranjang Anyaman Purun", 
-    price: 69000, 
-    rating: 4.6, 
-    stock: 999,
-    unit: "pcs",
-    image: "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?auto=format&fit=crop&w=800&h=800&q=70",
-    images: ["https://images.unsplash.com/photo-1594633313593-bab3825d0caf?auto=format&fit=crop&w=800&h=800&q=70"],
-    description: "Keranjang anyaman dari purun berkualitas tinggi",
-    category: "kerajinan",
-    sellerName: "Kerajinan Purun Lokal",
-    sellerPhone: "6281234567893",
-    location: "Muara Enim, Sumsel",
-    tags: ["purun", "anyaman"],
-    featured: false,
-    available: true
-  },
-  { 
-    id: "dodol-kelapa", 
-    name: "Dodol Kelapa Semendo 250g", 
-    price: 27000, 
-    rating: 4.6, 
-    stock: 999,
-    unit: "pack",
-    image: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70",
-    images: ["https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70"],
-    description: "Dodol kelapa manis dan lembut khas Semendo",
-    category: "snack",
-    sellerName: "Dodol Kelapa Semendo",
-    sellerPhone: "6281234567894",
-    location: "Muara Enim, Sumsel",
-    tags: ["dodol", "kelapa"],
-    featured: true,
-    available: true
-  },
-  { 
-    id: "batik-kujur-kain", 
-    name: "Batik Kujur Kain 2 meter", 
-    price: 125000, 
-    rating: 4.9, 
-    stock: 25,
-    unit: "meter",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&h=800&q=70",
-    images: ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&h=800&q=70"],
-    description: "Batik Kujur tradisional khas Muara Enim dengan motif klasik yang elegan",
-    category: "kerajinan",
-    sellerName: "Batik Muara Enim",
-    sellerPhone: "6281234567896",
-    location: "Muara Enim, Sumsel",
-    tags: ["batik", "kujur", "kain"],
-    featured: true,
-    available: true
-  },
-  { 
-    id: "batik-kujur-baju", 
-    name: "Baju Batik Kujur Wanita", 
-    price: 180000, 
-    rating: 4.8, 
-    stock: 15,
-    unit: "pcs",
-    image: "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=800&h=800&q=70",
-    images: ["https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=800&h=800&q=70"],
-    description: "Baju batik kujur wanita dengan desain modern dan motif tradisional",
-    category: "fashion",
-    sellerName: "Batik Muara Enim",
-    sellerPhone: "6281234567896",
-    location: "Muara Enim, Sumsel",
-    tags: ["batik", "kujur", "baju", "wanita"],
-    featured: true,
-    available: true
-  },
-  { 
-    id: "batik-kujur-selendang", 
-    name: "Selendang Batik Kujur", 
-    price: 75000, 
-    rating: 4.7, 
-    stock: 20,
-    unit: "pcs",
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&h=800&q=70",
-    images: ["https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&h=800&q=70"],
-    description: "Selendang batik kujur dengan motif tradisional yang cantik",
-    category: "fashion",
-    sellerName: "Batik Muara Enim",
-    sellerPhone: "6281234567896",
-    location: "Muara Enim, Sumsel",
-    tags: ["batik", "kujur", "selendang"],
-    featured: false,
-    available: true
-  },
-];
+/* ===== Products will be loaded from service ===== */
 
 /* ===== Banner data (full-width slider) ===== */
 type Banner = { id: string; title: string; subtitle: string; cta: string; href?: string; image: string };
@@ -278,21 +133,27 @@ export default function Home() {
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  // Load products from service
+  React.useEffect(() => {
+    getAllProducts().then(setProducts);
+  }, []);
 
   // Calculate category counts
   const categoriesWithCounts = useMemo(() => {
     return CATEGORIES.map(category => {
       if (category.id === "all") {
-        return { ...category, count: PRODUCTS.length };
+        return { ...category, count: products.length };
       }
-      const count = PRODUCTS.filter(product => product.category === category.id).length;
+      const count = products.filter(product => product.category === category.id).length;
       return { ...category, count };
     });
-  }, []);
+  }, [products]);
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    let filtered = [...PRODUCTS];
+    let filtered = [...products];
 
     // Filter by search query
     if (searchQuery.trim()) {
@@ -341,7 +202,7 @@ export default function Home() {
     }
 
     return filtered;
-  }, [selectedCategory, sortBy, priceRange, searchQuery]);
+  }, [products, selectedCategory, sortBy, priceRange, searchQuery]);
 
   return (
     <>
