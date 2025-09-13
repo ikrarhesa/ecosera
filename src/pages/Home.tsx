@@ -37,7 +37,7 @@ const PRODUCTS: Product[] = [
   },
   { 
     id: "gula-aren", 
-    name: "Gula Aren Semende 500g", 
+    name: "Gula Aren Semendo 500g", 
     price: 38000, 
     rating: 4.8, 
     stock: 999,
@@ -49,7 +49,7 @@ const PRODUCTS: Product[] = [
     sellerName: "Gula Aren Tradisional",
     sellerPhone: "6281234567891",
     location: "Muara Enim, Sumsel",
-    tags: ["gula", "aren", "semende"],
+    tags: ["gula", "aren", "semendo"],
     featured: true,
     available: true
   },
@@ -91,16 +91,16 @@ const PRODUCTS: Product[] = [
   },
   { 
     id: "dodol-kelapa", 
-    name: "Dodol Kelapa Semende 250g", 
+    name: "Dodol Kelapa Semendo 250g", 
     price: 27000, 
     rating: 4.6, 
     stock: 999,
     unit: "pack",
     image: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70",
     images: ["https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70"],
-    description: "Dodol kelapa manis dan lembut khas Semende",
+    description: "Dodol kelapa manis dan lembut khas Semendo",
     category: "snack",
-    sellerName: "Dodol Kelapa Semende",
+    sellerName: "Dodol Kelapa Semendo",
     sellerPhone: "6281234567894",
     location: "Muara Enim, Sumsel",
     tags: ["dodol", "kelapa"],
@@ -112,10 +112,10 @@ const PRODUCTS: Product[] = [
 /* ===== Banner data (full-width slider) ===== */
 type Banner = { id: string; title: string; subtitle: string; cta: string; href?: string; image: string };
 const BANNERS: Banner[] = [
-  { id: "kopi",    title: "Festival Kopi Semende",    subtitle: "Diskon 20% minggu ini", cta: "Belanja Kopi",    href: "/product/kopi-semendo-250g",  image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "kopi",    title: "Festival Kopi Semendo",    subtitle: "Diskon 20% minggu ini", cta: "Belanja Kopi",    href: "/product/kopi-semendo-250g",  image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&h=560&q=70" },
   { id: "kemplang",title: "Paket Kemplang Hemat",     subtitle: "Bundling khas Sumsel",  cta: "Lihat Paket",     image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1400&h=560&q=70" },
   { id: "purun",   title: "Anyaman Purun Lokal",      subtitle: "Edisi UMKM Muara Enim", cta: "Cek Kerajinan",   image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1400&h=560&q=70" },
-  { id: "gula",    title: "Gula Aren Semende",        subtitle: "Manis alami tanpa pengawet", cta: "Coba Sekarang", image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "gula",    title: "Gula Aren Semendo",        subtitle: "Manis alami tanpa pengawet", cta: "Coba Sekarang", image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&h=560&q=70" },
   { id: "serai",   title: "Minyak Serai Wangi",       subtitle: "Aromaterapi & segar",   cta: "Beli Serai",      image: "https://images.unsplash.com/photo-1526318472351-c75fcf070305?auto=format&fit=crop&w=1400&h=560&q=70" },
 ];
 

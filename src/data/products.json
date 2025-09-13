@@ -28,7 +28,7 @@
   },
   {
     "id": "gula-aren",
-    "name": "Gula Aren Semende 500g",
+    "name": "Gula Aren Semendo 500g",
     "price": 38000,
     "rating": 4.8,
     "sold": 210,
@@ -40,7 +40,7 @@
     "tags": [
       "gula",
       "aren",
-      "semende"
+      "semendo"
     ],
     "featured": true,
     "available": true,
@@ -51,7 +51,7 @@
       "https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=800&h=800&q=70",
       "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?auto=format&fit=crop&w=800&h=800&q=70"
     ],
-    "description": "Gula aren murni dari pohon aren Semende yang diproses secara tradisional. Memiliki rasa manis alami yang khas dan aroma yang harum. Cocok untuk membuat aneka kue dan minuman tradisional."
+    "description": "Gula aren murni dari pohon aren Semendo yang diproses secara tradisional. Memiliki rasa manis alami yang khas dan aroma yang harum. Cocok untuk membuat aneka kue dan minuman tradisional."
   },
   {
     "id": "kemplang",
@@ -107,13 +107,13 @@
   },
   {
     "id": "dodol-kelapa",
-    "name": "Dodol Kelapa Semende 250g",
+    "name": "Dodol Kelapa Semendo 250g",
     "price": 27000,
     "rating": 4.6,
     "sold": 130,
     "thumb": "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70",
     "category": "snack",
-    "sellerName": "Dodol Kelapa Semende",
+    "sellerName": "Dodol Kelapa Semendo",
     "sellerPhone": "6281234567894",
     "location": "Muara Enim, Sumsel",
     "tags": [
@@ -129,7 +129,7 @@
       "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=800&h=800&q=70",
       "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&h=800&q=70"
     ],
-    "description": "Dodol kelapa tradisional khas Semende dengan tekstur kenyal dan rasa kelapa yang autentik. Dibuat dari kelapa segar pilihan dan gula aren asli. Camilan manis yang cocok untuk segala usia."
+    "description": "Dodol kelapa tradisional khas Semendo dengan tekstur kenyal dan rasa kelapa yang autentik. Dibuat dari kelapa segar pilihan dan gula aren asli. Camilan manis yang cocok untuk segala usia."
   },
   {
     "id": "serai-wangi",
