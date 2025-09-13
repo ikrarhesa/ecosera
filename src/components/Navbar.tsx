@@ -44,7 +44,7 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 inset-x-0 z-40">
         <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4 pb-3">
-          <div className="relative bg-white/95 backdrop-blur border border-slate-100 rounded-3xl shadow-[0_6px_24px_rgba(15,23,42,0.12)] px-5 py-2">
+          <div className="relative bg-white/80 backdrop-blur-md border border-white/20 rounded-full shadow-[0_8px_32px_rgba(15,23,42,0.15)] px-6 py-3">
             <div className="flex items-center justify-between text-slate-700 text-xs">
               <Link 
                 to="/" 
@@ -82,7 +82,7 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
                 }`}
               >
                 <ShoppingCart className="h-5 w-5" />
-                <span>Cart</span>
+                <span>Keranjang</span>
               </Link>
               
               <Link 
