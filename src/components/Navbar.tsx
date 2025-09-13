@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Store, Home as HomeIcon, Package, ShoppingCart, User, Plus, Search } from "lucide-react";
+import { Store, Home as HomeIcon, Package, ShoppingCart, User, Plus, Search, MessageCircle } from "lucide-react";
 
 interface NavbarProps {
   showSearchBar?: boolean;
@@ -23,7 +23,7 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
       <div className="sticky top-0 z-20">
         <div className="max-w-md md:max-w-lg lg:max-w-xl mx-auto">
           <header 
-            className="mx-4 mt-3 rounded-2xl relative overflow-hidden" 
+            className="mx-4 mt-3 relative overflow-hidden" 
             style={{
               background: 'linear-gradient(129deg, rgba(34, 84, 197, 1) 28%, rgba(69, 193, 255, 1) 100%)'
             }}
@@ -48,18 +48,23 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
                 </div>
               </div>
               
-              {/* Search Bar */}
-              <div className="px-4 pb-3">
-                <div className="relative max-w-sm mx-auto">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 text-slate-400" />
+              {/* Search Bar and Chat Icon Row */}
+              <div className="px-4 pb-3 flex items-center gap-3">
+                <div className="relative flex-1">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                    <Search className="h-4 w-4 text-slate-500" />
                   </div>
                   <input
                     type="text"
                     placeholder="Cari produk, kategori, atau merek..."
-                    className="w-full pl-10 pr-4 py-2.5 bg-white/90 backdrop-blur-sm border border-white/20 rounded-xl text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white/90 backdrop-blur-sm border border-white/20 rounded-xl text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent relative z-0"
                   />
                 </div>
+                
+                {/* Chat Icon */}
+                <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors flex-shrink-0">
+                  <MessageCircle className="h-5 w-5 text-white" />
+                </button>
               </div>
             </div>
           </header>
