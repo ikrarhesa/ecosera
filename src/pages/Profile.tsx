@@ -1,22 +1,41 @@
-import { User, MapPin, Phone, Mail, Settings, Heart, Package, Star } from "lucide-react";
+import { User, MapPin, Phone, Mail, Settings, Heart, Package, Star, Edit3 } from "lucide-react";
 import { Link } from "react-router-dom";
 import BottomNavbar from "../components/BottomNavbar";
+import ProfileHeader from "../components/ProfileHeader";
 
 export default function Profile() {
   return (
     <>
+      <ProfileHeader />
       <BottomNavbar />
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
 
-      {/* Header */}
-      <div className="px-4 pt-3 pb-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="h-16 w-16 rounded-full bg-blue-100 grid place-items-center">
-            <User className="h-8 w-8 text-blue-600" />
+      {/* Profile Section */}
+      <div className="px-4 pt-4 pb-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+        <div className="flex items-center gap-4 mb-6">
+          {/* Profile Picture with Edit Icon */}
+          <div className="relative">
+            <div className="h-20 w-20 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 grid place-items-center">
+              <User className="h-10 w-10 text-white" />
+            </div>
+            <button className="absolute -bottom-1 -right-1 h-6 w-6 bg-black rounded-full flex items-center justify-center">
+              <Edit3 className="h-3 w-3 text-white" />
+            </button>
           </div>
-          <div>
-            <h1 className="text-lg font-semibold text-slate-900">Profil Saya</h1>
-            <p className="text-sm text-slate-600">Kelola akun dan preferensi</p>
+          
+          {/* User Info */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className="text-xl font-bold text-slate-900">ikrarhesaa</h1>
+              <div className="flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                <span>Gold</span>
+                <span>›</span>
+              </div>
+            </div>
+            <div className="flex gap-4 text-sm text-slate-600">
+              <span>6 Pengikut</span>
+              <span>155 Mengikuti</span>
+            </div>
           </div>
         </div>
       </div>
