@@ -107,13 +107,13 @@ export default function ELearning() {
               className="block bg-white rounded-xl border border-slate-100 p-4 hover:shadow-md transition-shadow"
             >
               <div className="flex gap-4">
-                <div className="relative flex-shrink-0">
+                <div className="relative flex-shrink-0 w-20 h-20 bg-slate-100 rounded-lg overflow-hidden">
                   <img
                     src={module.thumbnail}
                     alt={module.title}
-                    className="w-20 h-20 rounded-lg object-cover"
+                    className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/20 rounded-lg flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                     <Play className="h-6 w-6 text-white" />
                   </div>
                 </div>
