@@ -35,12 +35,20 @@ export default function Profile() {
                 <h2 className="font-semibold text-white">John Doe</h2>
                 <p className="text-sm text-white/80">Pelanggan Ecosera</p>
               </div>
+            <div className="flex gap-2">
               <Link
                 to="/e-learning"
                 className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
               >
                 E-learning
               </Link>
+              <Link
+                to="/admin-dashboard"
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
+              >
+                Dashboard Admin
+              </Link>
+            </div>
             </div>
           
             <div className="space-y-2">
