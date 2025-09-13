@@ -32,7 +32,7 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
             <div 
               className="absolute inset-0 opacity-20 bg-cover bg-center bg-no-repeat"
               style={{
-                backgroundImage: 'url("/src/assets/images/header-pattern.svg")',
+                backgroundImage: 'url("/images/header-pattern.svg")',
                 backgroundSize: '50%'
               }}
             />
@@ -41,7 +41,7 @@ export default function Navbar({ showSearchBar = false, children }: NavbarProps)
               <div className="px-4 pt-3 pb-2 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <img 
-                    src="/src/assets/images/ecosera-logo.svg" 
+                    src="/images/ecosera-logo.svg" 
                     alt="Ecosera Logo" 
                     className="h-10 w-auto"
                   />
