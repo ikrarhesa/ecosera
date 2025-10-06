@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Store, Star } from "lucide-react";
+import { Store, Star, MapPin } from "lucide-react";
 import type { Product } from "../types/product";
 import { primaryImageOf } from "../services/products";
 
@@ -50,6 +50,14 @@ export default function ProductCard({ product }: { product: Product }) {
         )}
         
         <p className="font-semibold text-blue-600 mt-1">Rp {money(product.price)}</p>
+        
+        {/* Seller location */}
+        {product.location && (
+          <div className="flex items-center gap-1 mt-1">
+            <MapPin className="h-3 w-3 text-slate-500 flex-shrink-0" />
+            <span className="text-xs text-slate-500 truncate">{product.location}</span>
+          </div>
+        )}
       </div>
     </Link>
   );
