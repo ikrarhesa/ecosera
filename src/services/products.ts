@@ -37,6 +37,7 @@ function normalize(raw: any): Product {
     sellerPhone: raw.sellerPhone ?? "",  // Default phone if missing
     location: raw.location ?? "Muara Enim",  // Default location
     rating: Number(raw.rating ?? 4.8),  // Default rating if missing
+    sold: Number(raw.sold ?? 0),  // Default sold count if missing
     tags: Array.isArray(raw.tags) ? raw.tags : [],  // Ensure tags are an array
   };
 

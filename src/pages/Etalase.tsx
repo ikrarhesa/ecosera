@@ -6,7 +6,6 @@ import type { Product } from "../types/product";
 import { getAllProducts } from "../services/products";
 
 export default function Etalase() {
-  const nav = useNavigate();
   const [all, setAll] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("default");
@@ -26,9 +25,9 @@ export default function Etalase() {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(product => 
         product.name.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query) ||
+        (product.description && product.description.toLowerCase().includes(query)) ||
         product.tags?.some(tag => tag.toLowerCase().includes(query)) ||
-        product.sellerName.toLowerCase().includes(query)
+        (product.sellerName && product.sellerName.toLowerCase().includes(query))
       );
     }
 

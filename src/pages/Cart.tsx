@@ -1,7 +1,7 @@
 // src/pages/Cart.tsx
 import { useCart } from "../context/CartContext";
 import { Trash2, Minus, Plus, Store, MessageCircle } from "lucide-react";
-import { useRef, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useToast } from "../context/ToastContext";
 import { money } from "../utils/money";
 import { SHOP_WA } from "../utils/env";
@@ -71,7 +71,7 @@ function ConfirmModal({
   );
 }
 
-/** Satu baris item keranjang dengan swipe-to-delete & qty stepper */
+/** Satu baris item keranjang dengan delete button di dalam kartu */
 function CartItemRow({
   name,
   qty,
@@ -89,55 +89,12 @@ function CartItemRow({
   onRemoveConfirmed: () => void;
   onChangeQty: (q: number) => void;
 }) {
-  const startX = useRef<number | null>(null);
-  const [offset, setOffset] = useState(0); // px; negatif ke kiri
   const [ask, setAsk] = useState(false);
-  const MAX = 80; // lebar area tombol hapus
-  const THRESH_SHOW = 40; // ambang tampil tombol
-  const THRESH_DELETE = 120; // swipe panjang langsung minta konfirmasi
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    startX.current = e.touches[0].clientX;
-  };
-  const onTouchMove = (e: React.TouchEvent) => {
-    if (startX.current == null) return;
-    const dx = e.touches[0].clientX - startX.current;
-    const next = Math.max(-MAX, Math.min(0, dx)); // hanya ke kiri
-    setOffset(next);
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (startX.current == null) return;
-    const dx = e.changedTouches[0].clientX - startX.current;
-    if (Math.abs(dx) > THRESH_DELETE && dx < 0) {
-      setAsk(true); // swipe jauh: minta konfirmasi
-    } else if (dx < -THRESH_SHOW) {
-      setOffset(-MAX); // tampilkan tombol
-    } else {
-      setOffset(0); // balik
-    }
-    startX.current = null;
-  };
 
   return (
     <div className="relative">
-      {/* Tombol Hapus di belakang kartu */}
-      <div className="absolute inset-y-0 right-0 flex items-center pr-2">
-        <button
-          onClick={() => setAsk(true)}
-          className="h-10 px-3 rounded-lg bg-red-500 text-white text-sm shadow"
-        >
-          Hapus
-        </button>
-      </div>
-
-      {/* Kartu yang bisa diswipe */}
-      <div
-        className="flex items-center gap-3 rounded-2xl bg-white/80 backdrop-blur border border-black/10 p-3 relative transition-transform duration-200 will-change-transform"
-        style={{ transform: `translateX(${offset}px)` }}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-      >
+      {/* Kartu item */}
+      <div className="flex items-center gap-3 rounded-2xl bg-white/80 backdrop-blur border border-black/10 p-3">
         {/* Thumbnail */}
         <div className="h-16 w-16 rounded-xl overflow-hidden shrink-0 border border-black/10 bg-slate-100">
           <img
@@ -150,38 +107,54 @@ function CartItemRow({
 
         {/* Info + Stepper */}
         <div className="flex-1 min-w-0">
-          <p className="font-medium line-clamp-2">{name}</p>
-          {sellerName && (
-            <div className="flex items-center gap-1">
-              <Store className="h-3 w-3 text-blue-600" />
-              <p className="text-[12px] text-blue-600 font-medium">{sellerName}</p>
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="font-medium line-clamp-2">{name}</p>
+              {sellerName && (
+                <div className="flex items-center gap-1 mt-1">
+                  <Store className="h-3 w-3 text-blue-600" />
+                  <p className="text-[12px] text-blue-600 font-medium">{sellerName}</p>
+                </div>
+              )}
+              <p className="text-[13px] text-slate-600">Rp {money(price)} / item</p>
             </div>
-          )}
-          <p className="text-[13px] text-slate-600">Rp {money(price)} / item</p>
-
-          <div className="mt-2 flex items-center gap-2">
+            
+            {/* Delete button in top-right */}
             <button
-              onClick={() => onChangeQty(qty - 1)}
-              className="h-8 w-8 grid place-items-center rounded-lg border border-black/10 bg-white"
-              aria-label="Kurangi"
+              onClick={() => setAsk(true)}
+              className="ml-2 p-1.5 rounded-lg hover:bg-red-50 transition-colors group"
+              title="Hapus item"
             >
-              <Minus className="h-4 w-4" />
-            </button>
-            <div className="min-w-8 text-center font-semibold">{qty}</div>
-            <button
-              onClick={() => onChangeQty(qty + 1)}
-              className="h-8 w-8 grid place-items-center rounded-lg border border-black/10 bg-white"
-              aria-label="Tambah"
-            >
-              <Plus className="h-4 w-4" />
+              <Trash2 className="h-4 w-4 text-red-500 group-hover:text-red-600" />
             </button>
           </div>
-        </div>
 
-        {/* Total per item */}
-        <div className="text-right">
-          <p className="text-xs text-slate-600">Total</p>
-          <p className="font-semibold">Rp {money(price * qty)}</p>
+          <div className="mt-2 flex items-center justify-between">
+            {/* Quantity stepper */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => onChangeQty(qty - 1)}
+                className="h-8 w-8 grid place-items-center rounded-lg border border-black/10 bg-white hover:bg-slate-50 transition-colors"
+                aria-label="Kurangi"
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <div className="min-w-8 text-center font-semibold">{qty}</div>
+              <button
+                onClick={() => onChangeQty(qty + 1)}
+                className="h-8 w-8 grid place-items-center rounded-lg border border-black/10 bg-white hover:bg-slate-50 transition-colors"
+                aria-label="Tambah"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Total per item */}
+            <div className="text-right">
+              <p className="text-xs text-slate-600">Total</p>
+              <p className="font-semibold">Rp {money(price * qty)}</p>
+            </div>
+          </div>
         </div>
       </div>
 

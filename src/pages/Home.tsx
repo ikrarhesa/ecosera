@@ -1,20 +1,19 @@
 // src/pages/Home.tsx
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import {
-  Store, Search, Bell, Star, Filter, ChevronDown,
   ChevronRight as ArrowRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ProductCard from "../components/ProductCard";
+import { useCart } from "../context/CartContext";
+import { useToast } from "../context/ToastContext";
 import type { Product } from "../types/product";
 import { getAllProducts } from "../services/products";
 
+import PilihanDaerahStripSimple from '../components/PilihanDaerahStripSimple';
+
 /* ===== Helpers ===== */
-const money = (n: number) => n.toLocaleString("id-ID");
-const img = (q: string, w = 1400, h = 560) =>
-  // ukuran fix biar stabil
-  `https://images.unsplash.com/photo-155${Math.floor(Math.random()*9)}?auto=format&fit=crop&w=${w}&h=${h}&q=70&ixlib=rb-4.0.3&${encodeURIComponent(q)}`;
 
 /* ===== Categories ===== */
 const CATEGORIES = [
@@ -132,13 +131,37 @@ export default function Home() {
   const [priceRange, setPriceRange] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+  
+  // Cart integration
+  const { addToCart } = useCart();
+  const { show: showToast } = useToast();
 
   // Load products from service
   React.useEffect(() => {
     getAllProducts().then(setProducts);
   }, []);
+
+  // Handle add to cart from PilihanDaerahStrip
+  const handleAddToCart = (itemId: string) => {
+    try {
+      // Find the product to get its details
+      const product = products.find(p => p.id === itemId);
+      if (product) {
+        addToCart({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          thumb: product.thumb || product.image
+        }, 1);
+        showToast(`${product.name} ditambahkan ke keranjang`);
+      } else {
+        console.warn('[pilihan] produk tidak ditemukan:', itemId);
+      }
+    } catch (e) {
+      console.error('[pilihan] gagal tambah ke keranjang', e);
+    }
+  };
 
   // Calculate category counts
   const categoriesWithCounts = useMemo(() => {
@@ -160,9 +183,9 @@ export default function Home() {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(product => 
         product.name.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query) ||
+        (product.description && product.description.toLowerCase().includes(query)) ||
         product.tags?.some(tag => tag.toLowerCase().includes(query)) ||
-        product.sellerName.toLowerCase().includes(query)
+        (product.sellerName && product.sellerName.toLowerCase().includes(query))
       );
     }
 
@@ -204,6 +227,32 @@ export default function Home() {
     return filtered;
   }, [products, selectedCategory, sortBy, priceRange, searchQuery]);
 
+  // Analytics event logging
+  useEffect(() => {
+    const log = (name: string) => (e: any) => {
+      console.log(`[analytics] ${name}`, e?.detail ?? {});
+    };
+    const onView = log('pilihan_view');
+    const onTab = log('pilihan_tab_switch');
+    const onImp = log('pilihan_impression');
+    const onAdd = log('pilihan_click_add');
+    const onChat = log('pilihan_click_chat');
+
+    window.addEventListener('pilihan_view', onView as EventListener);
+    window.addEventListener('pilihan_tab_switch', onTab as EventListener);
+    window.addEventListener('pilihan_impression', onImp as EventListener);
+    window.addEventListener('pilihan_click_add', onAdd as EventListener);
+    window.addEventListener('pilihan_click_chat', onChat as EventListener);
+
+    return () => {
+      window.removeEventListener('pilihan_view', onView as EventListener);
+      window.removeEventListener('pilihan_tab_switch', onTab as EventListener);
+      window.removeEventListener('pilihan_impression', onImp as EventListener);
+      window.removeEventListener('pilihan_click_add', onAdd as EventListener);
+      window.removeEventListener('pilihan_click_chat', onChat as EventListener);
+    };
+  }, []);
+
   return (
     <>
       <Navbar 
@@ -217,6 +266,11 @@ export default function Home() {
         <main className="px-4 pt-1 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
           {/* Banner carousel */}
           <BannerCarousel />
+
+          {/* Pilihan Daerah Strip */}
+          <PilihanDaerahStripSimple
+            onAdd={handleAddToCart}
+          />
 
           {/* Category Filters - Horizontal Scrollable */}
           <div className="mb-3 mt-3">
