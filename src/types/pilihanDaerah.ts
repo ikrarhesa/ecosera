@@ -25,3 +25,4 @@ export interface PilihanResponse {
   tab: PilihanTab;
   items: PilihanItem[];
 }
+

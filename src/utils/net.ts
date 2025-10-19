@@ -12,3 +12,4 @@ export function onOnlineOnce(cb: () => void): () => void {
   window.addEventListener('online', handler);
   return () => window.removeEventListener('online', handler);
 }
+

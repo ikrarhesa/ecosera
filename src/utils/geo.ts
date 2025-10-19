@@ -10,3 +10,4 @@ export function haversineKm(aLat: number, aLng: number, bLat: number, bLng: numb
   const h = sinDlat * sinDlat + Math.cos(lat1) * Math.cos(lat2) * sinDlng * sinDlng;
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
 }
+

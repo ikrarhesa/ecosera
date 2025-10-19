@@ -10,23 +10,28 @@ import BottomNavbar from "../components/BottomNavbar";
 const fallbackImg =
   "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&h=300&q=70";
 
+function checksum(s: string) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h.toString(36).toUpperCase().slice(0, 6);
+}
+
 function buildWaMessage(
   sellerName: string,
   items: { name: string; qty: number; price: number }[],
   subtotal: number
 ) {
+  const payload = JSON.stringify({ sellerName, items, subtotal });
+  const orderId = checksum(payload);
   const lines = [
-    `*Pesanan dari ${sellerName}*`,
+    "Halo, saya ingin pesan dari *Ecosera*",
+    Seller: **,
     "————————————",
-    ...items.map(
-      (i, idx) => `${idx + 1}) ${i.name} x${i.qty} = Rp ${money(i.price * i.qty)}`
-    ),
+    ...items.map((it) => •  x — Rp ),
     "————————————",
-    `Subtotal: Rp ${money(subtotal)}`,
-    `Ongkir: (akan dikonfirmasi)`,
-    `Total: Rp ${money(subtotal)} *estimasi tanpa ongkir*`,
+    Total: Rp  (estimasi, belum termasuk ongkir),
+    OrderID: #,
     "————————————",
-    "Mohon isi data pemesanan:",
     "Nama:",
     "Alamat:",
     "Nomor HP:",
@@ -291,7 +296,7 @@ export default function Cart() {
                 if (items.length === 0) return;
                 if (confirm("Kosongkan seluruh keranjang?")) {
                   clearCart();
-                  show("Keranjang dikosongkan 🗑️");
+                  show("Keranjang dikosongkan ðŸ—‘ï¸");
                 }
               }}
               className="rounded-xl p-2 border border-slate-200 bg-white hover:bg-slate-50"

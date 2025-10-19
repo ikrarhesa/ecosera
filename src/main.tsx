@@ -5,15 +5,21 @@ import App from './App'
 import './index.css'
 import { CartProvider } from './context/CartContext'
 import { ToastProvider } from './context/ToastContext'
+import { assertEnv } from "./utils/env";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+
+assertEnv();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <ToastProvider>
-        <CartProvider>
-          <App />
-        </CartProvider>
-      </ToastProvider>
-    </BrowserRouter>
-  </React.StrictMode>,
+  <ErrorBoundary>
+    <React.StrictMode>
+      <BrowserRouter>
+        <ToastProvider>
+          <CartProvider>
+            <App />
+          </CartProvider>
+        </ToastProvider>
+      </BrowserRouter>
+    </React.StrictMode>
+  </ErrorBoundary>,
 )

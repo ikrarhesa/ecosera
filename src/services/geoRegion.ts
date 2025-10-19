@@ -22,3 +22,4 @@ export function resolveRegionLabel(lat?: number, lng?: number, fallback = 'Sekit
   }
   return fallback;
 }
+
