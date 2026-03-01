@@ -265,6 +265,66 @@ export default function Home() {
     };
   }, []);
 
+  if (loading) {
+    return (
+      <>
+        <Navbar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          showFilter={false}
+          onFilterClick={() => { }}
+        />
+        <div className="min-h-screen bg-[#F6F8FC] pb-28">
+          <main className="px-4 pt-1">
+            {/* Banner Skeleton */}
+            <section className="mt-1">
+              <div className="relative overflow-hidden rounded-lg h-48 border border-slate-100 bg-slate-200 animate-pulse" />
+            </section>
+
+            {/* Pilihan Daerah Strip Skeleton */}
+            <div className="mt-3 bg-white rounded-xl border border-slate-100 p-3 flex gap-3 overflow-hidden shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse shrink-0" />
+              <div className="flex-1 space-y-2 py-1">
+                <div className="h-4 bg-slate-200 rounded w-1/3 animate-pulse" />
+                <div className="h-3 bg-slate-200 rounded w-1/2 animate-pulse" />
+              </div>
+            </div>
+
+            {/* Categories Skeleton */}
+            <div className="mb-3 mt-3">
+              <div className="h-5 w-20 bg-slate-200 rounded animate-pulse mb-3" />
+              <div className="flex gap-2 overflow-hidden pb-2">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="h-9 w-24 bg-slate-200 rounded-full animate-pulse shrink-0" />
+                ))}
+              </div>
+            </div>
+
+            {/* Grid Header Skeleton */}
+            <div className="flex items-center justify-between mb-3 mt-4">
+              <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
+              <div className="h-4 w-16 bg-slate-200 rounded animate-pulse" />
+            </div>
+
+            {/* Grid Skeleton */}
+            <div className="grid grid-cols-2 gap-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 animate-pulse">
+                  <div className="w-full aspect-square bg-slate-200"></div>
+                  <div className="p-3">
+                    <div className="h-4 bg-slate-200 rounded w-full mb-2"></div>
+                    <div className="h-4 bg-slate-200 rounded w-2/3 mb-3"></div>
+                    <div className="h-5 bg-slate-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar
@@ -441,31 +501,15 @@ export default function Home() {
                   : categoriesWithCounts.find(c => c.id === selectedCategory)?.name
               }
             </h3>
-            {!loading && <span className="text-sm text-slate-600">{filteredProducts.length} produk</span>}
           </div>
 
-          {loading ? (
-            <div className="grid grid-cols-2 gap-3">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 animate-pulse">
-                  <div className="w-full aspect-square bg-slate-200"></div>
-                  <div className="p-3">
-                    <div className="h-4 bg-slate-200 rounded w-full mb-2"></div>
-                    <div className="h-4 bg-slate-200 rounded w-2/3 mb-3"></div>
-                    <div className="h-5 bg-slate-200 rounded w-1/2"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {filteredProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-2 gap-3">
+            {filteredProducts.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
 
-          {!loading && filteredProducts.length === 0 && (
+          {filteredProducts.length === 0 && (
             <div className="text-center py-8">
               <p className="text-slate-600">Tidak ada produk dalam kategori ini</p>
             </div>
