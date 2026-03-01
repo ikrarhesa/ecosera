@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWishlist } from "../context/WishlistContext";
 import Navbar from "../components/Navbar";
 import { Heart, Trash2 } from "lucide-react";
@@ -13,6 +13,15 @@ export default function Wishlist() {
     const navigate = useNavigate();
     const { show } = useToast();
     const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        // Simulate network loading state for smoother UX
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 800);
+        return () => clearTimeout(timer);
+    }, []);
 
     const toggleSelect = (id: string, e: React.MouseEvent) => {
         e.preventDefault();
@@ -50,7 +59,7 @@ export default function Wishlist() {
                         <h1 className="font-bold text-slate-900 text-2xl">Tersimpan</h1>
                         <p className="text-sm text-slate-500 mt-0.5">{wishlist.length} items</p>
                     </div>
-                    {selectedItems.size > 0 && (
+                    {selectedItems.size > 0 && !isLoading && (
                         <button
                             onClick={handleBatchDelete}
                             className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium border border-red-100 hover:bg-red-100 transition-colors"
@@ -62,7 +71,25 @@ export default function Wishlist() {
                 </div>
 
                 <main className="px-4 mt-2">
-                    {wishlist.length === 0 ? (
+                    {isLoading ? (
+                        <div className="flex flex-col border-t border-slate-100 mt-2">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <div key={i} className="flex items-center py-5 border-b border-slate-100 last:border-b-0 animate-pulse">
+                                    <div className="pr-4 py-2">
+                                        <div className="w-5 h-5 rounded border-[1.5px] border-slate-200 bg-slate-200"></div>
+                                    </div>
+                                    <div className="w-20 h-20 flex-shrink-0 bg-slate-200 rounded-xl mr-4"></div>
+                                    <div className="flex-1 pr-3 flex flex-col justify-center gap-3">
+                                        <div className="h-4 bg-slate-200 rounded w-full"></div>
+                                        <div className="h-4 bg-slate-200 rounded w-2/3"></div>
+                                    </div>
+                                    <div className="pl-1">
+                                        <div className="h-5 bg-slate-200 rounded w-20"></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : wishlist.length === 0 ? (
                         <div className="text-center mt-20">
                             <Heart className="h-16 w-16 text-slate-200 mx-auto mb-4" />
                             <p className="text-slate-800 font-semibold text-lg">Belum ada yang disimpan</p>

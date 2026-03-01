@@ -8,7 +8,7 @@ import { getSoughtAfterItems, SoughtAfterItem } from "../services/soughtAfter";
 import { supabase } from "../lib/supabase";
 
 export default function Etalase() {
-  const { products: all } = useProducts();
+  const { products: all, loading } = useProducts();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState("all");
@@ -133,8 +133,8 @@ export default function Etalase() {
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
                   className={`snap-start shrink-0 flex items-center justify-center px-4 py-2 rounded-full text-sm font-medium transition-colors border ${selectedCategory === cat.id
-                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                      : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border-slate-200/50"
+                    ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                    : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border-slate-200/50"
                     }`}
                 >
                   {cat.name}
@@ -253,13 +253,28 @@ export default function Etalase() {
             <span className="text-xs text-slate-600">{filteredProducts.length} item</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {filteredProducts.map((p: Product) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-2 gap-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 animate-pulse">
+                  <div className="w-full aspect-square bg-slate-200"></div>
+                  <div className="p-3">
+                    <div className="h-4 bg-slate-200 rounded w-full mb-2"></div>
+                    <div className="h-4 bg-slate-200 rounded w-2/3 mb-3"></div>
+                    <div className="h-5 bg-slate-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {filteredProducts.map((p: Product) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          )}
 
-          {filteredProducts.length === 0 && searchQuery.trim() && (
+          {!loading && filteredProducts.length === 0 && searchQuery.trim() && (
             <div className="text-center py-8">
               <p className="text-slate-600">Tidak ada hasil untuk "{searchQuery}"</p>
             </div>

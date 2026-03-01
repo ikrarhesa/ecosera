@@ -133,7 +133,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [categories, setCategories] = useState<{ id: string, name: string }[]>([{ id: "all", name: "Semua" }]);
-  const { products } = useProducts();
+  const { products, loading } = useProducts();
 
   useEffect(() => {
     import("../lib/supabase").then(({ supabase }) => {
@@ -441,16 +441,31 @@ export default function Home() {
                   : categoriesWithCounts.find(c => c.id === selectedCategory)?.name
               }
             </h3>
-            <span className="text-sm text-slate-600">{filteredProducts.length} produk</span>
+            {!loading && <span className="text-sm text-slate-600">{filteredProducts.length} produk</span>}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {filteredProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-2 gap-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 animate-pulse">
+                  <div className="w-full aspect-square bg-slate-200"></div>
+                  <div className="p-3">
+                    <div className="h-4 bg-slate-200 rounded w-full mb-2"></div>
+                    <div className="h-4 bg-slate-200 rounded w-2/3 mb-3"></div>
+                    <div className="h-5 bg-slate-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {filteredProducts.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          )}
 
-          {filteredProducts.length === 0 && (
+          {!loading && filteredProducts.length === 0 && (
             <div className="text-center py-8">
               <p className="text-slate-600">Tidak ada produk dalam kategori ini</p>
             </div>

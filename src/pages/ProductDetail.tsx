@@ -209,8 +209,60 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="mx-auto w-full max-w-md min-h-screen bg-white">
-        <div className="p-4">Memuat produk…</div>
+      <div className="w-full min-h-screen bg-white">
+        {/* Header Skeleton */}
+        <div className="sticky top-0 z-20 flex items-center justify-between bg-white px-3 py-3 border-b">
+          <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse" />
+          <div className="flex gap-2">
+            <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse" />
+            <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse" />
+          </div>
+        </div>
+
+        {/* Gallery Image Skeleton */}
+        <div className="w-full aspect-square bg-slate-200 animate-pulse" />
+
+        {/* Content Skeleton */}
+        <div className="px-4 mt-5 space-y-4">
+          <div className="h-6 bg-slate-200 rounded-md w-3/4 animate-pulse" />
+          <div className="h-8 bg-slate-200 rounded-md w-1/3 animate-pulse mt-3" />
+          <div className="flex gap-2 mt-3">
+            <div className="w-20 h-5 bg-slate-200 rounded-md animate-pulse" />
+            <div className="w-24 h-5 bg-slate-200 rounded-md animate-pulse" />
+          </div>
+
+          {/* Seller Skeleton */}
+          <div className="mt-6 flex items-center justify-between rounded-2xl border p-3">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-slate-200 animate-pulse" />
+              <div className="space-y-2">
+                <div className="h-4 bg-slate-200 rounded-md w-24 animate-pulse" />
+                <div className="h-3 bg-slate-200 rounded-md w-32 animate-pulse" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <div className="w-8 h-4 bg-slate-200 rounded-md animate-pulse" />
+              <div className="w-8 h-4 bg-slate-200 rounded-md animate-pulse" />
+            </div>
+          </div>
+
+          {/* Description Skeleton */}
+          <div className="mt-6 space-y-3">
+            <div className="h-4 bg-slate-200 rounded-md w-1/4 animate-pulse mb-4" />
+            <div className="h-4 bg-slate-200 rounded-md w-full animate-pulse" />
+            <div className="h-4 bg-slate-200 rounded-md w-full animate-pulse" />
+            <div className="h-4 bg-slate-200 rounded-md w-5/6 animate-pulse" />
+            <div className="h-4 bg-slate-200 rounded-md w-2/3 animate-pulse" />
+          </div>
+        </div>
+
+        {/* Bottom Bar Skeleton */}
+        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-30 w-full max-w-md md:max-w-lg lg:max-w-xl bg-white border-t px-3 py-3">
+          <div className="flex gap-2">
+            <div className="flex-1 h-11 bg-slate-200 rounded-xl animate-pulse" />
+            <div className="flex-[2] h-11 bg-slate-200 rounded-xl animate-pulse" />
+          </div>
+        </div>
       </div>
     );
   }
