@@ -5,9 +5,10 @@ import {
   MessageCircle, ShoppingCart, ShieldCheck, Truck, PackageOpen, Check
 } from "lucide-react";
 import type { Product } from "../types/product";
-import { getProductBySlug, getRelatedProducts, allImagesOf } from "../services/products";
+import { getProductBySlug, getRelatedProducts, allImagesOf, getProductReviews, submitProductReview, type ProductReview } from "../services/products";
 import { useToast } from "../context/ToastContext";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 import { supabase } from "../lib/supabase";
 
 const ACCENT = "#2254c5";
@@ -21,15 +22,24 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { show } = useToast();
   const { addToCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [liked, setLiked] = useState(false);
+  const liked = product ? isInWishlist(product.id) : false;
   const [qty, setQty] = useState(1);
   const [related, setRelated] = useState<Product[]>([]);
 
   const galleryRef = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
+
+  // Reviews State
+  const [reviews, setReviews] = useState<ProductReview[]>([]);
+  const [reviewerName, setReviewerName] = useState("");
+  const [contactInfo, setContactInfo] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -54,6 +64,10 @@ export default function ProductDetail() {
           }
         })();
       }
+
+      const revs = p ? await getProductReviews(p.id) : [];
+      if (!mounted) return;
+      setReviews(revs);
 
       setQty(1);
       setIdx(0);
@@ -141,6 +155,40 @@ export default function ProductDetail() {
     show("Produk berhasil ditambahkan ke keranjang! 🛒");
   };
 
+  const onSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product || !reviewerName.trim() || !contactInfo.trim()) return;
+    setSubmittingReview(true);
+
+    const success = await submitProductReview({
+      product_id: product.id,
+      reviewer_name: reviewerName.trim(),
+      contact_info: contactInfo.trim(),
+      rating: reviewRating,
+      comment: reviewComment.trim()
+    });
+
+    if (success) {
+      show("Terima kasih! Ulasan berhasil dikirim.");
+      setReviewerName("");
+      setContactInfo("");
+      setReviewComment("");
+      setReviewRating(5);
+      // Refresh reviews
+      const revs = await getProductReviews(product.id);
+      setReviews(revs);
+    } else {
+      show("Gagal mengirim ulasan. Silakan coba lagi.");
+    }
+    setSubmittingReview(false);
+  };
+
+  const displayRating = useMemo(() => {
+    if (reviews.length === 0) return product?.rating?.toFixed(1) ?? "4.8";
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+    return (sum / reviews.length).toFixed(1);
+  }, [reviews, product]);
+
   const images = useMemo(() => allImagesOf(product), [product]);
 
   const goTo = (i: number) => {
@@ -191,7 +239,12 @@ export default function ProductDetail() {
         </button>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setLiked(v => !v)}
+            onClick={() => {
+              if (product) {
+                toggleWishlist(product);
+                show(liked ? "Dihapus dari wishlist" : "Disimpan ke wishlist 💖");
+              }
+            }}
             className={`p-2 rounded-full border ${liked ? "bg-red-50 border-red-200" : "bg-white"}`}
             aria-label="Like"
           >
@@ -294,9 +347,9 @@ export default function ProductDetail() {
 
         <div className="mt-1 flex items-center gap-1 text-sm text-gray-700">
           <Star className="fill-amber-400 stroke-amber-400" size={16} />
-          <span>{product.rating?.toFixed(1) ?? "4.8"}</span>
+          <span>{displayRating}</span>
           <span className="text-gray-400">•</span>
-          <span>{product.stock == null ? "Stok tersedia" : `Stok ${product.stock}`}</span>
+          <span>{reviews.length > 0 ? `${reviews.length} ulasan` : (product.stock == null ? "Stok tersedia" : `Stok ${product.stock}`)}</span>
         </div>
 
         {/* Seller / Lokasi */}
@@ -308,7 +361,7 @@ export default function ProductDetail() {
             <div>
               <p className="text-sm font-semibold">{product.sellerName ?? "UMKM Lokal"}</p>
               <p className="text-xs text-gray-500 flex items-center gap-1">
-                <MapPin size={14} /> {product.location ?? "Muara Enim, Sumsel"}
+                <MapPin size={14} /> {product.location || "Lokasi belum diatur"}
               </p>
             </div>
           </Link>
@@ -361,6 +414,64 @@ export default function ProductDetail() {
           <li className="flex items-center gap-2"><Check size={16} style={{ color: ACCENT }} /> Harga bersaing</li>
           <li className="flex items-center gap-2"><Check size={16} style={{ color: ACCENT }} /> Dukungan Ecosera</li>
         </ul>
+
+        {/* Reviews Section */}
+        <div className="mt-6 border-t pt-5">
+          <h2 className="text-sm font-semibold mb-4">Ulasan Pembeli ({reviews.length})</h2>
+
+          {/* Review List */}
+          <div className="space-y-4 mb-6">
+            {reviews.length === 0 ? (
+              <p className="text-sm text-gray-500 italic">Belum ada ulasan untuk produk ini. Jadilah yang pertama!</p>
+            ) : (
+              reviews.map((rev, i) => (
+                <div key={rev.id || i} className="border-b pb-3 last:border-b-0 last:pb-0">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{rev.reviewer_name}</span>
+                    <div className="flex text-amber-400">
+                      {Array.from({ length: 5 }).map((_, idx) => (
+                        <Star key={idx} size={12} className={idx < rev.rating ? "fill-amber-400" : "fill-gray-200 text-gray-200"} />
+                      ))}
+                    </div>
+                  </div>
+                  {rev.comment && <p className="text-sm text-gray-600 mt-1">{rev.comment}</p>}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Write Review Form */}
+          <div className="bg-gray-50 p-4 rounded-xl border">
+            <h3 className="text-sm font-medium mb-3">Tulis Ulasan Baru</h3>
+            <form onSubmit={onSubmitReview} className="space-y-3">
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">Nama (Tampil Publik)</label>
+                <input required type="text" value={reviewerName} onChange={(e) => setReviewerName(e.target.value)} placeholder="Nama Anda" className="w-full text-sm rounded-lg border p-2 focus:ring-1 focus:ring-blue-500" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">No HP / Email (Privasi Terjamin)</label>
+                <input required type="text" value={contactInfo} onChange={(e) => setContactInfo(e.target.value)} placeholder="Untuk mencegah spam" className="w-full text-sm rounded-lg border p-2 focus:ring-1 focus:ring-blue-500" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">Penilaian</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button key={star} type="button" onClick={() => setReviewRating(star)} className="p-1">
+                      <Star size={24} className={star <= reviewRating ? "fill-amber-400 stroke-amber-400" : "stroke-gray-300"} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">Komentar (Opsional)</label>
+                <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} placeholder="Bagaimana produk ini?" rows={2} className="w-full text-sm rounded-lg border p-2 focus:ring-1 focus:ring-blue-500" />
+              </div>
+              <button disabled={submittingReview} type="submit" className="w-full py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                {submittingReview ? "Mengirim..." : "Kirim Ulasan"}
+              </button>
+            </form>
+          </div>
+        </div>
 
         {/* Related */}
         {related.length > 0 && (

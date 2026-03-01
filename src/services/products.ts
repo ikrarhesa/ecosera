@@ -5,18 +5,27 @@ import { supabase } from "../lib/supabase";
 const PLACEHOLDER = "https://placehold.co/800x800/png?text=Ecosera";
 
 // Cache seller names to avoid repeated lookups
-const sellerCache: Record<string, { name: string; phone: string; address: string }> = {};
+const sellerCache: Record<string, { name: string; phone: string; address: string; lat?: number; lng?: number }> = {};
 
 async function fetchSellerInfo(sellerId: string) {
   if (!sellerId) return null;
   if (sellerCache[sellerId]) return sellerCache[sellerId];
   const { data } = await supabase
     .from("sellers")
-    .select("name, phone, address")
+    .select("name, phone, address, latitude, longitude, social_media")
     .eq("id", sellerId)
     .single();
   if (data) {
-    sellerCache[sellerId] = { name: data.name, phone: data.phone || "", address: data.address || "Muara Enim" };
+    // Prefer social_media.whatsapp over the legacy phone column
+    const social = (data.social_media as Record<string, string> | null) ?? {};
+    const waPhone = social.whatsapp?.trim() || data.phone || "";
+    sellerCache[sellerId] = {
+      name: data.name,
+      phone: waPhone,
+      address: data.address || "",
+      lat: data.latitude ?? undefined,
+      lng: data.longitude ?? undefined,
+    };
   }
   return sellerCache[sellerId] || null;
 }
@@ -43,7 +52,9 @@ function normalize(raw: any): Product {
     category: String(raw.category ?? "general"),  // Default category if missing
     sellerName: raw._sellerName ?? raw.sellerName ?? "UMKM Lokal",
     sellerPhone: raw._sellerPhone ?? raw.sellerPhone ?? "",
-    location: raw._sellerAddress ?? raw.location ?? "Muara Enim",
+    location: raw._sellerAddress ?? raw.location ?? "",
+    sellerLat: raw._sellerLat ?? undefined,
+    sellerLng: raw._sellerLng ?? undefined,
     rating: Number(raw.rating ?? 4.8),  // Default rating if missing
     sold: Number(raw.sold ?? 0),  // Default sold count if missing
     tags: Array.isArray(raw.tags) ? raw.tags : [],  // Ensure tags are an array
@@ -62,7 +73,7 @@ export async function getAllProducts(): Promise<Product[]> {
   try {
     const { data, error } = await supabase
       .from("products")
-      .select("*")
+      .select("*, product_categories(category_id)")
       .eq("is_active", true);
 
     if (error) {
@@ -77,7 +88,8 @@ export async function getAllProducts(): Promise<Product[]> {
 
     return products.map((raw: any) => {
       const info = sellerCache[raw.seller_id];
-      return normalize({ ...raw, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address });
+      const category = raw.product_categories?.[0]?.category_id || "general";
+      return normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng });
     });
   } catch (err) {
     console.error("Unexpected error fetching all products:", err);
@@ -90,7 +102,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   try {
     const { data, error } = await supabase
       .from("products")
-      .select("*")
+      .select("*, product_categories(category_id)")
       .eq("slug", slug)
       .single();
 
@@ -102,7 +114,8 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 
     // Enrich with seller name
     const info = await fetchSellerInfo(data.seller_id);
-    return normalize({ ...data, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address });
+    const category = data.product_categories?.[0]?.category_id || "general";
+    return normalize({ ...data, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng });
   } catch (err) {
     console.error("Unexpected error fetching product:", err);
     return null;
@@ -162,7 +175,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
   try {
     const { data, error } = await supabase
       .from("products")
-      .select("*")
+      .select("*, product_categories(category_id)")
       .eq("featured", true)
       .eq("is_active", true);
 
@@ -177,10 +190,65 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 
     return products.map((raw: any) => {
       const info = sellerCache[raw.seller_id];
-      return normalize({ ...raw, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address });
+      const category = raw.product_categories?.[0]?.category_id || "general";
+      return normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng });
     });
   } catch (err) {
     console.error("Unexpected error fetching featured products:", err);
     return [];
+  }
+}
+
+// ---- Reviews Feature ----
+
+export interface ProductReview {
+  id?: string;
+  product_id: string;
+  reviewer_name: string;
+  contact_info: string;
+  rating: number;
+  comment?: string;
+  created_at?: string;
+}
+
+export async function getProductReviews(productId: string): Promise<ProductReview[]> {
+  try {
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("product_id", productId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching reviews:", error);
+      return [];
+    }
+    return data || [];
+  } catch (err) {
+    console.error("Unexpected error fetching reviews:", err);
+    return [];
+  }
+}
+
+export async function submitProductReview(review: ProductReview): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("reviews").insert([
+      {
+        product_id: review.product_id,
+        reviewer_name: review.reviewer_name,
+        contact_info: review.contact_info,
+        rating: review.rating,
+        comment: review.comment || ""
+      }
+    ]);
+
+    if (error) {
+      console.error("Error submitting review:", error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("Unexpected error submitting review:", err);
+    return false;
   }
 }

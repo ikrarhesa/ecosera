@@ -8,20 +8,11 @@ import Navbar from "../components/Navbar";
 import ProductCard from "../components/ProductCard";
 import { useProducts } from "../context/ProductsContext";
 import PilihanDaerahStripSimple from '../components/PilihanDaerahStripSimple';
+import { calculateDistance, requestUserLocation } from "../utils/distance";
 
 /* ===== Helpers ===== */
 
-/* ===== Categories ===== */
-const CATEGORIES = [
-  { id: "all", name: "Semua", count: 0 },
-  { id: "makanan", name: "Makanan", count: 0 },
-  { id: "minuman", name: "Minuman", count: 0 },
-  { id: "kerajinan", name: "Kerajinan", count: 0 },
-  { id: "fashion", name: "Fashion", count: 0 },
-  { id: "kopi", name: "Kopi", count: 0 },
-  { id: "snack", name: "Snack", count: 0 },
-  { id: "sembako", name: "Sembako", count: 0 }
-];
+/* ===== Categories will be loaded dynamically ===== */
 
 /* ===== Sort Options ===== */
 const SORT_OPTIONS = [
@@ -89,7 +80,7 @@ function BannerCarousel() {
 
   return (
     <section className="mt-1">
-      <div className="relative overflow-hidden rounded-3xl h-48 border border-slate-100 bg-white">
+      <div className="relative overflow-hidden rounded-lg h-48 border border-slate-100 bg-white">
         <div
           className="whitespace-nowrap h-full transition-transform duration-500 ease-out"
           style={{ transform: `translateX(-${i * 100}%)` }}
@@ -140,21 +131,45 @@ export default function Home() {
   const [priceRange, setPriceRange] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [categories, setCategories] = useState<{ id: string, name: string }[]>([{ id: "all", name: "Semua" }]);
   const { products } = useProducts();
+
+  useEffect(() => {
+    import("../lib/supabase").then(({ supabase }) => {
+      supabase.from("categories").select("*").order("name").then(({ data }) => {
+        if (data) {
+          setCategories([{ id: "all", name: "Semua" }, ...data.map(c => ({ id: c.id, name: c.name }))]);
+        }
+      });
+    });
+  }, []);
+
+  React.useEffect(() => {
+    if (distance !== "all" && !userLocation) {
+      requestUserLocation().then(loc => {
+        if (loc) setUserLocation(loc);
+        else {
+          alert("Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin diberikan.");
+          setDistance("all");
+        }
+      });
+    }
+  }, [distance, userLocation]);
 
   // Cart integration
   // (Removed since we don't have handleAddToCart here anymore)
 
   // Calculate category counts
   const categoriesWithCounts = useMemo(() => {
-    return CATEGORIES.map(category => {
+    return categories.map(category => {
       if (category.id === "all") {
         return { ...category, count: products.length };
       }
       const count = products.filter(product => product.category === category.id).length;
       return { ...category, count };
     });
-  }, [products]);
+  }, [products, categories]);
   // Filter and sort products
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
@@ -185,6 +200,22 @@ export default function Home() {
       }
     }
 
+    // Filter by distance
+    if (distance !== "all" && userLocation) {
+      let maxDist = Infinity;
+      let minDist = 0;
+      if (distance === "0-5") { maxDist = 5; }
+      else if (distance === "5-10") { minDist = 5; maxDist = 10; }
+      else if (distance === "10-20") { minDist = 10; maxDist = 20; }
+      else if (distance === "20+") { minDist = 20; }
+
+      filtered = filtered.filter(product => {
+        if (product.sellerLat == null || product.sellerLng == null) return false;
+        const dist = calculateDistance(userLocation.lat, userLocation.lng, product.sellerLat, product.sellerLng);
+        return dist >= minDist && dist <= maxDist;
+      });
+    }
+
     // Sort products
     switch (sortBy) {
       case "price-low":
@@ -206,7 +237,7 @@ export default function Home() {
     }
 
     return filtered;
-  }, [products, selectedCategory, sortBy, priceRange, searchQuery]);
+  }, [products, selectedCategory, sortBy, priceRange, searchQuery, distance, userLocation]);
 
   // Analytics event logging
   useEffect(() => {

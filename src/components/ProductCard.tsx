@@ -20,13 +20,13 @@ export default function ProductCard({ product }: { product: Product }) {
         />
       </div>
       <div className="mt-2">
-        <h4 className="font-medium text-sm line-clamp-2">{product.name}</h4>
+        <h4 className="font-medium text-sm truncate">{product.name}</h4>
 
         {/* Shop name with icon */}
         {product.sellerName && (
-          <div className="flex items-center gap-1 mt-1">
-            <Store className="h-3 w-3 text-blue-600" />
-            <span className="text-xs text-blue-600 font-medium truncate">{product.sellerName}</span>
+          <div className="flex items-center gap-1 mt-1 w-full">
+            <Store className="h-3 w-3 text-blue-600 flex-shrink-0" />
+            <span className="text-xs text-blue-600 font-medium truncate min-w-0 flex-1">{product.sellerName}</span>
           </div>
         )}
 
@@ -52,9 +52,9 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Seller location */}
         {product.location && (
-          <div className="flex items-center gap-1 mt-1">
+          <div className="flex items-center gap-1 mt-1 w-full">
             <MapPin className="h-3 w-3 text-slate-500 flex-shrink-0" />
-            <span className="text-xs text-slate-500 truncate">{product.location}</span>
+            <span className="text-xs text-slate-500 truncate min-w-0 flex-1">{product.location}</span>
           </div>
         )}
       </div>

@@ -174,6 +174,14 @@ export default function AdminDashboard() {
                   <span className="hidden sm:inline">Kelola Promo</span>
                   <span className="sm:hidden">Promo</span>
                 </Link>
+                <Link
+                  to="/admin/trending"
+                  className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all text-white text-sm font-medium"
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="hidden sm:inline">Kelola Trending</span>
+                  <span className="sm:hidden">Trending</span>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/20 backdrop-blur-sm border border-red-400/30 hover:bg-red-500/30 transition-all text-white text-sm"

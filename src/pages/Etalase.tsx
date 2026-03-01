@@ -1,8 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import Navbar from "../components/Navbar";
 import type { Product } from "../types/product";
 import { useProducts } from "../context/ProductsContext";
+import { getSoughtAfterItems, SoughtAfterItem } from "../services/soughtAfter";
+import { supabase } from "../lib/supabase";
 
 export default function Etalase() {
   const { products: all } = useProducts();
@@ -10,10 +13,47 @@ export default function Etalase() {
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [dbCategories, setDbCategories] = useState<{ id: string, name: string }[]>([]);
+
+  const [soughtAfterItems, setSoughtAfterItems] = useState<SoughtAfterItem[]>([]);
+  const [loadingSoughtAfter, setLoadingSoughtAfter] = useState(true);
+
+  useEffect(() => {
+    async function fetchSoughtAfter() {
+      try {
+        setLoadingSoughtAfter(true);
+        const data = await getSoughtAfterItems();
+        setSoughtAfterItems(data);
+      } catch (err) {
+        console.error("Failed to load sought after items:", err);
+      } finally {
+        setLoadingSoughtAfter(false);
+      }
+    }
+    fetchSoughtAfter();
+  }, []);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const { data } = await supabase.from("categories").select("*").order("name");
+      if (data) {
+        setDbCategories(data.map(c => ({ id: c.id, name: c.name })));
+      }
+    }
+    fetchCategories();
+  }, []);
 
   // Filter and sort products based on search and filters
   const filteredProducts = useMemo(() => {
     let filtered = [...all];
+
+    // Filter by category
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(product =>
+        product.category?.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
 
     // Filter by search query
     if (searchQuery.trim()) {
@@ -62,7 +102,7 @@ export default function Etalase() {
     }
 
     return filtered;
-  }, [all, searchQuery, sortBy, priceRange]);
+  }, [all, searchQuery, sortBy, priceRange, selectedCategory]);
 
   return (
     <>
@@ -74,7 +114,86 @@ export default function Etalase() {
       />
 
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
+
+        {/* Top Category Strip - Hidden when searching */}
+        {!searchQuery.trim() && (
+          <div className="bg-white border-b border-slate-200">
+            <div className="overflow-x-auto no-scrollbar py-3 px-4 flex gap-3 snap-x">
+              <button
+                onClick={() => setSelectedCategory("all")}
+                className={`snap-start shrink-0 flex items-center justify-center px-4 py-2 rounded-full text-sm font-medium transition-colors border ${selectedCategory === "all"
+                  ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                  : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border-slate-200/50"
+                  }`}
+              >
+                Semua
+              </button>
+              {dbCategories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`snap-start shrink-0 flex items-center justify-center px-4 py-2 rounded-full text-sm font-medium transition-colors border ${selectedCategory === cat.id
+                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                      : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border-slate-200/50"
+                    }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <main className="px-4 pt-4">
+          {/* Sought After Grid - Hidden when searching */}
+          {!searchQuery.trim() && (
+            <div className="mb-6">
+              <h3 className="font-bold text-slate-800 mb-3 text-lg">Lagi Tren di Ecosera</h3>
+              {loadingSoughtAfter ? (
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="aspect-[4/3] bg-slate-200 animate-pulse rounded-xl"></div>
+                  ))}
+                </div>
+              ) : soughtAfterItems.filter(item => item.image_url && !item.image_url.includes('placeholder.svg')).length > 0 ? (
+                <div className="flex flex-wrap gap-2 sm:gap-3">
+                  {soughtAfterItems
+                    .filter(item => item.image_url && !item.image_url.includes('placeholder.svg'))
+                    .slice(0, 6)
+                    .map((item) => {
+                      const content = (
+                        <div className="relative aspect-[4/3] w-20 sm:w-24 rounded-xl overflow-hidden shadow-sm border border-slate-200/60 group shrink-0">
+                          <img
+                            src={item.image_url}
+                            alt={item.title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/images/placeholder.svg';
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent flex items-end">
+                            <span className="text-white font-medium text-[10px] sm:text-xs p-2 truncate w-full tracking-wide">
+                              {item.title}
+                            </span>
+                          </div>
+                        </div>
+                      );
+
+                      return item.link_url ? (
+                        <Link key={item.position} to={item.link_url} className="block">
+                          {content}
+                        </Link>
+                      ) : (
+                        <div key={item.position}>
+                          {content}
+                        </div>
+                      );
+                    })}
+                </div>
+              ) : null}
+            </div>
+          )}
+
           {/* Advanced Filters - Only show when searching */}
           {searchQuery.trim().length > 0 && showFilters && (
             <div className="mb-4 p-4 bg-white rounded-xl border border-slate-200 space-y-4">
@@ -126,7 +245,9 @@ export default function Etalase() {
             <h3 className="font-semibold text-slate-900">
               {searchQuery.trim()
                 ? `Hasil pencarian "${searchQuery}"`
-                : "Semua Produk"
+                : selectedCategory !== "all"
+                  ? `${dbCategories.find(c => c.id === selectedCategory)?.name || "Kategori"}`
+                  : "Semua Produk"
               }
             </h3>
             <span className="text-xs text-slate-600">{filteredProducts.length} item</span>

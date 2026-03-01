@@ -13,6 +13,8 @@ export interface Product {
   sellerName: string;  // Add sellerName
   sellerPhone: string;
   location: string;
+  sellerLat?: number;
+  sellerLng?: number;
   rating: number;
   tags: string[];
   featured?: boolean;

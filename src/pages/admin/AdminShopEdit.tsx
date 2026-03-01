@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Upload, Save, Store, Phone, Mail, MapPin, Instagram, Facebook } from "lucide-react";
+import { ArrowLeft, Upload, Save, Store, Phone, Mail, MapPin, Instagram, Facebook, Navigation } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
 interface SocialMedia {
@@ -20,6 +20,8 @@ export default function AdminShopEdit() {
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [address, setAddress] = useState("");
+    const [latitude, setLatitude] = useState("");
+    const [longitude, setLongitude] = useState("");
     const [social, setSocial] = useState<SocialMedia>({});
     const [currentLogo, setCurrentLogo] = useState<string | null>(null);
     const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -50,6 +52,8 @@ export default function AdminShopEdit() {
                 setPhone(data.phone || "");
                 setEmail(data.email || "");
                 setAddress(data.address || "");
+                setLatitude(data.latitude != null ? String(data.latitude) : "");
+                setLongitude(data.longitude != null ? String(data.longitude) : "");
                 setCurrentLogo(data.logo_url || null);
                 setCurrentBanner(data.banner_url || null);
                 setSocial((data.social_media as SocialMedia) || {});
@@ -137,6 +141,8 @@ export default function AdminShopEdit() {
                     phone: phone.trim() || null,
                     email: email.trim() || null,
                     address: address.trim() || null,
+                    latitude: latitude.trim() ? parseFloat(latitude) : null,
+                    longitude: longitude.trim() ? parseFloat(longitude) : null,
                     logo_url: logoUrl,
                     banner_url: bannerUrl,
                     social_media: cleanSocial,
@@ -251,6 +257,36 @@ export default function AdminShopEdit() {
                                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                 <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} className={`${inputCls} pl-9`} placeholder="Muara Enim, Sumatera Selatan" />
                             </div>
+                        </div>
+
+                        {/* Coordinates */}
+                        <div>
+                            <label className={labelCls}>Koordinat Lokasi</label>
+                            <div className="grid grid-cols-2 gap-2 mb-2">
+                                <div>
+                                    <input type="number" step="any" value={latitude} onChange={(e) => setLatitude(e.target.value)} className={inputCls} placeholder="Latitude (cth: -3.8)" />
+                                </div>
+                                <div>
+                                    <input type="number" step="any" value={longitude} onChange={(e) => setLongitude(e.target.value)} className={inputCls} placeholder="Longitude (cth: 103.8)" />
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (navigator.geolocation) {
+                                        navigator.geolocation.getCurrentPosition(
+                                            (pos) => {
+                                                setLatitude(pos.coords.latitude.toFixed(6));
+                                                setLongitude(pos.coords.longitude.toFixed(6));
+                                            },
+                                            () => alert("Gagal mendapatkan lokasi. Pastikan izin lokasi diaktifkan.")
+                                        );
+                                    }
+                                }}
+                                className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 transition-colors"
+                            >
+                                <Navigation className="h-3.5 w-3.5" /> Gunakan Lokasi Saya
+                            </button>
                         </div>
                     </div>
 

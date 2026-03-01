@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, Upload, Check, Save } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Upload, Check, Save, X } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { generateSlug } from "../../lib/utils";
+
+const MAX_IMAGES = 3;
 
 interface Category { id: string; name: string; }
 interface Variant { id?: string; variant_name: string; price_override: string; stock: string; }
@@ -20,9 +22,10 @@ export default function AdminProductEdit() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
-    const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    // Multi-image state: existing URLs from DB + newly picked files
+    const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
+    const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+    const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
 
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
@@ -44,7 +47,11 @@ export default function AdminProductEdit() {
                 setName(prod.name || "");
                 setDescription(prod.description || "");
                 setPrice(String(prod.price || ""));
-                setCurrentImageUrl(prod.image_url || null);
+                // Load existing images: prefer images array, fall back to image_url
+                const imgs: string[] = Array.isArray(prod.images) && prod.images.length > 0
+                    ? prod.images
+                    : prod.image_url ? [prod.image_url] : [];
+                setExistingImageUrls(imgs);
             }
 
             // Fetch all categories
@@ -76,13 +83,29 @@ export default function AdminProductEdit() {
         })();
     }, [product_id]);
 
-    // Image preview
+    // New-file previews
     useEffect(() => {
-        if (!imageFile) { setImagePreview(null); return; }
-        const url = URL.createObjectURL(imageFile);
-        setImagePreview(url);
-        return () => URL.revokeObjectURL(url);
-    }, [imageFile]);
+        const urls = newImageFiles.map((f) => URL.createObjectURL(f));
+        setNewImagePreviews(urls);
+        return () => urls.forEach((u) => URL.revokeObjectURL(u));
+    }, [newImageFiles]);
+
+    const totalImages = existingImageUrls.length + newImageFiles.length;
+
+    const addNewFiles = (files: FileList | null) => {
+        if (!files) return;
+        const room = MAX_IMAGES - totalImages;
+        const picked = Array.from(files).slice(0, room);
+        if (picked.length > 0) setNewImageFiles((prev) => [...prev, ...picked]);
+    };
+
+    const removeExistingImage = (index: number) => {
+        setExistingImageUrls((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const removeNewImage = (index: number) => {
+        setNewImageFiles((prev) => prev.filter((_, i) => i !== index));
+    };
 
     const slug = generateSlug(name);
 
@@ -109,31 +132,37 @@ export default function AdminProductEdit() {
 
         setSubmitting(true);
         try {
-            // 1. Upload new image if changed
-            let imageUrl = currentImageUrl;
-            if (imageFile) {
-                const ext = imageFile.name.split(".").pop() || "png";
-                const filePath = `products/${slug}-${Date.now()}.${ext}`;
+            // 1. Upload any new image files
+            const newUploadedUrls: string[] = [];
+            for (let i = 0; i < newImageFiles.length; i++) {
+                const file = newImageFiles[i];
+                const ext = file.name.split(".").pop() || "png";
+                const filePath = `products/${slug}-${Date.now()}-${i}.${ext}`;
                 const { error: uploadErr } = await supabase.storage
                     .from("product-images")
-                    .upload(filePath, imageFile, { cacheControl: "3600", contentType: imageFile.type, upsert: true });
+                    .upload(filePath, file, { cacheControl: "3600", contentType: file.type, upsert: true });
                 if (uploadErr) {
-                    setFormError(`Gagal upload gambar: ${uploadErr.message}`);
+                    setFormError(`Gagal upload gambar ${i + 1}: ${uploadErr.message}`);
                     setSubmitting(false);
                     return;
                 }
                 const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(filePath);
-                imageUrl = urlData.publicUrl;
+                newUploadedUrls.push(urlData.publicUrl);
             }
 
-            // 2. Update product
+            // 2. Merge existing (kept) + newly uploaded
+            const allImages = [...existingImageUrls, ...newUploadedUrls];
+            const primaryUrl = allImages[0] || null;
+
+            // 3. Update product
             const { error: updateErr } = await supabase
                 .from("products")
                 .update({
                     name: trimmedName,
                     description: description.trim() || null,
                     price: numPrice,
-                    image_url: imageUrl,
+                    image_url: primaryUrl,
+                    images: allImages.length > 0 ? allImages : null,
                     slug,
                 })
                 .eq("id", product_id);
@@ -232,22 +261,62 @@ export default function AdminProductEdit() {
                         </div>
                     </div>
 
-                    {/* Image */}
+                    {/* Image Upload (up to 3) */}
                     <div className="bg-white/70 backdrop-blur-md rounded-xl shadow-lg border border-white/20 p-5">
-                        <h3 className="font-semibold text-slate-900 mb-3">Gambar Produk</h3>
-                        <label className="block cursor-pointer">
-                            <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors">
-                                {(imagePreview || currentImageUrl) ? (
-                                    <img src={imagePreview || currentImageUrl!} alt="Preview" className="mx-auto max-h-40 rounded-lg object-contain mb-2" />
-                                ) : (
-                                    <Upload className="h-8 w-8 text-slate-400 mx-auto mb-2" />
-                                )}
-                                <p className="text-sm text-slate-600">
-                                    {imageFile ? imageFile.name : currentImageUrl ? "Klik untuk ganti gambar" : "Klik untuk upload"}
-                                </p>
-                            </div>
-                            <input type="file" accept="image/*" className="hidden" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
-                        </label>
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="font-semibold text-slate-900">Gambar Produk</h3>
+                            <span className="text-xs text-slate-500">{totalImages}/{MAX_IMAGES}</span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-3">
+                            {/* Existing images from DB */}
+                            {existingImageUrls.map((src, i) => (
+                                <div key={`ex-${i}`} className="relative aspect-square rounded-xl border border-slate-200 overflow-hidden bg-slate-50 group">
+                                    <img src={src} alt={`Existing ${i + 1}`} className="w-full h-full object-cover" />
+                                    {i === 0 && newImageFiles.length === 0 && (
+                                        <span className="absolute top-1 left-1 bg-blue-600 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded">Utama</span>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => removeExistingImage(i)}
+                                        className="absolute top-1 right-1 h-6 w-6 rounded-full bg-red-500 text-white grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
+                                    >
+                                        <X className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
+                            ))}
+
+                            {/* Newly added file previews */}
+                            {newImagePreviews.map((src, i) => (
+                                <div key={`new-${i}`} className="relative aspect-square rounded-xl border border-blue-200 overflow-hidden bg-blue-50 group">
+                                    <img src={src} alt={`New ${i + 1}`} className="w-full h-full object-cover" />
+                                    <span className="absolute bottom-1 left-1 bg-green-600 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded">Baru</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeNewImage(i)}
+                                        className="absolute top-1 right-1 h-6 w-6 rounded-full bg-red-500 text-white grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
+                                    >
+                                        <X className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
+                            ))}
+
+                            {/* Add slot */}
+                            {totalImages < MAX_IMAGES && (
+                                <label className="aspect-square rounded-xl border-2 border-dashed border-slate-300 hover:border-blue-400 cursor-pointer flex flex-col items-center justify-center gap-1 transition-colors bg-white/60">
+                                    <Upload className="h-6 w-6 text-slate-400" />
+                                    <span className="text-[11px] text-slate-500 text-center leading-tight">Tambah<br />Foto</span>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        multiple
+                                        onChange={(e) => addNewFiles(e.target.files)}
+                                    />
+                                </label>
+                            )}
+                        </div>
+                        <p className="text-xs text-slate-500 mt-2">PNG, JPG, WebP (maks 5MB per foto). Foto pertama jadi gambar utama.</p>
                     </div>
 
                     {/* Categories */}

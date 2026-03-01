@@ -18,5 +18,7 @@ export type Product = {
   sellerName?: string;
   sellerPhone?: string;
   location?: string;
+  sellerLat?: number;
+  sellerLng?: number;
   seller_id?: string | null;
 };

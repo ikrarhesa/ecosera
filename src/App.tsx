@@ -10,6 +10,8 @@ import Cart from "./pages/Cart";
 import SellerShop from "./pages/SellerShop";
 import ELearning from "./pages/ELearning";
 import ModuleDetail from "./pages/ModuleDetail";
+import Wishlist from "./pages/Wishlist";
+import Search from "./pages/Search";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminShops from "./pages/admin/AdminShops";
@@ -21,6 +23,7 @@ import AdminShopNew from "./pages/admin/AdminShopNew";
 import AdminMarketing from "./pages/admin/AdminMarketing";
 import AdminMarketingNew from "./pages/admin/AdminMarketingNew";
 import AdminMarketingEdit from "./pages/admin/AdminMarketingEdit";
+import AdminTrending from "./pages/admin/AdminTrending";
 
 export default function App() {
   return (
@@ -31,6 +34,8 @@ export default function App() {
         <Route path="/etalase" element={<Etalase />} />
         <Route path="/product/:slug" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/shop/:seller_id" element={<SellerShop />} />
         <Route path="/e-learning" element={<ELearning />} />
         <Route path="/e-learning/:moduleId" element={<ModuleDetail />} />
@@ -49,6 +54,7 @@ export default function App() {
         <Route path="/admin/marketing" element={<ProtectedRoute><AdminMarketing /></ProtectedRoute>} />
         <Route path="/admin/marketing/new" element={<ProtectedRoute><AdminMarketingNew /></ProtectedRoute>} />
         <Route path="/admin/marketing/:id/edit" element={<ProtectedRoute><AdminMarketingEdit /></ProtectedRoute>} />
+        <Route path="/admin/trending" element={<ProtectedRoute><AdminTrending /></ProtectedRoute>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

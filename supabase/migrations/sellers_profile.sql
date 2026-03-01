@@ -11,6 +11,8 @@ ALTER TABLE sellers ADD COLUMN IF NOT EXISTS email       TEXT;
 ALTER TABLE sellers ADD COLUMN IF NOT EXISTS address     TEXT;
 ALTER TABLE sellers ADD COLUMN IF NOT EXISTS description TEXT;
 ALTER TABLE sellers ADD COLUMN IF NOT EXISTS social_media JSONB DEFAULT '{}';
+ALTER TABLE sellers ADD COLUMN IF NOT EXISTS latitude     DOUBLE PRECISION;
+ALTER TABLE sellers ADD COLUMN IF NOT EXISTS longitude    DOUBLE PRECISION;
 
 -- social_media stores: { "instagram": "...", "facebook": "...", "tiktok": "...", "whatsapp": "..." }
 

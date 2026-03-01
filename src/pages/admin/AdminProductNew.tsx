@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, Upload, Check } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Upload, Check, X } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { generateSlug } from "../../lib/utils";
+
+const MAX_IMAGES = 3;
 
 // ── Types ─────────────────────────────────────────────────────────────
 interface Category {
@@ -31,8 +33,8 @@ export default function AdminProductNew() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
+    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
@@ -52,13 +54,22 @@ export default function AdminProductNew() {
         })();
     }, []);
 
-    // Image preview
+    // Image previews
     useEffect(() => {
-        if (!imageFile) { setImagePreview(null); return; }
-        const url = URL.createObjectURL(imageFile);
-        setImagePreview(url);
-        return () => URL.revokeObjectURL(url);
-    }, [imageFile]);
+        const urls = imageFiles.map((f) => URL.createObjectURL(f));
+        setImagePreviews(urls);
+        return () => urls.forEach((u) => URL.revokeObjectURL(u));
+    }, [imageFiles]);
+
+    const addImageFiles = (files: FileList | null) => {
+        if (!files) return;
+        const newFiles = Array.from(files).slice(0, MAX_IMAGES - imageFiles.length);
+        if (newFiles.length > 0) setImageFiles((prev) => [...prev, ...newFiles]);
+    };
+
+    const removeImageFile = (index: number) => {
+        setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    };
 
     const slug = generateSlug(name);
 
@@ -86,31 +97,32 @@ export default function AdminProductNew() {
 
         setSubmitting(true);
         try {
-            // 1. Upload image (optional)
-            let imageUrl: string | null = null;
-            if (imageFile) {
-                const ext = imageFile.name.split(".").pop() || "png";
-                const filePath = `products/${slug}-${Date.now()}.${ext}`;
-                console.log("[AdminProductNew] Uploading image:", filePath, "type:", imageFile.type, "size:", imageFile.size);
-                const { data: uploadData, error: uploadErr } = await supabase.storage
+            // 1. Upload images (up to 3)
+            const uploadedUrls: string[] = [];
+            for (let i = 0; i < imageFiles.length; i++) {
+                const file = imageFiles[i];
+                const ext = file.name.split(".").pop() || "png";
+                const filePath = `products/${slug}-${Date.now()}-${i}.${ext}`;
+                console.log(`[AdminProductNew] Uploading image ${i + 1}/${imageFiles.length}:`, filePath);
+                const { error: uploadErr } = await supabase.storage
                     .from("product-images")
-                    .upload(filePath, imageFile, {
+                    .upload(filePath, file, {
                         cacheControl: "3600",
-                        contentType: imageFile.type,
+                        contentType: file.type,
                         upsert: true
                     });
                 if (uploadErr) {
-                    console.error("[AdminProductNew] Upload error details:", JSON.stringify(uploadErr));
-                    setFormError(`Gagal upload gambar: ${uploadErr.message}`);
+                    console.error("[AdminProductNew] Upload error:", JSON.stringify(uploadErr));
+                    setFormError(`Gagal upload gambar ${i + 1}: ${uploadErr.message}`);
                     setSubmitting(false);
                     return;
                 }
-                console.log("[AdminProductNew] Upload success:", uploadData);
                 const { data: urlData } = supabase.storage
                     .from("product-images")
                     .getPublicUrl(filePath);
-                imageUrl = urlData.publicUrl;
+                uploadedUrls.push(urlData.publicUrl);
             }
+            const primaryUrl = uploadedUrls[0] || null;
 
             // 2. Insert product
             const { data: productData, error: productErr } = await supabase
@@ -119,7 +131,8 @@ export default function AdminProductNew() {
                     name: trimmedName,
                     description: description.trim() || null,
                     price: numPrice,
-                    image_url: imageUrl,
+                    image_url: primaryUrl,
+                    images: uploadedUrls.length > 0 ? uploadedUrls : null,
                     slug,
                     seller_id,
                     is_active: true
@@ -243,32 +256,47 @@ export default function AdminProductNew() {
                         </div>
                     </div>
 
-                    {/* Image Upload */}
+                    {/* Image Upload (up to 3) */}
                     <div className="bg-white/70 backdrop-blur-md rounded-xl shadow-lg border border-white/20 p-5">
-                        <h3 className="font-semibold text-slate-900 mb-3">Gambar Produk</h3>
-                        <label className="block cursor-pointer">
-                            <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors">
-                                {imagePreview ? (
-                                    <img
-                                        src={imagePreview}
-                                        alt="Preview"
-                                        className="mx-auto max-h-40 rounded-lg object-contain mb-2"
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="font-semibold text-slate-900">Gambar Produk</h3>
+                            <span className="text-xs text-slate-500">{imageFiles.length}/{MAX_IMAGES}</span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-3">
+                            {/* Existing previews */}
+                            {imagePreviews.map((src, i) => (
+                                <div key={i} className="relative aspect-square rounded-xl border border-slate-200 overflow-hidden bg-slate-50 group">
+                                    <img src={src} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
+                                    {i === 0 && (
+                                        <span className="absolute top-1 left-1 bg-blue-600 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded">Utama</span>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImageFile(i)}
+                                        className="absolute top-1 right-1 h-6 w-6 rounded-full bg-red-500 text-white grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
+                                    >
+                                        <X className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
+                            ))}
+
+                            {/* Add slot (shown if < MAX_IMAGES) */}
+                            {imageFiles.length < MAX_IMAGES && (
+                                <label className="aspect-square rounded-xl border-2 border-dashed border-slate-300 hover:border-blue-400 cursor-pointer flex flex-col items-center justify-center gap-1 transition-colors bg-white/60">
+                                    <Upload className="h-6 w-6 text-slate-400" />
+                                    <span className="text-[11px] text-slate-500 text-center leading-tight">Tambah<br />Foto</span>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        multiple
+                                        onChange={(e) => addImageFiles(e.target.files)}
                                     />
-                                ) : (
-                                    <Upload className="h-8 w-8 text-slate-400 mx-auto mb-2" />
-                                )}
-                                <p className="text-sm text-slate-600">
-                                    {imageFile ? imageFile.name : "Klik untuk upload gambar"}
-                                </p>
-                                <p className="text-xs text-slate-500">PNG, JPG, WebP (maks 5MB)</p>
-                            </div>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                            />
-                        </label>
+                                </label>
+                            )}
+                        </div>
+                        <p className="text-xs text-slate-500 mt-2">PNG, JPG, WebP (maks 5MB per foto). Foto pertama jadi gambar utama.</p>
                     </div>
 
                     {/* Categories */}

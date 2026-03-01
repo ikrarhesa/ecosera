@@ -1,0 +1,121 @@
+import { useState } from "react";
+import { useWishlist } from "../context/WishlistContext";
+import Navbar from "../components/Navbar";
+import { Heart, Trash2 } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { useToast } from "../context/ToastContext";
+import { primaryImageOf } from "../services/products";
+
+const money = (n: number) => n.toLocaleString("id-ID");
+
+export default function Wishlist() {
+    const { wishlist, toggleWishlist } = useWishlist();
+    const navigate = useNavigate();
+    const { show } = useToast();
+    const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+
+    const toggleSelect = (id: string, e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const newSelected = new Set(selectedItems);
+        if (newSelected.has(id)) {
+            newSelected.delete(id);
+        } else {
+            newSelected.add(id);
+        }
+        setSelectedItems(newSelected);
+    };
+
+    const handleBatchDelete = () => {
+        if (selectedItems.size === 0) return;
+
+        // Items to delete
+        const itemsToDelete = wishlist.filter(p => selectedItems.has(p.id));
+
+        // Remove from wishlist context
+        itemsToDelete.forEach(p => {
+            toggleWishlist(p);
+        });
+
+        show(`${selectedItems.size} produk dihapus`);
+        setSelectedItems(new Set());
+    };
+
+    return (
+        <>
+            <Navbar />
+            <div className="min-h-screen bg-white pb-28">
+                <div className="px-4 pt-6 pb-2 flex items-center justify-between sticky top-0 bg-white z-10 border-b border-white">
+                    <div>
+                        <h1 className="font-bold text-slate-900 text-2xl">Tersimpan</h1>
+                        <p className="text-sm text-slate-500 mt-0.5">{wishlist.length} items</p>
+                    </div>
+                    {selectedItems.size > 0 && (
+                        <button
+                            onClick={handleBatchDelete}
+                            className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium border border-red-100 hover:bg-red-100 transition-colors"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                            <span>Hapus ({selectedItems.size})</span>
+                        </button>
+                    )}
+                </div>
+
+                <main className="px-4 mt-2">
+                    {wishlist.length === 0 ? (
+                        <div className="text-center mt-20">
+                            <Heart className="h-16 w-16 text-slate-200 mx-auto mb-4" />
+                            <p className="text-slate-800 font-semibold text-lg">Belum ada yang disimpan</p>
+                            <p className="text-slate-500 mt-1 max-w-[250px] mx-auto leading-relaxed">Cari produk yang kamu suka dan simpan untuk nanti!</p>
+                            <button
+                                onClick={() => navigate("/")}
+                                className="mt-6 px-8 py-3 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                            >
+                                Mulai Belanja
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col border-t border-slate-100 mt-2">
+                            {wishlist.map((p) => {
+                                const isSelected = selectedItems.has(p.id);
+                                return (
+                                    <Link to={`/product/${p.slug || p.id}`} key={p.id} className="flex items-center py-5 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors">
+                                        <div
+                                            className="pr-4 py-2 cursor-pointer"
+                                            onClick={(e) => toggleSelect(p.id, e)}
+                                        >
+                                            {isSelected ? (
+                                                <div className="w-5 h-5 rounded flex items-center justify-center bg-slate-900 text-white border border-slate-900 shadow-sm">
+                                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </div>
+                                            ) : (
+                                                <div className="w-5 h-5 rounded border-[1.5px] border-slate-300 bg-white hover:border-slate-400 transition-colors"></div>
+                                            )}
+                                        </div>
+                                        <div className="w-20 h-20 flex-shrink-0 bg-white rounded-xl overflow-hidden mr-4 border border-slate-100">
+                                            <img
+                                                src={primaryImageOf(p)}
+                                                alt={p.name}
+                                                className="w-full h-full object-cover"
+                                                loading="lazy"
+                                                onError={(e) => { (e.currentTarget as HTMLImageElement).src = "https://placehold.co/800x800/png?text=Ecosera"; }}
+                                            />
+                                        </div>
+                                        <div className="flex-1 min-w-0 pr-3 flex flex-col justify-center">
+                                            <h4 className="text-[15px] font-medium text-slate-800 leading-snug line-clamp-3">{p.name}</h4>
+                                        </div>
+                                        <div className="text-right whitespace-nowrap pl-1 pointer-events-none">
+                                            <div className="text-[15px] font-bold text-green-700 tracking-tight">Rp {money(p.price)}</div>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    )}
+                </main>
+            </div>
+        </>
+    );
+}

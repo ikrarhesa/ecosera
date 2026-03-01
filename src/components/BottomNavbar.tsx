@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home as HomeIcon, Package, ShoppingCart } from "lucide-react";
+import { Home as HomeIcon, Package, ShoppingCart, Heart } from "lucide-react";
 
 export default function BottomNavbar() {
   const location = useLocation();
@@ -31,6 +31,15 @@ export default function BottomNavbar() {
             >
               <Package className="h-5 w-5" />
               <span>Etalase</span>
+            </Link>
+
+            <Link
+              to="/wishlist"
+              className={`flex flex-col items-center gap-1 py-2 transition-colors ${isActive("/wishlist") ? "text-blue-600" : "text-slate-700"
+                }`}
+            >
+              <Heart className="h-5 w-5" />
+              <span>Simpan</span>
             </Link>
 
             <Link

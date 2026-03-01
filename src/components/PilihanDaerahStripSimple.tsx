@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Star, MapPin, Navigation } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { Product } from '../types/product';
 import { getAllProducts } from '../services/products';
 
@@ -8,9 +9,9 @@ type TabType = 'nearby' | 'popular' | 'new';
 
 const money = (n: number) => n.toLocaleString("id-ID");
 
-// Simple distance calculation (Haversine formula)
+// Haversine distance calculation (km)
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371; // Earth's radius in kilometers
+  const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -19,20 +20,6 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
-
-// Mock location data for sellers (in real app, this would come from your database)
-const sellerLocations: Record<string, { lat: number; lng: number; name: string }> = {
-  'kopi-semendo': { lat: -3.8, lng: 103.8, name: 'Kebun Kopi Semendo' },
-  'gula-aren': { lat: -3.9, lng: 103.9, name: 'Gula Aren Tradisional' },
-  'kemplang': { lat: -3.7, lng: 103.7, name: 'Kemplang Palembang Asli' },
-  'anyaman-purun': { lat: -3.6, lng: 103.6, name: 'Kerajinan Purun Lokal' },
-  'dodol-kelapa': { lat: -3.8, lng: 103.8, name: 'Dodol Kelapa Semendo' },
-  'serai-wangi': { lat: -3.5, lng: 103.5, name: 'Aromaterapi Serai Wangi' },
-  'kerupuk-palembang': { lat: -3.7, lng: 103.7, name: 'Kemplang Palembang Asli' },
-  'batik-kujur-kain': { lat: -3.4, lng: 103.4, name: 'Batik Muara Enim' },
-  'batik-kujur-baju': { lat: -3.4, lng: 103.4, name: 'Batik Muara Enim' },
-  'batik-kujur-selendang': { lat: -3.4, lng: 103.4, name: 'Batik Muara Enim' },
-};
 
 export default function PilihanDaerahStripSimple() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -72,36 +59,40 @@ export default function PilihanDaerahStripSimple() {
       switch (activeTab) {
         case 'nearby':
           if (userLocation) {
-            // Sort by distance
-            filteredProducts = allProducts
+            // Sort by distance using real seller coordinates
+            filteredProducts = [...allProducts]
               .map(product => {
-                const sellerLoc = sellerLocations[product.id];
-                if (sellerLoc) {
+                const hasCoords = product.sellerLat != null && product.sellerLng != null;
+                if (hasCoords) {
                   const distance = calculateDistance(
                     userLocation.lat, userLocation.lng,
-                    sellerLoc.lat, sellerLoc.lng
+                    product.sellerLat!, product.sellerLng!
                   );
                   return { ...product, distance };
                 }
-                return { ...product, distance: 999 };
+                return { ...product, distance: Infinity };
               })
               .sort((a, b) => (a as any).distance - (b as any).distance)
               .slice(0, 6);
           } else {
-            filteredProducts = allProducts.slice(0, 6);
+            filteredProducts = [...allProducts].slice(0, 6);
           }
           break;
         case 'popular':
           // Sort by sold count (most selling)
-          filteredProducts = allProducts
-            .sort((a, b) => b.sold - a.sold)
+          filteredProducts = [...allProducts]
+            .sort((a, b) => (b.sold || 0) - (a.sold || 0))
             .slice(0, 6);
           break;
         case 'new':
-          // Sort by ID (assuming newer products have higher IDs) or by featured
-          filteredProducts = allProducts
-            .filter(p => p.featured)
-            .sort((a, b) => b.id.localeCompare(a.id))
+          // Sort by created_at if available, else by ID
+          filteredProducts = [...allProducts]
+            .sort((a, b) => {
+              const dateA = (a as any).created_at ? new Date((a as any).created_at).getTime() : 0;
+              const dateB = (b as any).created_at ? new Date((b as any).created_at).getTime() : 0;
+              if (dateA !== dateB) return dateB - dateA;
+              return b.id.localeCompare(a.id);
+            })
             .slice(0, 6);
           break;
       }
@@ -219,11 +210,11 @@ export default function PilihanDaerahStripSimple() {
         </div>
       )}
 
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-1 -mx-1">
         {products.map((product) => (
-          <div key={product.id} className="w-[156px] shrink-0 rounded-xl bg-white border border-slate-200 p-2">
+          <Link key={product.id} to={`/product/${product.slug || product.id}`} className="block w-[156px] shrink-0 rounded-xl bg-white border border-slate-200 p-2 hover:border-blue-300 transition-colors">
             {/* Image */}
-            <div className="w-full aspect-square rounded-lg overflow-hidden">
+            <div className="w-full aspect-square rounded-lg overflow-hidden bg-slate-100">
               <img
                 src={product.image || "https://placehold.co/800x800/png?text=Ecosera"}
                 alt={product.name}
@@ -236,17 +227,17 @@ export default function PilihanDaerahStripSimple() {
             </div>
 
             {/* Name */}
-            <div className="mt-2 text-sm line-clamp-2 text-slate-900">
+            <div className="mt-2 text-sm font-medium truncate text-slate-900">
               {product.name}
             </div>
 
             {/* Price */}
             <div className="mt-1 flex items-baseline">
-              <span className="text-sm font-semibold text-blue-600">
+              <span className="text-sm font-bold text-blue-600">
                 Rp {money(product.price)}
               </span>
-              <span className="text-xs text-slate-600 ml-1">
-                {product.unit}
+              <span className="text-[10px] text-slate-500 ml-1 truncate">
+                / {product.unit}
               </span>
             </div>
 
@@ -260,9 +251,9 @@ export default function PilihanDaerahStripSimple() {
 
             {/* Location */}
             {product.location && (
-              <div className="flex items-center gap-1 mt-1">
+              <div className="flex items-center gap-1 mt-1 w-full">
                 <MapPin className="h-3 w-3 text-slate-500 flex-shrink-0" />
-                <span className="text-xs text-slate-500 truncate">{product.location}</span>
+                <span className="text-xs text-slate-500 truncate min-w-0 flex-1">{product.location}</span>
               </div>
             )}
 
@@ -284,7 +275,7 @@ export default function PilihanDaerahStripSimple() {
               </div>
             )}
 
-          </div>
+          </Link>
         ))}
       </div>
     </div>
