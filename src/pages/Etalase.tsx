@@ -1,20 +1,15 @@
-import { useEffect, useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useMemo } from "react";
 import ProductCard from "../components/ProductCard";
 import Navbar from "../components/Navbar";
 import type { Product } from "../types/product";
-import { getAllProducts } from "../services/products";
+import { useProducts } from "../context/ProductsContext";
 
 export default function Etalase() {
-  const [all, setAll] = useState<Product[]>([]);
+  const { products: all } = useProducts();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
-
-  useEffect(() => {
-    getAllProducts().then(setAll);
-  }, []);
 
   // Filter and sort products based on search and filters
   const filteredProducts = useMemo(() => {
@@ -23,7 +18,7 @@ export default function Etalase() {
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(product => 
+      filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(query) ||
         (product.description && product.description.toLowerCase().includes(query)) ||
         product.tags?.some(tag => tag.toLowerCase().includes(query)) ||
@@ -41,7 +36,7 @@ export default function Etalase() {
       };
       const range = ranges[priceRange as keyof typeof ranges];
       if (range) {
-        filtered = filtered.filter(product => 
+        filtered = filtered.filter(product =>
           product.price >= range.min && product.price <= range.max
         );
       }
@@ -71,15 +66,15 @@ export default function Etalase() {
 
   return (
     <>
-      <Navbar 
+      <Navbar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         showFilter={searchQuery.trim().length > 0}
         onFilterClick={() => setShowFilters(!showFilters)}
       />
-      
+
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
-        <main className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+        <main className="px-4 pt-4">
           {/* Advanced Filters - Only show when searching */}
           {searchQuery.trim().length > 0 && showFilters && (
             <div className="mb-4 p-4 bg-white rounded-xl border border-slate-200 space-y-4">
@@ -92,7 +87,7 @@ export default function Etalase() {
                   ×
                 </button>
               </div>
-              
+
               {/* Sort Options */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Urutkan</label>
@@ -129,8 +124,8 @@ export default function Etalase() {
 
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-slate-900">
-              {searchQuery.trim() 
-                ? `Hasil pencarian "${searchQuery}"` 
+              {searchQuery.trim()
+                ? `Hasil pencarian "${searchQuery}"`
                 : "Semua Produk"
               }
             </h3>

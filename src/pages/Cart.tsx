@@ -1,37 +1,32 @@
 // src/pages/Cart.tsx
 import { useCart } from "../context/CartContext";
-import { Trash2, Minus, Plus, Store, MessageCircle } from "lucide-react";
-import { useState, useMemo } from "react";
+import { Trash2, Minus, Plus, Store, MessageCircle, ArrowLeft, ShoppingBag } from "lucide-react";
+import { useState, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "../context/ToastContext";
 import { money } from "../utils/money";
 import { SHOP_WA } from "../utils/env";
-import BottomNavbar from "../components/BottomNavbar";
 
 const fallbackImg =
   "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&h=300&q=70";
-
-function checksum(s: string) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-  return h.toString(36).toUpperCase().slice(0, 6);
-}
 
 function buildWaMessage(
   sellerName: string,
   items: { name: string; qty: number; price: number }[],
   subtotal: number
 ) {
-  const payload = JSON.stringify({ sellerName, items, subtotal });
-  const orderId = checksum(payload);
   const lines = [
-    "Halo, saya ingin pesan dari *Ecosera*",
-    Seller: **,
+    `*Pesanan dari ${sellerName}*`,
     "————————————",
-    ...items.map((it) => •  x — Rp ),
+    ...items.map(
+      (i, idx) => `${idx + 1}) ${i.name} x${i.qty} = Rp ${money(i.price * i.qty)}`
+    ),
     "————————————",
-    Total: Rp  (estimasi, belum termasuk ongkir),
-    OrderID: #,
+    `Subtotal: Rp ${money(subtotal)}`,
+    `Ongkir: (akan dikonfirmasi)`,
+    `Total: Rp ${money(subtotal)} *estimasi tanpa ongkir*`,
     "————————————",
+    "Mohon isi data pemesanan:",
     "Nama:",
     "Alamat:",
     "Nomor HP:",
@@ -123,7 +118,7 @@ function CartItemRow({
               )}
               <p className="text-[13px] text-slate-600">Rp {money(price)} / item</p>
             </div>
-            
+
             {/* Delete button in top-right */}
             <button
               onClick={() => setAsk(true)}
@@ -178,15 +173,15 @@ function CartItemRow({
 }
 
 /** Komponen untuk kelompok seller */
-function SellerGroup({ 
-  sellerName, 
-  items, 
-  removeFromCart, 
-  updateQty, 
-  show 
-}: { 
-  sellerName: string; 
-  items: any[]; 
+function SellerGroup({
+  sellerName,
+  items,
+  removeFromCart,
+  updateQty,
+  show
+}: {
+  sellerName: string;
+  items: any[];
   removeFromCart: (id: string) => void;
   updateQty: (id: string, qty: number) => void;
   show: (msg: string) => void;
@@ -262,6 +257,12 @@ function SellerGroup({
 export default function Cart() {
   const { items, removeFromCart, clearCart, updateQty } = useCart();
   const { show } = useToast();
+  const navigate = useNavigate();
+  const [closing, setClosing] = useState(false);
+
+  const goBack = useCallback(() => {
+    setClosing(true);
+  }, []);
 
   // Group items by seller
   const groupedBySeller = useMemo(() => {
@@ -280,37 +281,79 @@ export default function Cart() {
 
   return (
     <>
-      <BottomNavbar />
-      <div className="min-h-screen bg-[#F6F8FC] pb-28">
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translate3d(100%, 0, 0); }
+          to   { transform: translate3d(0, 0, 0); }
+        }
+        @keyframes slideOutRight {
+          from { transform: translate3d(0, 0, 0); }
+          to   { transform: translate3d(100%, 0, 0); }
+        }
+      `}</style>
+
+      <div
+        className="min-h-screen bg-[#F6F8FC]"
+        style={{
+          animation: closing
+            ? "slideOutRight 0.25s cubic-bezier(0.4, 0, 1, 1) forwards"
+            : "slideInRight 0.25s cubic-bezier(0, 0, 0.2, 1) forwards",
+          willChange: "transform",
+          backfaceVisibility: "hidden",
+          overflow: closing ? "hidden" : undefined,
+        }}
+        onAnimationEnd={() => {
+          if (closing) navigate(-1);
+        }}>
         {/* Header */}
-        <div className="px-4 pt-3 pb-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="font-semibold text-slate-900">Keranjang</div>
-              {totalItems > 0 && (
-                <div className="text-xs text-slate-600">{totalItems} item dari {Object.keys(groupedBySeller).length} toko</div>
-              )}
+        <div className="sticky top-0 z-20 bg-white border-b border-slate-200">
+          <div className="px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={goBack}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors"
+                aria-label="Kembali"
+              >
+                <ArrowLeft className="h-5 w-5 text-slate-700" />
+              </button>
+              <div>
+                <div className="font-semibold text-slate-900 text-lg">Keranjang</div>
+                {totalItems > 0 && (
+                  <div className="text-xs text-slate-500">{totalItems} item dari {Object.keys(groupedBySeller).length} toko</div>
+                )}
+              </div>
             </div>
-            <button
-              onClick={() => {
-                if (items.length === 0) return;
-                if (confirm("Kosongkan seluruh keranjang?")) {
-                  clearCart();
-                  show("Keranjang dikosongkan ðŸ—‘ï¸");
-                }
-              }}
-              className="rounded-xl p-2 border border-slate-200 bg-white hover:bg-slate-50"
-              title="Hapus semua"
-            >
-              <Trash2 className="h-5 w-5 text-red-500" />
-            </button>
+            {totalItems > 0 && (
+              <button
+                onClick={() => {
+                  if (confirm("Kosongkan seluruh keranjang?")) {
+                    clearCart();
+                    show("Keranjang dikosongkan 🗑️");
+                  }
+                }}
+                className="rounded-xl p-2 border border-slate-200 bg-white hover:bg-red-50 transition-colors"
+                title="Hapus semua"
+              >
+                <Trash2 className="h-5 w-5 text-red-500" />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Items grouped by seller */}
-        <main className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+        {/* Content */}
+        <main className="px-4 pt-4 pb-8">
           {totalItems === 0 ? (
-            <p className="text-slate-600 text-center mt-10">Keranjang kosong.</p>
+            <div className="text-center mt-16">
+              <ShoppingBag className="h-16 w-16 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-500 font-medium">Keranjang kosong</p>
+              <p className="text-slate-400 text-sm mt-1">Yuk mulai belanja!</p>
+              <button
+                onClick={() => navigate("/")}
+                className="mt-4 px-6 py-2 rounded-xl bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+              >
+                Mulai Belanja
+              </button>
+            </div>
           ) : (
             <div className="space-y-4">
               {Object.entries(groupedBySeller).map(([sellerName, sellerItems]) => (
@@ -326,7 +369,7 @@ export default function Cart() {
             </div>
           )}
         </main>
-      </div>
+      </div >
     </>
   );
 }

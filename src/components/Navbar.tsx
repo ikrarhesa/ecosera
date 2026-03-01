@@ -11,26 +11,26 @@ interface NavbarProps {
   onFilterClick?: () => void;
 }
 
-export default function Navbar({ 
-  showSearchBar = false, 
-  children, 
-  searchQuery = "", 
+export default function Navbar({
+  showSearchBar = false,
+  children,
+  searchQuery = "",
   onSearchChange,
   showFilter = false,
-  onFilterClick 
+  onFilterClick
 }: NavbarProps) {
   return (
     <>
-      <Header 
+      <Header
         searchQuery={searchQuery}
         onSearchChange={onSearchChange}
         showFilter={showFilter}
         onFilterClick={onFilterClick}
       />
-        
+
       {/* Optional Additional Content */}
       {showSearchBar && children && (
-        <div className="px-4 pb-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+        <div className="px-4 pb-2">
           {children}
         </div>
       )}

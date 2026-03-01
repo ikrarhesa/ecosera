@@ -5,9 +5,10 @@ import {
   MessageCircle, ShoppingCart, ShieldCheck, Truck, PackageOpen, Check
 } from "lucide-react";
 import type { Product } from "../types/product";
-import { getProductById, getRelatedProducts, allImagesOf } from "../services/products";
+import { getProductBySlug, getRelatedProducts, allImagesOf } from "../services/products";
 import { useToast } from "../context/ToastContext";
 import { useCart } from "../context/CartContext";
+import { supabase } from "../lib/supabase";
 
 const ACCENT = "#2254c5";
 const PLACEHOLDER = "https://placehold.co/800x800/png?text=Ecosera";
@@ -16,7 +17,7 @@ const fmtIDR = (n: number) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
 
 export default function ProductDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { show } = useToast();
   const { addToCart } = useCart();
@@ -34,9 +35,26 @@ export default function ProductDetail() {
     let mounted = true;
     (async () => {
       setLoading(true);
-      const p = await getProductById(String(id));
+      const p = await getProductBySlug(String(slug));
       if (!mounted) return;
       setProduct(p);
+
+      // Fire and forget 'product_view' analytics log
+      if (p) {
+        (async () => {
+          try {
+            const { error } = await supabase.from("event_logs").insert({
+              event_type: "product_view",
+              product_id: p.id,
+              seller_id: p.seller_id
+            });
+            if (error) console.error("[EventLog] product_view insert error:", error);
+          } catch (err) {
+            console.error("[EventLog] Unexpected product_view error:", err);
+          }
+        })();
+      }
+
       setQty(1);
       setIdx(0);
       if (p) setRelated(await getRelatedProducts(p.category || "default", p.id, 10));
@@ -44,7 +62,7 @@ export default function ProductDetail() {
       setLoading(false);
     })();
     return () => { mounted = false; };
-  }, [id]);
+  }, [slug]);
 
   const outOfStock = useMemo(() => {
     if (!product) return false;
@@ -68,14 +86,15 @@ export default function ProductDetail() {
     const url = window.location.href;
     const text = `Cek ${product.name} di Ecosera (${fmtIDR(product.price)}/${product.unit})`;
     if (navigator.share) {
-      try { await navigator.share({ title: product.name, text, url }); } catch {}
+      try { await navigator.share({ title: product.name, text, url }); } catch { }
     } else {
-      try { await navigator.clipboard.writeText(url); alert("Link disalin ke clipboard ✅"); } catch {}
+      try { await navigator.clipboard.writeText(url); alert("Link disalin ke clipboard ✅"); } catch { }
     }
   };
 
-  const onChatWA = () => {
+  const onChatWA = async () => {
     if (!product) return;
+
     const phone = (product.sellerPhone || "").replace(/\D/g, "");
     const text = encodeURIComponent(
       `Halo ${product.sellerName ?? "Seller"}, saya ingin pesan:\n` +
@@ -84,6 +103,29 @@ export default function ProductDetail() {
       `• Total: ${fmtIDR(total)}\n\n` +
       `Link produk: ${window.location.href}`
     );
+
+    // 🔹 Log event BEFORE redirect
+    console.log("[EventLog] Attempting insert for product:", product.id);
+    try {
+      const { data, error } = await supabase
+        .from("event_logs")
+        .insert({
+          event_type: "wa_click",
+          product_id: product.id,
+          seller_id: product.seller_id,
+        })
+        .select();
+
+      if (error) {
+        console.error("[EventLog] Insert error:", error.message, error.details, error.code);
+      } else {
+        console.log("[EventLog] Insert success:", data);
+      }
+    } catch (err) {
+      console.error("[EventLog] Unexpected error:", err);
+    }
+
+    // 🔹 Then redirect
     window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
   };
 
@@ -141,7 +183,7 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md min-h-screen bg-white text-gray-900">
+    <div className="w-full min-h-screen bg-white text-gray-900">
       {/* Header */}
       <div className="sticky top-0 z-20 flex items-center justify-between bg-white/90 backdrop-blur px-3 py-3 border-b">
         <button onClick={() => navigate(-1)} className="p-2 rounded-full" aria-label="Back" style={{ color: ACCENT }}>
@@ -259,7 +301,7 @@ export default function ProductDetail() {
 
         {/* Seller / Lokasi */}
         <div className="mt-3 flex items-center justify-between rounded-2xl border p-3">
-          <div className="flex items-center gap-2">
+          <Link to={product.seller_id ? `/shop/${product.seller_id}` : "#"} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="h-9 w-9 rounded-full bg-gray-100 grid place-items-center font-medium">
               {(product.sellerName ?? "UMKM")[0]}
             </div>
@@ -269,7 +311,7 @@ export default function ProductDetail() {
                 <MapPin size={14} /> {product.location ?? "Muara Enim, Sumsel"}
               </p>
             </div>
-          </div>
+          </Link>
           <div className="flex items-center gap-2 text-[11px] text-gray-600">
             <span className="inline-flex items-center gap-1"><ShieldCheck size={14} /> Terverifikasi</span>
             <span className="inline-flex items-center gap-1"><Truck size={14} /> COD/Antar</span>
@@ -326,7 +368,7 @@ export default function ProductDetail() {
             <h3 className="text-sm font-semibold mb-2">Produk Terkait</h3>
             <div className="flex gap-3 overflow-x-auto pb-1">
               {related.map(r => (
-                <Link key={r.id} to={`/product/${r.id}`} className="min-w-[160px] rounded-xl border overflow-hidden">
+                <Link key={r.id} to={`/product/${r.slug || r.id}`} className="min-w-[160px] rounded-xl border overflow-hidden">
                   <img src={r.image || PLACEHOLDER} alt={r.name} className="h-28 w-full object-cover" loading="lazy"
                     onError={(e) => { (e.currentTarget as HTMLImageElement).src = PLACEHOLDER; }} />
                   <div className="p-2">
@@ -341,16 +383,19 @@ export default function ProductDetail() {
       </div>
 
       {/* Sticky Actions */}
-      <div className="fixed bottom-0 left-0 right-0 z-30">
-        <div className="mx-auto w-full max-w-md border-t bg-white px-3 py-3">
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-30 w-full max-w-md md:max-w-lg lg:max-w-xl">
+        <div className="w-full border-t bg-white px-3 py-3">
           <div className="flex items-center gap-2">
-            <button onClick={onChatWA} className="flex-1 h-11 rounded-xl border inline-flex items-center justify-center gap-2 text-sm font-medium" aria-label="Chat via WhatsApp">
-              <MessageCircle size={18} /> Chat
-            </button>
             <button onClick={onAddToCart} disabled={outOfStock}
-              className={`flex-[2] h-11 rounded-xl inline-flex items-center justify-center gap-2 text-sm font-semibold text-white ${outOfStock ? "opacity-50" : ""}`}
-              style={{ backgroundColor: ACCENT }} aria-label="Tambahkan ke Keranjang">
-              <ShoppingCart size={18} /> Tambah ke Keranjang
+              className={`flex-1 h-11 rounded-xl border border-slate-300 inline-flex items-center justify-center gap-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors ${outOfStock ? "opacity-50" : ""}`}
+              aria-label="Tambahkan ke Keranjang">
+              <ShoppingCart size={18} /> Keranjang
+            </button>
+            <button onClick={onChatWA}
+              className="flex-[2] h-11 rounded-xl inline-flex items-center justify-center gap-2 text-sm font-semibold text-white transition-colors"
+              style={{ backgroundColor: ACCENT }}
+              aria-label="Pesan lewat WhatsApp">
+              <MessageCircle size={18} /> Pesan lewat WA
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 export type Product = {
   id: string;
-  slug?: string; 
+  slug?: string;
   name: string;
   price: number;
   rating: number;
@@ -18,4 +18,5 @@ export type Product = {
   sellerName?: string;
   sellerPhone?: string;
   location?: string;
+  seller_id?: string | null;
 };

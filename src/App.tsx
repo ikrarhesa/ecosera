@@ -1,78 +1,57 @@
 
 // src/App.tsx
-import { useEffect, useState } from "react";
-import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Etalase from "./pages/Etalase";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
-import Profile from "./pages/Profile";
-import AddProduct from "./pages/AddProduct";
+import SellerShop from "./pages/SellerShop";
 import ELearning from "./pages/ELearning";
 import ModuleDetail from "./pages/ModuleDetail";
-import NotFound from "./pages/NotFound";
+import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
-import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
-import OnboardingWelcome from "./pages/onboarding/OnboardingWelcome";
-import OnboardingKurasiLokal from "./pages/onboarding/OnboardingKurasiLokal";
-import OnboardingHandmadeOtentik from "./pages/onboarding/OnboardingHandmadeOtentik";
-import OnboardingKualitasTerjamin from "./pages/onboarding/OnboardingKualitasTerjamin";
+import AdminShops from "./pages/admin/AdminShops";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminProductNew from "./pages/admin/AdminProductNew";
+import AdminProductEdit from "./pages/admin/AdminProductEdit";
+import AdminShopEdit from "./pages/admin/AdminShopEdit";
+import AdminShopNew from "./pages/admin/AdminShopNew";
+import AdminMarketing from "./pages/admin/AdminMarketing";
+import AdminMarketingNew from "./pages/admin/AdminMarketingNew";
+import AdminMarketingEdit from "./pages/admin/AdminMarketingEdit";
 
 export default function App() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [isReady, setIsReady] = useState(() => typeof window === "undefined");
-
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      setIsReady(true);
-      return;
-    }
-
-    const hasCompleted = window.localStorage.getItem("ecosera:onboardingCompleted") === "true";
-    const isOnboardingRoute = location.pathname.startsWith("/onboarding");
-
-    if (hasCompleted) {
-      if (isOnboardingRoute) {
-        navigate("/", { replace: true });
-        return;
-      }
-      setIsReady(true);
-      return;
-    }
-
-    if (!isOnboardingRoute) {
-      navigate("/onboarding/welcome", { replace: true });
-      return;
-    }
-
-    setIsReady(true);
-  }, [location.pathname, navigate]);
-
-  if (!isReady) {
-    return null;
-  }
-
   return (
-    <Routes>
-      <Route path="/onboarding" element={<Navigate to="/onboarding/welcome" replace />} />
-      <Route path="/onboarding/welcome" element={<OnboardingWelcome />} />
-      <Route path="/onboarding/kurasi-lokal" element={<OnboardingKurasiLokal />} />
-      <Route path="/onboarding/handmade-otentik" element={<OnboardingHandmadeOtentik />} />
-      <Route path="/onboarding/kualitas-terjamin" element={<OnboardingKualitasTerjamin />} />
-      <Route path="/" element={<Home />} />
-      <Route path="/etalase" element={<Etalase />} />
-      <Route path="/product/:id" element={<ProductDetail />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/add-product" element={<AddProduct />} />
-      <Route path="/e-learning" element={<ELearning />} />
-      <Route path="/e-learning/:moduleId" element={<ModuleDetail />} />
-      <Route path="/admin-dashboard" element={<AdminDashboard />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/sign-up" element={<SignUp />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/etalase" element={<Etalase />} />
+        <Route path="/product/:slug" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/shop/:seller_id" element={<SellerShop />} />
+        <Route path="/e-learning" element={<ELearning />} />
+        <Route path="/e-learning/:moduleId" element={<ModuleDetail />} />
+
+        {/* Admin login (public) */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+
+        {/* Protected admin routes */}
+        <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/shops" element={<ProtectedRoute><AdminShops /></ProtectedRoute>} />
+        <Route path="/admin/shops/new" element={<ProtectedRoute><AdminShopNew /></ProtectedRoute>} />
+        <Route path="/admin/shops/:seller_id/edit" element={<ProtectedRoute><AdminShopEdit /></ProtectedRoute>} />
+        <Route path="/admin/shops/:seller_id/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
+        <Route path="/admin/shops/:seller_id/products/new" element={<ProtectedRoute><AdminProductNew /></ProtectedRoute>} />
+        <Route path="/admin/shops/:seller_id/products/:product_id/edit" element={<ProtectedRoute><AdminProductEdit /></ProtectedRoute>} />
+        <Route path="/admin/marketing" element={<ProtectedRoute><AdminMarketing /></ProtectedRoute>} />
+        <Route path="/admin/marketing/new" element={<ProtectedRoute><AdminMarketingNew /></ProtectedRoute>} />
+        <Route path="/admin/marketing/:id/edit" element={<ProtectedRoute><AdminMarketingEdit /></ProtectedRoute>} />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AuthProvider>
   );
 }

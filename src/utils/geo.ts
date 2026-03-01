@@ -11,3 +11,7 @@ export function haversineKm(aLat: number, aLng: number, bLat: number, bLng: numb
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
+
+
+
+

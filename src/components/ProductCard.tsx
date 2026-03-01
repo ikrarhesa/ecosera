@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { Store, Star, MapPin } from "lucide-react";
 import type { Product } from "../types/product";
@@ -10,7 +9,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const img = primaryImageOf(product);
 
   return (
-    <Link to={`/product/${product.id}`} className="p-3 rounded-xl bg-white/70 border border-black/10 hover:bg-white">
+    <Link to={`/product/${product.slug || product.id}`} className="p-3 rounded-xl bg-white/70 border border-black/10 hover:bg-white">
       <div className="aspect-square rounded-lg overflow-hidden">
         <img
           src={img}
@@ -22,7 +21,7 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
       <div className="mt-2">
         <h4 className="font-medium text-sm line-clamp-2">{product.name}</h4>
-        
+
         {/* Shop name with icon */}
         {product.sellerName && (
           <div className="flex items-center gap-1 mt-1">
@@ -30,9 +29,9 @@ export default function ProductCard({ product }: { product: Product }) {
             <span className="text-xs text-blue-600 font-medium truncate">{product.sellerName}</span>
           </div>
         )}
-        
+
         {/* Rating and sold info */}
-        {(product.rating || (product as any).sold) && (
+        {(product.rating || product.sold != null) && (
           <div className="flex items-center gap-1 mt-1">
             {product.rating && (
               <>
@@ -40,17 +39,17 @@ export default function ProductCard({ product }: { product: Product }) {
                 <span className="text-xs text-slate-600">{product.rating}</span>
               </>
             )}
-            {(product as any).sold && (
+            {product.sold != null && (
               <>
                 {product.rating && <span className="text-xs text-slate-400">•</span>}
-                <span className="text-xs text-slate-600">{(product as any).sold} terjual</span>
+                <span className="text-xs text-slate-600">{product.sold} tertarik</span>
               </>
             )}
           </div>
         )}
-        
+
         <p className="font-semibold text-blue-600 mt-1">Rp {money(product.price)}</p>
-        
+
         {/* Seller location */}
         {product.location && (
           <div className="flex items-center gap-1 mt-1">
