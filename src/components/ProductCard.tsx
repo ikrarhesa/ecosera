@@ -1,30 +1,56 @@
-import { Star } from "lucide-react";
+import React from "react";
 import { Link } from "react-router-dom";
+import { Store, Star } from "lucide-react";
 import type { Product } from "../types/product";
-import { money } from "../utils/money";
+import { primaryImageOf } from "../services/products";
 
-export default function ProductCard({ p }: { p: Product }) {
-  const href = `/product/${p.slug || p.id}`;  // <-- pakai slug kalau ada
-  const FALLBACK_THUMB = "https://picsum.photos/seed/ecosera/600/600";
-  const imgSrc = p.thumb || FALLBACK_THUMB;
+const money = (n: number) => n.toLocaleString("id-ID");
+
+export default function ProductCard({ product }: { product: Product }) {
+  const img = primaryImageOf(product);
 
   return (
-    <Link to={href} className="p-3 rounded-2xl bg-white border border-slate-100 hover:shadow-sm">
-      <div className="relative aspect-square rounded-xl overflow-hidden">
+    <Link to={`/product/${product.id}`} className="p-3 rounded-xl bg-white/70 border border-black/10 hover:bg-white">
+      <div className="aspect-square rounded-lg overflow-hidden">
         <img
-          src={imgSrc}
-          alt={p.name}
+          src={img}
+          alt={product.name}
           className="w-full h-full object-cover"
           loading="lazy"
-          onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_THUMB; }}
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = "https://placehold.co/800x800/png?text=Ecosera"; }}
         />
-        <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/90 text-[11px] border border-slate-200">
-          <Star className="h-3.5 w-3.5 text-amber-500" /> {p.rating}
-        </span>
       </div>
-      <div className="mt-2 text-sm font-medium leading-tight line-clamp-2">{p.name}</div>
-      <div className="text-[11px] text-slate-600">{p.sold}+ terjual</div>
-      <div className="mt-1 font-semibold">Rp {money(p.price)}</div>
+      <div className="mt-2">
+        <h4 className="font-medium text-sm line-clamp-2">{product.name}</h4>
+        
+        {/* Shop name with icon */}
+        {product.sellerName && (
+          <div className="flex items-center gap-1 mt-1">
+            <Store className="h-3 w-3 text-blue-600" />
+            <span className="text-xs text-blue-600 font-medium truncate">{product.sellerName}</span>
+          </div>
+        )}
+        
+        {/* Rating and sold info */}
+        {(product.rating || (product as any).sold) && (
+          <div className="flex items-center gap-1 mt-1">
+            {product.rating && (
+              <>
+                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                <span className="text-xs text-slate-600">{product.rating}</span>
+              </>
+            )}
+            {(product as any).sold && (
+              <>
+                {product.rating && <span className="text-xs text-slate-400">•</span>}
+                <span className="text-xs text-slate-600">{(product as any).sold} terjual</span>
+              </>
+            )}
+          </div>
+        )}
+        
+        <p className="font-semibold text-blue-600 mt-1">Rp {money(product.price)}</p>
+      </div>
     </Link>
   );
 }

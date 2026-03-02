@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 312 89">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        font-family: Play-Regular, Play;
+        font-size: 59.81px;
+      }
+    </style>
+  </defs>
+  <g>
+    <path class="cls-1" d="M42.05,37.41l.03-1.78,2.7-.55,2.06,.72,18.8-18.23h-31.56c-3.28,0-6.01,2.31-6.66,5.39l14.63,14.45Z"/>
+    <path class="cls-1" d="M70.57,19.31l-.5,.61-21.04,20.53,.07,3.34,23.74,12.26V24.39c0-2.02-.88-3.83-2.28-5.08Z"/>
+    <path class="cls-1" d="M49.24,50.05l.3,13.39h16.49c1.83,0,3.48-.72,4.71-1.89l-21.49-11.5Z"/>
+    <path class="cls-1" d="M41.92,45.38l-14.65-14.99v26.24c0,3.76,3.05,6.82,6.82,6.82h7.54l.29-18.06Z"/>
+  </g>
+  <text class="cls-2" transform="translate(79.15 62.84)"><tspan x="0" y="0">Ecosera</tspan></text>
+</svg>

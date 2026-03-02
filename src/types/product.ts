@@ -10,4 +10,12 @@ export type Product = {
   tags?: string[];
   featured?: boolean;
   available?: boolean;
+  stock?: number;
+  unit?: string;
+  image?: string;
+  images?: string[];
+  description?: string;
+  sellerName?: string;
+  sellerPhone?: string;
+  location?: string;
 };

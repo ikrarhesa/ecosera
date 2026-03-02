@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-export type CartItem = { id: string; name: string; price: number; qty: number; thumb?: string };
+export type CartItem = { id: string; name: string; price: number; qty: number; thumb?: string; sellerName?: string };
 
 type CartCtx = {
   items: CartItem[];

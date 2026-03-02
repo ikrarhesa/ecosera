@@ -1,91 +1,73 @@
-import React, { useEffect, useRef, useState } from "react";
+// src/pages/Home.tsx
+import React, { useState, useRef, useMemo } from "react";
 import {
-  Store, Search, MapPin,
-  ChevronLeft, ChevronRight, ChevronRight as ArrowRight,
-  Home as HomeIcon, Grid2X2, ShoppingCart, User, Plus
+  Store, Search, Bell, Star, Filter, ChevronDown,
+  ChevronRight as ArrowRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
 import ProductCard from "../components/ProductCard";
 import type { Product } from "../types/product";
-import { getFeaturedProducts } from "../services/products";
+import { getAllProducts } from "../services/products";
 
-/* ===== Banner data ===== */
-type Banner = { id: string; title: string; subtitle: string; cta: string; href?: string; image: string; date?: string };
-const BANNERS: Banner[] = [
-  { id: "kopi",    title: "Festival Kopi Semende",    subtitle: "Diskon 20% minggu ini", cta: "Belanja Kopi",    href: "/product/kopi-semendo",  image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&h=560&q=70", date: "Minggu ini" },
-  { id: "kemplang",title: "Paket Kemplang Hemat",     subtitle: "Bundling khas Sumsel",  cta: "Lihat Paket",     image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1400&h=560&q=70", date: "Terbatas" },
-  { id: "purun",   title: "Anyaman Purun Lokal",      subtitle: "Edisi UMKM Muara Enim", cta: "Cek Kerajinan",   image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1400&h=560&q=70", date: "Edisi Lokal" },
+/* ===== Helpers ===== */
+const money = (n: number) => n.toLocaleString("id-ID");
+const img = (q: string, w = 1400, h = 560) =>
+  // ukuran fix biar stabil
+  `https://images.unsplash.com/photo-155${Math.floor(Math.random()*9)}?auto=format&fit=crop&w=${w}&h=${h}&q=70&ixlib=rb-4.0.3&${encodeURIComponent(q)}`;
+
+/* ===== Categories ===== */
+const CATEGORIES = [
+  { id: "all", name: "Semua", count: 0 },
+  { id: "makanan", name: "Makanan", count: 0 },
+  { id: "minuman", name: "Minuman", count: 0 },
+  { id: "kerajinan", name: "Kerajinan", count: 0 },
+  { id: "fashion", name: "Fashion", count: 0 },
+  { id: "kopi", name: "Kopi", count: 0 },
+  { id: "snack", name: "Snack", count: 0 },
+  { id: "sembako", name: "Sembako", count: 0 }
 ];
 
-/* ===== Tiny UI pieces ===== */
-type CategoryKey = "Kopi" | "Snack" | "Minuman" | "Kerajinan";
-const CATEGORY_LIST: CategoryKey[] = ["Kopi", "Snack", "Minuman", "Kerajinan"];
+/* ===== Sort Options ===== */
+const SORT_OPTIONS = [
+  { id: "default", name: "Default" },
+  { id: "price-low", name: "Harga Terendah" },
+  { id: "price-high", name: "Harga Tertinggi" },
+  { id: "rating", name: "Rating Tertinggi" },
+  { id: "newest", name: "Terbaru" }
+];
 
-function CategoryTabs({
-  value,
-  onChange,
-}: {
-  value: CategoryKey | null;
-  onChange: (v: CategoryKey | null) => void;
-}) {
-  return (
-    <div className="mt-3 flex items-center gap-2 overflow-x-auto no-scrollbar">
-      {CATEGORY_LIST.map((t) => {
-        const active = value === t;
-        return (
-          <button
-            key={t}
-            onClick={() => onChange(active ? null : t)}
-            className={[
-              "shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-medium border transition",
-              active
-                ? "bg-blue-50 text-blue-700 border-blue-200"
-                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-            ].join(" ")}
-            aria-pressed={active}
-          >
-            {t}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
+const DISTANCE_OPTIONS = [
+  { id: "all", name: "Semua Jarak" },
+  { id: "0-5", name: "0-5 km" },
+  { id: "5-10", name: "5-10 km" },
+  { id: "10-20", name: "10-20 km" },
+  { id: "20+", name: "20+ km" }
+];
 
-function SearchBar({
-  query,
-  onQuery,
-  category,
-  onCategory,
-}: {
-  query: string;
-  onQuery: (v: string) => void;
-  category: CategoryKey | null;
-  onCategory: (v: CategoryKey | null) => void;
-}) {
-  return (
-    <div className="rounded-3xl bg-white border border-slate-100 p-3">
-      <div className="flex items-center gap-2">
-        <span className="inline-flex items-center gap-1.5 text-[12px] px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-          <MapPin className="h-3.5 w-3.5" /> Muara Enim
-        </span>
-        <label className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <input
-            value={query}
-            onChange={(e) => onQuery(e.target.value)}
-            placeholder="Cari produk…"
-            className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-[13px] outline-none focus:bg-white"
-            aria-label="Cari produk"
-          />
-        </label>
-        {/* 🔔 Notification icon DIHAPUS */}
-      </div>
-      <CategoryTabs value={category} onChange={onCategory} />
-    </div>
-  );
-}
+const PRICE_RANGES = [
+  { id: "all", name: "Semua Harga", min: 0, max: Infinity },
+  { id: "0-50k", name: "Rp 0 - 50k", min: 0, max: 50000 },
+  { id: "50k-100k", name: "Rp 50k - 100k", min: 50000, max: 100000 },
+  { id: "100k-200k", name: "Rp 100k - 200k", min: 100000, max: 200000 },
+  { id: "200k+", name: "Rp 200k+", min: 200000, max: Infinity }
+];
 
+/* ===== Products will be loaded from service ===== */
+
+/* ===== Banner data (full-width slider) ===== */
+type Banner = { id: string; title: string; subtitle: string; cta: string; href?: string; image: string };
+const BANNERS: Banner[] = [
+  { id: "kopi",    title: "Festival Kopi Semendo",    subtitle: "Diskon 20% minggu ini", cta: "Belanja Kopi",    href: "/product/kopi-semendo-250g",  image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "kemplang",title: "Paket Kemplang Hemat",     subtitle: "Bundling khas Sumsel",  cta: "Lihat Paket",     image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "purun",   title: "Anyaman Purun Lokal",      subtitle: "Edisi UMKM Muara Enim", cta: "Cek Kerajinan",   image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "gula",    title: "Gula Aren Semendo",        subtitle: "Manis alami tanpa pengawet", cta: "Coba Sekarang", image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "batik",   title: "Batik Kujur Muara Enim",   subtitle: "Koleksi batik tradisional", cta: "Lihat Koleksi", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1400&h=560&q=70" },
+  { id: "serai",   title: "Minyak Serai Wangi",       subtitle: "Aromaterapi & segar",   cta: "Beli Serai",      image: "https://images.unsplash.com/photo-1526318472351-c75fcf070305?auto=format&fit=crop&w=1400&h=560&q=70" },
+];
+
+
+/* ===== Carousel Banner ===== */
 function BannerCarousel() {
   const [i, setI] = useState(0);
   const touchX = useRef<number | null>(null);
@@ -101,7 +83,7 @@ function BannerCarousel() {
   };
 
   return (
-    <section className="mt-4">
+    <section className="mt-1">
       <div className="relative overflow-hidden rounded-3xl h-48 border border-slate-100 bg-white">
         <div
           className="whitespace-nowrap h-full transition-transform duration-500 ease-out"
@@ -114,7 +96,6 @@ function BannerCarousel() {
               <img src={b.image} alt={b.title} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/25" />
               <div className="absolute left-4 right-4 bottom-4 text-white">
-                <div className="text-[11px] opacity-90">{b.date}</div>
                 <h3 className="text-lg font-bold leading-tight">{b.title}</h3>
                 <p className="text-xs opacity-90">{b.subtitle}</p>
                 <Link
@@ -127,21 +108,6 @@ function BannerCarousel() {
             </div>
           ))}
         </div>
-
-        <button
-          onClick={prev}
-          className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 grid place-items-center rounded-full bg-white text-slate-900 shadow border border-slate-200"
-          aria-label="Sebelumnya"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <button
-          onClick={next}
-          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 grid place-items-center rounded-full bg-white text-slate-900 shadow border border-slate-200"
-          aria-label="Berikutnya"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
 
         <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
           {BANNERS.map((_, idx) => (
@@ -158,171 +124,222 @@ function BannerCarousel() {
   );
 }
 
-function BottomDock() {
-  return (
-    <div className="fixed bottom-0 inset-x-0 z-40">
-      <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl px-4 pb-3">
-        <div className="relative bg-white/95 backdrop-blur border border-slate-100 rounded-3xl shadow-[0_6px_24px_rgba(15,23,42,0.12)] px-5 py-2">
-          <div className="flex items-center justify-between text-slate-700 text-xs">
-            <Link to="/" className="flex flex-col items-center gap-1 py-2">
-              <HomeIcon className="h-5 w-5" />
-              <span>Home</span>
-            </Link>
-            <Link to="/Etalase" className="flex flex-col items-center gap-1 py-2">
-              <Grid2X2 className="h-5 w-5" />
-              <span>Explore</span>
-            </Link>
-
-            <div className="w-14" />
-
-            <Link to="/cart" className="flex flex-col items-center gap-1 py-2">
-              <ShoppingCart className="h-5 w-5" />
-              <span>Cart</span>
-            </Link>
-            <Link to="/profile" className="flex flex-col items-center gap-1 py-2">
-              <User className="h-5 w-5" />
-              <span>Profile</span>
-            </Link>
-          </div>
-
-          <button
-            className="absolute left-1/2 -translate-x-1/2 -top-6 h-12 w-12 rounded-full grid place-items-center text-white shadow-lg bg-blue-600"
-            aria-label="Tambah"
-          >
-            <Plus className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ===================== Utils & Fallback ===================== */
-const parsePrice = (v: unknown): number => {
-  if (typeof v === "number") return v;
-  if (typeof v === "string") {
-    const n = Number(v.replace(/[^\d]/g, ""));
-    return Number.isFinite(n) ? n : 0;
-  }
-  return 0;
-};
-
-const slugify = (s: string) =>
-  s?.toLowerCase()?.replace(/[^a-z0-9]+/g, "-")?.replace(/(^-|-$)/g, "") || "produk";
-
-/** pilih thumbnail dengan fallback */
-const pickThumb = (p: any): string =>
-  p.thumb || p.thumbnail || p.image || (Array.isArray(p.images) ? p.images[0] : "") || "https://picsum.photos/seed/ecosera/600/600";
-
-/** Normalisasi ke shape ProductCard dan pakai ID slug supaya link ke /product/:id hidup */
-function toCardShape(p: any): Product {
-  const name = p.name ?? p.title ?? "Produk Lokal";
-  const idSlug = p.id ?? p.slug ?? slugify(name);
-  return {
-    id: idSlug,                                        // <-- penting: id dijadikan slug
-    name,
-    price: parsePrice(p.price),
-    rating: typeof p.rating === "number" ? p.rating : 4.7,
-    sold: typeof p.sold === "number" ? p.sold : 50,
-    thumb: pickThumb(p),
-    category: p.category,
-    tags: p.tags,
-    featured: p.featured,
-    available: p.available ?? true,
-  };
-}
-
-/** Filter by query & category (case-insensitive) */
-function matches(p: Product, query: string, cat: CategoryKey | null) {
-  const q = query.trim().toLowerCase();
-  const name = (p.name || "").toLowerCase();
-  const category = (p.category || (p.tags?.[0] ?? "")).toLowerCase();
-  const passQuery = q ? name.includes(q) || category.includes(q) : true;
-  const passCat = cat ? category === cat.toLowerCase() : true;
-  return passQuery && passCat;
-}
-
-/** 12 Dummy fallback products — ID sudah slug supaya /product/:id valid */
-const FALLBACK_PRODUCTS: Product[] = [
-  { id: "kopi-robusta-semende-200g",   name: "Kopi Robusta Semende 200g",   thumb: "https://images.unsplash.com/photo-1504630083234-14187a9df0f5?auto=format&fit=crop&w=800&q=70", rating: 4.8, sold: 120, price: 25000, category: "Kopi" },
-  { id: "kopi-arabica-pagaralam-250g", name: "Kopi Arabica Pagaralam 250g", thumb: "https://images.unsplash.com/photo-1494314671902-399b18174975?auto=format&fit=crop&w=800&q=70", rating: 4.9, sold: 96,  price: 38000, category: "Kopi" },
-  { id: "keripik-pisang-coklat",       name: "Keripik Pisang Coklat",       thumb: "https://images.unsplash.com/photo-1589308078053-832e8322b3f1?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 210, price: 16000, category: "Snack" },
-  { id: "pempek-kapal-selam-isi-5",    name: "Pempek Kapal Selam (isi 5)",  thumb: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 340, price: 45000, category: "Snack" },
-  { id: "es-teh-manis-botan",          name: "Es Teh Manis Botan",          thumb: "https://images.unsplash.com/photo-1556679343-c7306c72bcf0?auto=format&fit=crop&w=800&q=70", rating: 4.5, sold: 150, price: 10000, category: "Minuman" },
-  { id: "jus-jeruk-segar-350ml",       name: "Jus Jeruk Segar 350ml",       thumb: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 132, price: 14000, category: "Minuman" },
-  { id: "anyaman-purun-tas-mini",      name: "Anyaman Purun Tas Mini",      thumb: "https://images.unsplash.com/photo-1612178537255-7b6c7b5f8e4d?auto=format&fit=crop&w=800&q=70", rating: 4.8, sold: 85,  price: 75000, category: "Kerajinan" },
-  { id: "topi-anyaman-purun",          name: "Topi Anyaman Purun",          thumb: "https://images.unsplash.com/photo-1542060748-10c28b62716a?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 71,  price: 60000, category: "Kerajinan" },
-  { id: "kemplang-ikan-asli-200g",     name: "Kemplang Ikan Asli (200g)",   thumb: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=70", rating: 4.6, sold: 260, price: 28000, category: "Snack" },
-  { id: "kopi-house-blend-250g",       name: "Kopi House Blend 250g",       thumb: "https://images.unsplash.com/photo-1507133750040-4a8f57021524?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 110, price: 35000, category: "Kopi" },
-  { id: "sirup-markisa-lokal",         name: "Sirup Markisa Lokal",         thumb: "https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?auto=format&fit=crop&w=800&q=70", rating: 4.5, sold: 90,  price: 22000, category: "Minuman" },
-  { id: "dompet-anyaman-purun",        name: "Dompet Anyaman Purun",        thumb: "https://images.unsplash.com/photo-1582582429416-7530e7f3d20e?auto=format&fit=crop&w=800&q=70", rating: 4.7, sold: 64,  price: 52000, category: "Kerajinan" },
-];
-
-/** Bangun list ditampilkan: normalisasi, filter, penuhi minimal 6 dengan fallback, max 12 */
-function buildDisplayed(allReal: Product[], query: string, cat: CategoryKey | null) {
-  const real = allReal.map(toCardShape);
-  let out = real.filter((p) => matches(p, query, cat));
-  if (out.length < 6) {
-    const existingIds = new Set(out.map((p) => p.id));
-    for (const fb of FALLBACK_PRODUCTS) {
-      if (out.length >= 6) break;
-      if (!existingIds.has(fb.id)) out.push(fb);
-    }
-  }
-  return out.slice(0, 12);
-}
-
+/* ===== Page ===== */
 export default function Home() {
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("default");
+  const [distance, setDistance] = useState("all");
+  const [priceRange, setPriceRange] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<CategoryKey | null>(null);
 
-  useEffect(() => {
-    getFeaturedProducts().then((res) => setProducts(res as any));
+  // Load products from service
+  React.useEffect(() => {
+    getAllProducts().then(setProducts);
   }, []);
 
-  const displayed = buildDisplayed(products, query, category);
+  // Calculate category counts
+  const categoriesWithCounts = useMemo(() => {
+    return CATEGORIES.map(category => {
+      if (category.id === "all") {
+        return { ...category, count: products.length };
+      }
+      const count = products.filter(product => product.category === category.id).length;
+      return { ...category, count };
+    });
+  }, [products]);
+
+  // Filter and sort products
+  const filteredProducts = useMemo(() => {
+    let filtered = [...products];
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(product => 
+        product.name.toLowerCase().includes(query) ||
+        product.description.toLowerCase().includes(query) ||
+        product.tags?.some(tag => tag.toLowerCase().includes(query)) ||
+        product.sellerName.toLowerCase().includes(query)
+      );
+    }
+
+    // Filter by category
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(product => product.category === selectedCategory);
+    }
+
+    // Filter by price range
+    if (priceRange !== "all") {
+      const range = PRICE_RANGES.find(r => r.id === priceRange);
+      if (range) {
+        filtered = filtered.filter(product => 
+          product.price >= range.min && product.price <= range.max
+        );
+      }
+    }
+
+    // Sort products
+    switch (sortBy) {
+      case "price-low":
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case "price-high":
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+      case "rating":
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      case "newest":
+        // Assuming newer products have higher IDs or we can add a date field
+        filtered.sort((a, b) => b.id.localeCompare(a.id));
+        break;
+      default:
+        // Keep original order
+        break;
+    }
+
+    return filtered;
+  }, [products, selectedCategory, sortBy, priceRange, searchQuery]);
 
   return (
     <>
-      <header className="sticky top-0 z-20 bg-[#F6F8FC] bg-gradient-to-b from-white to-[#F6F8FC]">
-        <div className="px-4 pt-3 pb-2 flex items-center justify-between max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-          <div className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-xl grid place-items-center bg-blue-50 border border-blue-100">
-              <Store className="h-5 w-5 text-blue-700" />
+      <Navbar 
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        showFilter={searchQuery.trim().length > 0}
+        onFilterClick={() => setShowFilters(!showFilters)}
+      />
+      
+      <div className="min-h-screen bg-[#F6F8FC] pb-28">
+        <main className="px-4 pt-1 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+          {/* Banner carousel */}
+          <BannerCarousel />
+
+          {/* Category Filters - Horizontal Scrollable */}
+          <div className="mb-3 mt-3">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-semibold">Kategori</h3>
             </div>
-            <div className="leading-tight">
-              <p className="text-[11px] text-slate-500">Ecosera</p>
-              <p className="font-semibold text-slate-900">Jelajahi produk lokal</p>
+            
+            {/* Horizontal scrollable categories */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {categoriesWithCounts.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
+                    selectedCategory === category.id
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  {category.name}
+                  {category.count > 0 && (
+                    <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${
+                      selectedCategory === category.id
+                        ? "bg-blue-500 text-white"
+                        : "bg-slate-100 text-slate-600"
+                    }`}>
+                      {category.count}
+                    </span>
+                  )}
+                </button>
+              ))}
             </div>
           </div>
-          {/* 🔔 Notification icon DIHAPUS dari header */}
-        </div>
-      </header>
 
-      <main className="px-4 pb-28 pt-3 max-w-md md:max-w-lg lg:max-w-xl mx-auto bg-[#F6F8FC]">
-        <SearchBar
-          query={query}
-          onQuery={setQuery}
-          category={category}
-          onCategory={setCategory}
-        />
+          {/* Advanced Filters - Only show when searching */}
+          {searchQuery.trim().length > 0 && showFilters && (
+            <div className="mb-4 p-4 bg-white rounded-xl border border-slate-200 space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium text-slate-900">Filter Hasil Pencarian</h4>
+                <button
+                  onClick={() => setShowFilters(false)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  ×
+                </button>
+              </div>
+              
+              {/* Sort Options */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Urutkan</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
+                >
+                  {SORT_OPTIONS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-        <BannerCarousel />
+              {/* Distance Options */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Jarak</label>
+                <select
+                  value={distance}
+                  onChange={(e) => setDistance(e.target.value)}
+                  className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
+                >
+                  {DISTANCE_OPTIONS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-        <div className="flex items-center justify-between mt-5 mb-2">
-          <h3 className="font-semibold text-slate-900">Most Popular</h3>
-          <Link to="/Etalase" className="text-sm text-blue-600 font-medium">See All</Link>
-        </div>
+              {/* Price Range */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Rentang Harga</label>
+                <select
+                  value={priceRange}
+                  onChange={(e) => setPriceRange(e.target.value)}
+                  className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-transparent"
+                >
+                  {PRICE_RANGES.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
 
-        <div className="grid grid-cols-2 gap-3">
-          {displayed.map((p) => (
-            <ProductCard key={p.id} p={p} />
-          ))}
-        </div>
-      </main>
+          {/* Produk */}
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold">
+              {searchQuery.trim() 
+                ? `Hasil pencarian "${searchQuery}"` 
+                : selectedCategory === "all" 
+                  ? "Rekomendasi" 
+                  : categoriesWithCounts.find(c => c.id === selectedCategory)?.name
+              }
+            </h3>
+            <span className="text-sm text-slate-600">{filteredProducts.length} produk</span>
+          </div>
 
-      <BottomDock />
+          <div className="grid grid-cols-2 gap-3">
+            {filteredProducts.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-slate-600">Tidak ada produk dalam kategori ini</p>
+            </div>
+          )}
+        </main>
+      </div>
     </>
   );
 }
