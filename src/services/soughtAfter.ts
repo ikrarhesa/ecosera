@@ -10,6 +10,11 @@ export interface SoughtAfterItem {
     updated_at?: string;
 }
 
+let soughtAfterCache: SoughtAfterItem[] | null = null;
+export function getCachedSoughtAfterItems(): SoughtAfterItem[] | null {
+    return soughtAfterCache;
+}
+
 export async function getSoughtAfterItems(): Promise<SoughtAfterItem[]> {
     const { data, error } = await supabase
         .from("sought_after_items")
@@ -18,10 +23,11 @@ export async function getSoughtAfterItems(): Promise<SoughtAfterItem[]> {
 
     if (error) {
         console.error("Error fetching sought after items:", error);
-        return [];
+        return soughtAfterCache || [];
     }
 
-    return data || [];
+    soughtAfterCache = data || [];
+    return soughtAfterCache;
 }
 
 export async function upsertSoughtAfterItem(item: Omit<SoughtAfterItem, "id" | "created_at" | "updated_at">): Promise<void> {

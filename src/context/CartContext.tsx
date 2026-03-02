@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-export type CartItem = { id: string; name: string; price: number; qty: number; thumb?: string; sellerName?: string };
+export type CartItem = { id: string; name: string; price: number; qty: number; thumb?: string; sellerName?: string; variantName?: string };
 
 type CartCtx = {
   items: CartItem[];
@@ -20,13 +20,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) setItems(JSON.parse(raw));
-    } catch {}
+    } catch { }
   }, []);
 
   useEffect(() => {
     try {
       localStorage.setItem(KEY, JSON.stringify(items));
-    } catch {}
+    } catch { }
   }, [items]);
 
   const api: CartCtx = useMemo(() => ({

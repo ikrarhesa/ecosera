@@ -13,6 +13,11 @@ export interface Banner {
     created_at: string;
 }
 
+let activeBannersCache: Banner[] | null = null;
+export function getCachedActiveBanners(): Banner[] | null {
+    return activeBannersCache;
+}
+
 export async function getActiveBanners(): Promise<Banner[]> {
     const { data, error } = await supabase
         .from("banners")
@@ -24,10 +29,11 @@ export async function getActiveBanners(): Promise<Banner[]> {
 
     if (error) {
         console.error("Error fetching banners:", error);
-        return [];
+        return activeBannersCache || [];
     }
 
-    return data || [];
+    activeBannersCache = data || [];
+    return activeBannersCache;
 }
 
 export async function getBannerById(id: string): Promise<Banner | null> {

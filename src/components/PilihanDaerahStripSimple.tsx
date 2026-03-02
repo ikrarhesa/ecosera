@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Star, MapPin, Navigation } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Product } from '../types/product';
-import { getAllProducts } from '../services/products';
+import { useProducts } from '../context/ProductsContext';
 
 
 type TabType = 'nearby' | 'popular' | 'new';
@@ -22,8 +22,8 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 export default function PilihanDaerahStripSimple() {
+  const { products: allProducts, loading: contextLoading } = useProducts();
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('nearby');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt');
@@ -53,54 +53,53 @@ export default function PilihanDaerahStripSimple() {
   }, []);
 
   useEffect(() => {
-    getAllProducts().then(allProducts => {
-      let filteredProducts: Product[] = [];
+    if (contextLoading) return;
 
-      switch (activeTab) {
-        case 'nearby':
-          if (userLocation) {
-            // Sort by distance using real seller coordinates
-            filteredProducts = [...allProducts]
-              .map(product => {
-                const hasCoords = product.sellerLat != null && product.sellerLng != null;
-                if (hasCoords) {
-                  const distance = calculateDistance(
-                    userLocation.lat, userLocation.lng,
-                    product.sellerLat!, product.sellerLng!
-                  );
-                  return { ...product, distance };
-                }
-                return { ...product, distance: Infinity };
-              })
-              .sort((a, b) => (a as any).distance - (b as any).distance)
-              .slice(0, 6);
-          } else {
-            filteredProducts = [...allProducts].slice(0, 6);
-          }
-          break;
-        case 'popular':
-          // Sort by sold count (most selling)
+    let filteredProducts: Product[] = [];
+
+    switch (activeTab) {
+      case 'nearby':
+        if (userLocation) {
+          // Sort by distance using real seller coordinates
           filteredProducts = [...allProducts]
-            .sort((a, b) => (b.sold || 0) - (a.sold || 0))
-            .slice(0, 6);
-          break;
-        case 'new':
-          // Sort by created_at if available, else by ID
-          filteredProducts = [...allProducts]
-            .sort((a, b) => {
-              const dateA = (a as any).created_at ? new Date((a as any).created_at).getTime() : 0;
-              const dateB = (b as any).created_at ? new Date((b as any).created_at).getTime() : 0;
-              if (dateA !== dateB) return dateB - dateA;
-              return b.id.localeCompare(a.id);
+            .map(product => {
+              const hasCoords = product.sellerLat != null && product.sellerLng != null;
+              if (hasCoords) {
+                const distance = calculateDistance(
+                  userLocation.lat, userLocation.lng,
+                  product.sellerLat!, product.sellerLng!
+                );
+                return { ...product, distance };
+              }
+              return { ...product, distance: Infinity };
             })
+            .sort((a, b) => (a as any).distance - (b as any).distance)
             .slice(0, 6);
-          break;
-      }
+        } else {
+          filteredProducts = [...allProducts].slice(0, 6);
+        }
+        break;
+      case 'popular':
+        // Sort by sold count (most selling)
+        filteredProducts = [...allProducts]
+          .sort((a, b) => (b.sold || 0) - (a.sold || 0))
+          .slice(0, 6);
+        break;
+      case 'new':
+        // Sort by created_at if available, else by ID
+        filteredProducts = [...allProducts]
+          .sort((a, b) => {
+            const dateA = (a as any).created_at ? new Date((a as any).created_at).getTime() : 0;
+            const dateB = (b as any).created_at ? new Date((b as any).created_at).getTime() : 0;
+            if (dateA !== dateB) return dateB - dateA;
+            return b.id.localeCompare(a.id);
+          })
+          .slice(0, 6);
+        break;
+    }
 
-      setProducts(filteredProducts);
-      setLoading(false);
-    });
-  }, [activeTab, userLocation]);
+    setProducts(filteredProducts);
+  }, [activeTab, userLocation, allProducts, contextLoading]);
 
 
   const getTabLabel = (tab: TabType) => {
@@ -119,36 +118,7 @@ export default function PilihanDaerahStripSimple() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="mb-3 mt-3">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold">Pilihan Daerah</h3>
-        </div>
-
-        {/* Tab buttons skeleton */}
-        <div className="flex gap-2 mb-2">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-8 w-20 bg-slate-200 rounded-full animate-pulse" />
-          ))}
-        </div>
-
-        <div className="text-xs text-slate-600 mb-2">
-          Memuat produk...
-        </div>
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="w-[156px] shrink-0 rounded-xl bg-white border border-slate-200 p-2">
-              <div className="w-full aspect-square rounded-lg bg-slate-100 animate-pulse" />
-              <div className="mt-2 h-4 bg-slate-200 rounded animate-pulse" />
-              <div className="mt-1 h-3 bg-slate-200 rounded animate-pulse w-2/3" />
-              <div className="mt-2 h-6 bg-slate-200 rounded animate-pulse" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  if (contextLoading) return null; // Return nothing while waiting, the parent Home page has its own skeleton loader anyway
 
   return (
     <div className="mb-3 mt-3">

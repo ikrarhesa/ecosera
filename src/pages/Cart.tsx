@@ -1,34 +1,25 @@
 // src/pages/Cart.tsx
 import { useCart } from "../context/CartContext";
-<<<<<<< HEAD
-import { Trash2, Minus, Plus, Store, MessageCircle } from "lucide-react";
-import { useRef, useState, useMemo } from "react";
-import { useToast } from "../context/ToastContext";
-import { money } from "../utils/money";
-import { SHOP_WA } from "../utils/env";
-import BottomNavbar from "../components/BottomNavbar";
-=======
 import { Trash2, Minus, Plus, Store, MessageCircle, ArrowLeft, ShoppingBag } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../context/ToastContext";
 import { money } from "../utils/money";
 import { SHOP_WA } from "../utils/env";
->>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
 
 const fallbackImg =
   "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&h=300&q=70";
 
 function buildWaMessage(
   sellerName: string,
-  items: { name: string; qty: number; price: number }[],
+  items: { name: string; qty: number; price: number; variantName?: string }[],
   subtotal: number
 ) {
   const lines = [
     `*Pesanan dari ${sellerName}*`,
     "————————————",
     ...items.map(
-      (i, idx) => `${idx + 1}) ${i.name} x${i.qty} = Rp ${money(i.price * i.qty)}`
+      (i, idx) => `${idx + 1}) ${i.name}${i.variantName ? ` (${i.variantName})` : ''} x${i.qty} = Rp ${money(i.price * i.qty)}`
     ),
     "————————————",
     `Subtotal: Rp ${money(subtotal)}`,
@@ -80,13 +71,13 @@ function ConfirmModal({
   );
 }
 
-/** Satu baris item keranjang dengan delete button di dalam kartu */
 function CartItemRow({
   name,
   qty,
   price,
   thumb,
   sellerName,
+  variantName,
   onRemoveConfirmed,
   onChangeQty,
 }: {
@@ -95,6 +86,7 @@ function CartItemRow({
   price: number;
   thumb?: string;
   sellerName?: string;
+  variantName?: string;
   onRemoveConfirmed: () => void;
   onChangeQty: (q: number) => void;
 }) {
@@ -116,19 +108,12 @@ function CartItemRow({
 
         {/* Info + Stepper */}
         <div className="flex-1 min-w-0">
-<<<<<<< HEAD
-          <p className="font-medium line-clamp-2">{name}</p>
-          {sellerName && (
-            <div className="flex items-center gap-1">
-              <Store className="h-3 w-3 text-blue-600" />
-              <p className="text-[12px] text-blue-600 font-medium">{sellerName}</p>
-            </div>
-          )}
-          <p className="text-[13px] text-slate-600">Rp {money(price)} / item</p>
-=======
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
-              <p className="font-medium line-clamp-2">{name}</p>
+              <p className="font-medium line-clamp-2">
+                {name}
+                {variantName && <span className="text-slate-500 font-normal"> ({variantName})</span>}
+              </p>
               {sellerName && (
                 <div className="flex items-center gap-1 mt-1">
                   <Store className="h-3 w-3 text-blue-600" />
@@ -137,7 +122,6 @@ function CartItemRow({
               )}
               <p className="text-[13px] text-slate-600">Rp {money(price)} / item</p>
             </div>
->>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
 
             {/* Delete button in top-right */}
             <button
@@ -193,17 +177,6 @@ function CartItemRow({
 }
 
 /** Komponen untuk kelompok seller */
-<<<<<<< HEAD
-function SellerGroup({ 
-  sellerName, 
-  items, 
-  removeFromCart, 
-  updateQty, 
-  show 
-}: { 
-  sellerName: string; 
-  items: any[]; 
-=======
 function SellerGroup({
   sellerName,
   items,
@@ -213,7 +186,6 @@ function SellerGroup({
 }: {
   sellerName: string;
   items: any[];
->>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
   removeFromCart: (id: string) => void;
   updateQty: (id: string, qty: number) => void;
   show: (msg: string) => void;
@@ -221,7 +193,7 @@ function SellerGroup({
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
   const waMsg = buildWaMessage(
     sellerName,
-    items.map((i) => ({ name: i.name, qty: i.qty, price: i.price })),
+    items.map((i) => ({ name: i.name, qty: i.qty, price: i.price, variantName: i.variantName })),
     subtotal
   );
   const waLink = `https://wa.me/${SHOP_WA}?text=${waMsg}`;
@@ -249,6 +221,7 @@ function SellerGroup({
             price={i.price}
             thumb={i.thumb}
             sellerName={i.sellerName}
+            variantName={i.variantName}
             onRemoveConfirmed={() => {
               removeFromCart(i.id);
               show("Item dihapus dari keranjang");
@@ -289,15 +262,12 @@ function SellerGroup({
 export default function Cart() {
   const { items, removeFromCart, clearCart, updateQty } = useCart();
   const { show } = useToast();
-<<<<<<< HEAD
-=======
   const navigate = useNavigate();
   const [closing, setClosing] = useState(false);
 
   const goBack = useCallback(() => {
     setClosing(true);
   }, []);
->>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
 
   // Group items by seller
   const groupedBySeller = useMemo(() => {
@@ -316,39 +286,6 @@ export default function Cart() {
 
   return (
     <>
-<<<<<<< HEAD
-      <BottomNavbar />
-      <div className="min-h-screen bg-[#F6F8FC] pb-28">
-        {/* Header */}
-        <div className="px-4 pt-3 pb-2 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="font-semibold text-slate-900">Keranjang</div>
-              {totalItems > 0 && (
-                <div className="text-xs text-slate-600">{totalItems} item dari {Object.keys(groupedBySeller).length} toko</div>
-              )}
-            </div>
-            <button
-              onClick={() => {
-                if (items.length === 0) return;
-                if (confirm("Kosongkan seluruh keranjang?")) {
-                  clearCart();
-                  show("Keranjang dikosongkan 🗑️");
-                }
-              }}
-              className="rounded-xl p-2 border border-slate-200 bg-white hover:bg-slate-50"
-              title="Hapus semua"
-            >
-              <Trash2 className="h-5 w-5 text-red-500" />
-            </button>
-          </div>
-        </div>
-
-        {/* Items grouped by seller */}
-        <main className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-          {totalItems === 0 ? (
-            <p className="text-slate-600 text-center mt-10">Keranjang kosong.</p>
-=======
       <style>{`
         @keyframes slideInRight {
           from { transform: translate3d(100%, 0, 0); }
@@ -422,7 +359,6 @@ export default function Cart() {
                 Mulai Belanja
               </button>
             </div>
->>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
           ) : (
             <div className="space-y-4">
               {Object.entries(groupedBySeller).map(([sellerName, sellerItems]) => (
@@ -438,11 +374,7 @@ export default function Cart() {
             </div>
           )}
         </main>
-<<<<<<< HEAD
-      </div>
-=======
       </div >
->>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
     </>
   );
 }

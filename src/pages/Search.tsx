@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Search as SearchIcon, Filter, ArrowLeft } from "lucide-react";
+import { Search as SearchIcon, Filter, ArrowLeft, Store } from "lucide-react";
+import { Link } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import { useProducts } from "../context/ProductsContext";
 import { calculateDistance, requestUserLocation } from "../utils/distance";
@@ -36,11 +37,13 @@ export default function Search() {
     const query = searchParams.get("q") || "";
 
     const [localQuery, setLocalQuery] = useState(query);
+    const [isFocused, setIsFocused] = useState(false);
     const [sortBy, setSortBy] = useState("default");
     const [distance, setDistance] = useState("all");
     const [priceRange, setPriceRange] = useState("all");
     const [showFilters, setShowFilters] = useState(false);
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const containerRef = React.useRef<HTMLFormElement>(null);
 
     const { products } = useProducts();
 
@@ -56,6 +59,17 @@ export default function Search() {
         }
     }, [distance, userLocation]);
 
+    // Close suggestions when clicking outside
+    React.useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setIsFocused(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (localQuery.trim()) {
@@ -67,9 +81,9 @@ export default function Search() {
     const filteredProducts = useMemo(() => {
         let filtered = [...products];
 
-        // Filter by search query
-        if (query.trim()) {
-            const q = query.toLowerCase();
+        // Filter by live local query
+        if (localQuery.trim()) {
+            const q = localQuery.toLowerCase();
             filtered = filtered.filter(product =>
                 product.name.toLowerCase().includes(q) ||
                 (product.description && product.description.toLowerCase().includes(q)) ||
@@ -125,7 +139,16 @@ export default function Search() {
         }
 
         return filtered;
-    }, [products, query, sortBy, priceRange, distance, userLocation]);
+    }, [products, localQuery, sortBy, priceRange, distance, userLocation]);
+
+    // Compute suggestions
+    const suggestions = localQuery.trim()
+        ? products.filter(p =>
+            p.name.toLowerCase().includes(localQuery.toLowerCase()) ||
+            (p.category || "").toLowerCase().includes(localQuery.toLowerCase()) ||
+            (p.sellerName && p.sellerName.toLowerCase().includes(localQuery.toLowerCase()))
+        ).slice(0, 2) // Limit to 2 suggestions
+        : [];
 
     return (
         <div className="min-h-screen bg-[#F6F8FC] pb-28">
@@ -136,7 +159,7 @@ export default function Search() {
                         <ArrowLeft className="h-5 w-5" />
                     </button>
 
-                    <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center gap-3">
+                    <form ref={containerRef} onSubmit={handleSearchSubmit} className="flex-1 flex items-center gap-3">
                         <div className="relative flex-1">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                                 <SearchIcon className="h-4 w-4 text-slate-400" />
@@ -145,10 +168,48 @@ export default function Search() {
                                 type="text"
                                 placeholder="Cari produk..."
                                 value={localQuery}
-                                onChange={(e) => setLocalQuery(e.target.value)}
+                                onFocus={() => setIsFocused(true)}
+                                onChange={(e) => {
+                                    setLocalQuery(e.target.value);
+                                    setIsFocused(true);
+                                }}
                                 autoFocus
                                 className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border-none rounded-xl text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 relative z-0"
                             />
+
+                            {/* Suggestions Dropdown */}
+                            {isFocused && localQuery.trim().length > 0 && suggestions.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden z-[100]">
+                                    <div className="py-2">
+                                        {suggestions.map(product => (
+                                            <Link
+                                                key={product.id}
+                                                to={`/product/${product.slug || product.id}`}
+                                                className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
+                                            >
+                                                <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200">
+                                                    <img
+                                                        src={product.image || "https://placehold.co/800x800/png?text=Ecosera"}
+                                                        alt={product.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="text-sm font-medium text-slate-900 truncate">{product.name}</h4>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <span className="text-xs font-semibold text-blue-600">Rp {product.price.toLocaleString("id-ID")}</span>
+                                                        {product.sellerName && (
+                                                            <span className="text-[10px] text-slate-500 flex items-center gap-0.5 truncate border-l border-slate-300 pl-2">
+                                                                <Store className="h-3 w-3 shrink-0" /> {product.sellerName}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </form>
 
@@ -165,9 +226,9 @@ export default function Search() {
                 {/* Results Info */}
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-slate-900">
-                        {query ? `Hasil pencarian "${query}"` : "Ketik untuk mencari"}
+                        {localQuery ? `Hasil pencarian "${localQuery}"` : "Ketik untuk mencari"}
                     </h3>
-                    {query && (
+                    {localQuery && (
                         <span className="text-sm text-slate-600">{filteredProducts.length} produk</span>
                     )}
                 </div>
@@ -179,7 +240,7 @@ export default function Search() {
                     ))}
                 </div>
 
-                {query && filteredProducts.length === 0 && (
+                {localQuery && filteredProducts.length === 0 && (
                     <div className="text-center py-16">
                         <SearchIcon className="h-12 w-12 text-slate-300 mx-auto mb-3" />
                         <p className="text-slate-600 font-medium">Tidak ada hasil yang ditemukan</p>

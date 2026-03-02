@@ -1,3 +1,10 @@
+export type ProductVariant = {
+  id: string;
+  variant_name: string;
+  price_override: number | null;
+  stock: number | null;
+};
+
 export type Product = {
   id: string;
   slug?: string;
@@ -18,10 +25,8 @@ export type Product = {
   sellerName?: string;
   sellerPhone?: string;
   location?: string;
-<<<<<<< HEAD
-=======
   sellerLat?: number;
   sellerLng?: number;
   seller_id?: string | null;
->>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
+  variants?: ProductVariant[];
 };
