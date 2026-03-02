@@ -1,11 +1,20 @@
 // src/pages/Cart.tsx
 import { useCart } from "../context/CartContext";
+<<<<<<< HEAD
 import { Trash2, Minus, Plus, Store, MessageCircle } from "lucide-react";
 import { useRef, useState, useMemo } from "react";
 import { useToast } from "../context/ToastContext";
 import { money } from "../utils/money";
 import { SHOP_WA } from "../utils/env";
 import BottomNavbar from "../components/BottomNavbar";
+=======
+import { Trash2, Minus, Plus, Store, MessageCircle, ArrowLeft, ShoppingBag } from "lucide-react";
+import { useState, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "../context/ToastContext";
+import { money } from "../utils/money";
+import { SHOP_WA } from "../utils/env";
+>>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
 
 const fallbackImg =
   "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&h=300&q=70";
@@ -71,7 +80,7 @@ function ConfirmModal({
   );
 }
 
-/** Satu baris item keranjang dengan swipe-to-delete & qty stepper */
+/** Satu baris item keranjang dengan delete button di dalam kartu */
 function CartItemRow({
   name,
   qty,
@@ -89,55 +98,12 @@ function CartItemRow({
   onRemoveConfirmed: () => void;
   onChangeQty: (q: number) => void;
 }) {
-  const startX = useRef<number | null>(null);
-  const [offset, setOffset] = useState(0); // px; negatif ke kiri
   const [ask, setAsk] = useState(false);
-  const MAX = 80; // lebar area tombol hapus
-  const THRESH_SHOW = 40; // ambang tampil tombol
-  const THRESH_DELETE = 120; // swipe panjang langsung minta konfirmasi
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    startX.current = e.touches[0].clientX;
-  };
-  const onTouchMove = (e: React.TouchEvent) => {
-    if (startX.current == null) return;
-    const dx = e.touches[0].clientX - startX.current;
-    const next = Math.max(-MAX, Math.min(0, dx)); // hanya ke kiri
-    setOffset(next);
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (startX.current == null) return;
-    const dx = e.changedTouches[0].clientX - startX.current;
-    if (Math.abs(dx) > THRESH_DELETE && dx < 0) {
-      setAsk(true); // swipe jauh: minta konfirmasi
-    } else if (dx < -THRESH_SHOW) {
-      setOffset(-MAX); // tampilkan tombol
-    } else {
-      setOffset(0); // balik
-    }
-    startX.current = null;
-  };
 
   return (
     <div className="relative">
-      {/* Tombol Hapus di belakang kartu */}
-      <div className="absolute inset-y-0 right-0 flex items-center pr-2">
-        <button
-          onClick={() => setAsk(true)}
-          className="h-10 px-3 rounded-lg bg-red-500 text-white text-sm shadow"
-        >
-          Hapus
-        </button>
-      </div>
-
-      {/* Kartu yang bisa diswipe */}
-      <div
-        className="flex items-center gap-3 rounded-2xl bg-white/80 backdrop-blur border border-black/10 p-3 relative transition-transform duration-200 will-change-transform"
-        style={{ transform: `translateX(${offset}px)` }}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-      >
+      {/* Kartu item */}
+      <div className="flex items-center gap-3 rounded-2xl bg-white/80 backdrop-blur border border-black/10 p-3">
         {/* Thumbnail */}
         <div className="h-16 w-16 rounded-xl overflow-hidden shrink-0 border border-black/10 bg-slate-100">
           <img
@@ -150,6 +116,7 @@ function CartItemRow({
 
         {/* Info + Stepper */}
         <div className="flex-1 min-w-0">
+<<<<<<< HEAD
           <p className="font-medium line-clamp-2">{name}</p>
           {sellerName && (
             <div className="flex items-center gap-1">
@@ -158,30 +125,56 @@ function CartItemRow({
             </div>
           )}
           <p className="text-[13px] text-slate-600">Rp {money(price)} / item</p>
+=======
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="font-medium line-clamp-2">{name}</p>
+              {sellerName && (
+                <div className="flex items-center gap-1 mt-1">
+                  <Store className="h-3 w-3 text-blue-600" />
+                  <p className="text-[12px] text-blue-600 font-medium">{sellerName}</p>
+                </div>
+              )}
+              <p className="text-[13px] text-slate-600">Rp {money(price)} / item</p>
+            </div>
+>>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
 
-          <div className="mt-2 flex items-center gap-2">
+            {/* Delete button in top-right */}
             <button
-              onClick={() => onChangeQty(qty - 1)}
-              className="h-8 w-8 grid place-items-center rounded-lg border border-black/10 bg-white"
-              aria-label="Kurangi"
+              onClick={() => setAsk(true)}
+              className="ml-2 p-1.5 rounded-lg hover:bg-red-50 transition-colors group"
+              title="Hapus item"
             >
-              <Minus className="h-4 w-4" />
-            </button>
-            <div className="min-w-8 text-center font-semibold">{qty}</div>
-            <button
-              onClick={() => onChangeQty(qty + 1)}
-              className="h-8 w-8 grid place-items-center rounded-lg border border-black/10 bg-white"
-              aria-label="Tambah"
-            >
-              <Plus className="h-4 w-4" />
+              <Trash2 className="h-4 w-4 text-red-500 group-hover:text-red-600" />
             </button>
           </div>
-        </div>
 
-        {/* Total per item */}
-        <div className="text-right">
-          <p className="text-xs text-slate-600">Total</p>
-          <p className="font-semibold">Rp {money(price * qty)}</p>
+          <div className="mt-2 flex items-center justify-between">
+            {/* Quantity stepper */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => onChangeQty(qty - 1)}
+                className="h-8 w-8 grid place-items-center rounded-lg border border-black/10 bg-white hover:bg-slate-50 transition-colors"
+                aria-label="Kurangi"
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <div className="min-w-8 text-center font-semibold">{qty}</div>
+              <button
+                onClick={() => onChangeQty(qty + 1)}
+                className="h-8 w-8 grid place-items-center rounded-lg border border-black/10 bg-white hover:bg-slate-50 transition-colors"
+                aria-label="Tambah"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Total per item */}
+            <div className="text-right">
+              <p className="text-xs text-slate-600">Total</p>
+              <p className="font-semibold">Rp {money(price * qty)}</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -200,6 +193,7 @@ function CartItemRow({
 }
 
 /** Komponen untuk kelompok seller */
+<<<<<<< HEAD
 function SellerGroup({ 
   sellerName, 
   items, 
@@ -209,6 +203,17 @@ function SellerGroup({
 }: { 
   sellerName: string; 
   items: any[]; 
+=======
+function SellerGroup({
+  sellerName,
+  items,
+  removeFromCart,
+  updateQty,
+  show
+}: {
+  sellerName: string;
+  items: any[];
+>>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
   removeFromCart: (id: string) => void;
   updateQty: (id: string, qty: number) => void;
   show: (msg: string) => void;
@@ -284,6 +289,15 @@ function SellerGroup({
 export default function Cart() {
   const { items, removeFromCart, clearCart, updateQty } = useCart();
   const { show } = useToast();
+<<<<<<< HEAD
+=======
+  const navigate = useNavigate();
+  const [closing, setClosing] = useState(false);
+
+  const goBack = useCallback(() => {
+    setClosing(true);
+  }, []);
+>>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
 
   // Group items by seller
   const groupedBySeller = useMemo(() => {
@@ -302,6 +316,7 @@ export default function Cart() {
 
   return (
     <>
+<<<<<<< HEAD
       <BottomNavbar />
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
         {/* Header */}
@@ -333,6 +348,81 @@ export default function Cart() {
         <main className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
           {totalItems === 0 ? (
             <p className="text-slate-600 text-center mt-10">Keranjang kosong.</p>
+=======
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translate3d(100%, 0, 0); }
+          to   { transform: translate3d(0, 0, 0); }
+        }
+        @keyframes slideOutRight {
+          from { transform: translate3d(0, 0, 0); }
+          to   { transform: translate3d(100%, 0, 0); }
+        }
+      `}</style>
+
+      <div
+        className="min-h-screen bg-[#F6F8FC]"
+        style={{
+          animation: closing
+            ? "slideOutRight 0.25s cubic-bezier(0.4, 0, 1, 1) forwards"
+            : "slideInRight 0.25s cubic-bezier(0, 0, 0.2, 1) forwards",
+          willChange: "transform",
+          backfaceVisibility: "hidden",
+          overflow: closing ? "hidden" : undefined,
+        }}
+        onAnimationEnd={() => {
+          if (closing) navigate(-1);
+        }}>
+        {/* Header */}
+        <div className="sticky top-0 z-20 bg-white border-b border-slate-200">
+          <div className="px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={goBack}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors"
+                aria-label="Kembali"
+              >
+                <ArrowLeft className="h-5 w-5 text-slate-700" />
+              </button>
+              <div>
+                <div className="font-semibold text-slate-900 text-lg">Keranjang</div>
+                {totalItems > 0 && (
+                  <div className="text-xs text-slate-500">{totalItems} item dari {Object.keys(groupedBySeller).length} toko</div>
+                )}
+              </div>
+            </div>
+            {totalItems > 0 && (
+              <button
+                onClick={() => {
+                  if (confirm("Kosongkan seluruh keranjang?")) {
+                    clearCart();
+                    show("Keranjang dikosongkan 🗑️");
+                  }
+                }}
+                className="rounded-xl p-2 border border-slate-200 bg-white hover:bg-red-50 transition-colors"
+                title="Hapus semua"
+              >
+                <Trash2 className="h-5 w-5 text-red-500" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Content */}
+        <main className="px-4 pt-4 pb-8">
+          {totalItems === 0 ? (
+            <div className="text-center mt-16">
+              <ShoppingBag className="h-16 w-16 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-500 font-medium">Keranjang kosong</p>
+              <p className="text-slate-400 text-sm mt-1">Yuk mulai belanja!</p>
+              <button
+                onClick={() => navigate("/")}
+                className="mt-4 px-6 py-2 rounded-xl bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+              >
+                Mulai Belanja
+              </button>
+            </div>
+>>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
           ) : (
             <div className="space-y-4">
               {Object.entries(groupedBySeller).map(([sellerName, sellerItems]) => (
@@ -348,7 +438,11 @@ export default function Cart() {
             </div>
           )}
         </main>
+<<<<<<< HEAD
       </div>
+=======
+      </div >
+>>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
     </>
   );
 }

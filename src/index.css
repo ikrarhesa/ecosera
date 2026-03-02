@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,3 +14,13 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+<<<<<<< HEAD
+=======
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+>>>>>>> ace37154b74ca81d6b98d7a167b33475f2748f4a
