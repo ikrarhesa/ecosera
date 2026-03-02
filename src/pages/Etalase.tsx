@@ -53,57 +53,6 @@ export default function Etalase() {
     return filtered;
   }, [all, selectedCategory]);
 
-  if (loading) {
-    return (
-      <>
-        <Navbar />
-        <div className="min-h-screen bg-[#F6F8FC] pb-28">
-          {/* Top Category Strip Skeleton */}
-          <div className="bg-white border-b border-slate-200">
-            <div className="py-3 px-4 flex gap-3 overflow-hidden">
-              <div className="flex-shrink-0 w-20 h-9 bg-slate-200 rounded-full animate-pulse" />
-              {(dbCategories.length > 0 ? dbCategories.map(c => c.id) : [1, 2, 3, 4, 5]).map((i) => (
-                <div key={i} className="flex-shrink-0 w-24 h-9 bg-slate-200 rounded-full animate-pulse" />
-              ))}
-            </div>
-          </div>
-
-          <main className="px-4 pt-4">
-            {/* Sought After Grid Skeleton */}
-            <div className="mb-6">
-              <div className="h-6 w-48 bg-slate-200 rounded animate-pulse mb-3" />
-              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="aspect-[4/3] bg-slate-200 animate-pulse rounded-xl"></div>
-                ))}
-              </div>
-            </div>
-
-            {/* Grid Header Skeleton */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
-              <div className="h-4 w-16 bg-slate-200 rounded animate-pulse" />
-            </div>
-
-            {/* Grid */}
-            <div className="grid grid-cols-2 gap-3">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 animate-pulse">
-                  <div className="w-full aspect-square bg-slate-200"></div>
-                  <div className="p-3">
-                    <div className="h-4 bg-slate-200 rounded w-full mb-2"></div>
-                    <div className="h-4 bg-slate-200 rounded w-2/3 mb-3"></div>
-                    <div className="h-5 bg-slate-200 rounded w-1/2"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </main>
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
       <Navbar />
@@ -188,19 +137,41 @@ export default function Etalase() {
 
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-slate-900">
-              {selectedCategory !== "all"
-                ? `${dbCategories.find(c => c.id === selectedCategory)?.name || "Kategori"}`
-                : "Semua Produk"
-              }
+              {loading ? (
+                <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
+              ) : (
+                selectedCategory !== "all"
+                  ? `${dbCategories.find(c => c.id === selectedCategory)?.name || "Kategori"}`
+                  : "Semua Produk"
+              )}
             </h3>
-            <span className="text-xs text-slate-600">{filteredProducts.length} item</span>
+            {loading ? (
+              <div className="h-4 w-16 bg-slate-200 rounded animate-pulse" />
+            ) : (
+              <span className="text-xs text-slate-600">{filteredProducts.length} item</span>
+            )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {filteredProducts.map((p: Product) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-2 gap-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 animate-pulse">
+                  <div className="w-full aspect-square bg-slate-200"></div>
+                  <div className="p-3">
+                    <div className="h-4 bg-slate-200 rounded w-full mb-2"></div>
+                    <div className="h-4 bg-slate-200 rounded w-2/3 mb-3"></div>
+                    <div className="h-5 bg-slate-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {filteredProducts.map((p: Product) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          )}
         </main>
       </div>
     </>
