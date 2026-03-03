@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useNavigationType } from "react-router-dom";
 import {
   ArrowLeft, Heart, Share2, Star, MapPin, ChevronLeft, ChevronRight, ChevronDown,
   MessageCircle, ShoppingCart, ShieldCheck, Truck, PackageOpen, Check
@@ -20,6 +20,7 @@ const fmtIDR = (n: number) =>
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const navType = useNavigationType();
   const { show } = useToast();
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -50,7 +51,9 @@ export default function ProductDetail() {
   const animationStyle = {
     animation: closing
       ? "slideOutRight 0.25s cubic-bezier(0.4, 0, 1, 1) forwards"
-      : "slideInRight 0.25s cubic-bezier(0, 0, 0.2, 1) forwards",
+      : navType === "POP"
+        ? "none"
+        : "slideInRight 0.25s cubic-bezier(0, 0, 0.2, 1) forwards",
     willChange: "transform",
     backfaceVisibility: "hidden" as const,
     overflow: closing ? "hidden" : undefined,
@@ -74,9 +77,14 @@ export default function ProductDetail() {
   );
 
   useEffect(() => {
+    setClosing(false);
+    setProduct(cachedProduct);
+    setLoading(!cachedProduct);
+    setQty(1);
+    setIdx(0);
+
     let mounted = true;
     (async () => {
-      if (!cachedProduct) setLoading(true);
       const p = await getProductBySlug(String(slug));
       if (!mounted) return;
       setProduct(p);
