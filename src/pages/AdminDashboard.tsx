@@ -77,16 +77,25 @@ export default function AdminDashboard() {
       setLoading(true);
       setError(null);
       try {
-        const { data, error: rpcError } = await supabase.rpc(
-          "admin_product_metrics"
-        );
-        if (rpcError) {
-          console.error("[AdminDashboard] RPC error:", rpcError);
-          setError(rpcError.message);
+        // Fetch all event_logs directly instead of relying on missing RPC
+        const { data: events, error: fetchError } = await supabase
+          .from("event_logs")
+          .select("product_id, event_type");
+
+        if (fetchError) {
+          console.error("[AdminDashboard] event_logs fetch error:", fetchError);
+          setError(fetchError.message);
         } else {
-          const rawMetrics =
-            (data as Omit<ProductMetric, "product_name">[]) || [];
-          const ids = rawMetrics.map((m) => m.product_id).filter(Boolean);
+          // Aggregate views & clicks per product_id
+          const agg: Record<string, { views: number; clicks: number }> = {};
+          for (const ev of events || []) {
+            if (!ev.product_id) continue;
+            if (!agg[ev.product_id]) agg[ev.product_id] = { views: 0, clicks: 0 };
+            if (ev.event_type === "product_view") agg[ev.product_id].views++;
+            if (ev.event_type === "wa_click") agg[ev.product_id].clicks++;
+          }
+
+          const ids = Object.keys(agg);
           let nameMap: Record<string, string> = {};
           if (ids.length > 0) {
             const { data: products } = await supabase
@@ -99,10 +108,17 @@ export default function AdminDashboard() {
               );
             }
           }
+
           setMetrics(
-            rawMetrics.map((m) => ({
-              ...m,
-              product_name: nameMap[m.product_id] || "–",
+            ids.map((pid) => ({
+              product_id: pid,
+              product_name: nameMap[pid] || "–",
+              views: agg[pid].views,
+              clicks: agg[pid].clicks,
+              conversion_rate:
+                agg[pid].views > 0
+                  ? agg[pid].clicks / agg[pid].views
+                  : null,
             }))
           );
         }
@@ -246,8 +262,8 @@ export default function AdminDashboard() {
                         <td className="px-5 py-3.5 text-right tabular-nums">
                           <span
                             className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${(m.conversion_rate || 0) > 0
-                                ? "bg-green-50 text-green-700"
-                                : "text-slate-400"
+                              ? "bg-green-50 text-green-700"
+                              : "text-slate-400"
                               }`}
                           >
                             {pct(m.conversion_rate)}
