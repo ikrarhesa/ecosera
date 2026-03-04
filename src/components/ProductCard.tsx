@@ -30,18 +30,24 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
-        {/* Rating and sold info */}
-        {(product.rating || product.sold != null) && (
+        {/* Rating / "Produk Baru" badge */}
+        {product.rating ? (
           <div className="flex items-center gap-1 mt-1">
-            {product.rating && (
-              <>
-                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                <span className="text-xs text-slate-600">{product.rating}</span>
-              </>
-            )}
+            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+            <span className="text-xs text-slate-600">{product.rating}</span>
             {product.sold != null && (
               <>
-                {product.rating && <span className="text-xs text-slate-400">•</span>}
+                <span className="text-xs text-slate-400">•</span>
+                <span className="text-xs text-slate-600">{product.sold} tertarik</span>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 mt-1">
+            <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white bg-blue-600 rounded-full">Produk Baru</span>
+            {product.sold != null && (
+              <>
+                <span className="text-xs text-slate-400">•</span>
                 <span className="text-xs text-slate-600">{product.sold} tertarik</span>
               </>
             )}
