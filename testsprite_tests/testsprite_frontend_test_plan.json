@@ -1,1608 +1,1720 @@
 [
   {
     "id": "TC001",
-    "title": "Homepage renders core UI sections",
-    "description": "Verifies the homepage shows the search bar and key discovery sections for browsing local goods.",
-    "category": "Homepage",
+    "title": "Home page loads hero banners, categories, regional highlights, and featured products",
+    "description": "Verifies the landing page renders the core discovery sections successfully on initial load.",
+    "category": "Home Page (Landing)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /"
+        "description": "Navigate to the home page (/)"
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Search\" is visible"
+        "description": "Verify text \"Pilihan Daerah\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Categories\" is visible"
+        "description": "Verify element \"Hero banners section\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Regional\" is visible"
+        "description": "Verify element \"Categories section\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Products\" is visible"
+        "description": "Verify element \"Featured products section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Starter bundles section\" is visible"
       }
     ]
   },
   {
     "id": "TC002",
-    "title": "Tap a featured category shows category product listing",
-    "description": "Verifies selecting a featured category leads to a product listing view for that category.",
-    "category": "Homepage",
-    "priority": "High",
+    "title": "Hero banners section is visible and shows multiple banners (if available)",
+    "description": "Verifies the hero area renders banners in a way that indicates more than one banner can be displayed.",
+    "category": "Home Page (Landing)",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /"
+        "description": "Navigate to the home page (/)"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Categories\" is visible"
+        "description": "Verify element \"Hero banners section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"A hero banner image/card\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Banner pagination dots or indicator\" is visible"
       },
       {
         "type": "action",
-        "description": "Click on the first visible featured category tile"
+        "description": "Wait for 2 seconds"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Products\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Product card\" is visible"
+        "description": "Verify element \"A hero banner image/card\" is visible"
       }
     ]
   },
   {
     "id": "TC003",
-    "title": "Open a product from homepage listing navigates to product detail URL",
-    "description": "Verifies tapping a product card from the homepage leads to the product detail page.",
-    "category": "Homepage",
+    "title": "Categories section renders a minimal set of categories on the landing page",
+    "description": "Verifies categories are present on the home page to support quick discovery.",
+    "category": "Home Page (Landing)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /"
+        "description": "Navigate to the home page (/)"
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Product card\" is visible"
+        "description": "Verify element \"Categories section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"At least one category tile/chip\" is visible"
       },
       {
         "type": "action",
-        "description": "Click on the first visible \"Product card\""
+        "description": "Scroll to the \"Categories section\""
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/product/\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Product details\" is visible"
+        "description": "Verify element \"At least one category tile/chip\" is visible"
       }
     ]
   },
   {
     "id": "TC004",
-    "title": "Search bar accepts input and shows results on submit",
-    "description": "Verifies users can type into the search bar and trigger a visible results state.",
-    "category": "Homepage",
-    "priority": "Medium",
+    "title": "Pilihan Daerah section renders regional highlights",
+    "description": "Verifies the regional highlights section is visible and contains at least one item.",
+    "category": "Home Page (Landing)",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /"
+        "description": "Navigate to the home page (/)"
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Search\" is visible"
+        "description": "Verify text \"Pilihan Daerah\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Pilihan Daerah list/carousel\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"At least one regional highlight card\" is visible"
       },
       {
         "type": "action",
-        "description": "Type \"honey\" into the search field"
-      },
-      {
-        "type": "action",
-        "description": "Press Enter"
+        "description": "Scroll to the \"Pilihan Daerah\" section"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Results\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Product card\" is visible"
+        "description": "Verify element \"At least one regional highlight card\" is visible"
       }
     ]
   },
   {
     "id": "TC005",
-    "title": "Banners show loading spinner before content appears",
-    "description": "Verifies a loading spinner is shown while banner content is loading, then banners render.",
-    "category": "Homepage",
+    "title": "Featured products section shows a list limited to 10 items (UI sanity)",
+    "description": "Verifies featured products render as a bounded list intended for quick browsing.",
+    "category": "Home Page (Landing)",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /"
+        "description": "Navigate to the home page (/)"
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Banner loading\" is visible"
+        "description": "Verify element \"Featured products section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"At least one featured product card\" is visible"
       },
       {
         "type": "action",
-        "description": "Wait for element \"Banner loading\" to disappear"
+        "description": "Scroll to the \"Featured products section\""
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Banner\" is visible"
+        "description": "Verify element \"Featured products list/grid\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Search\" is visible"
+        "description": "Verify element \"Featured products section\" is visible"
       }
     ]
   },
   {
     "id": "TC006",
-    "title": "Regional picks strip is visible and scrollable on homepage",
-    "description": "Verifies the regional picks (Pilihan Daerah) section is present and can be explored.",
-    "category": "Homepage",
+    "title": "Starter bundles section is visible and contains bundle items",
+    "description": "Verifies starter bundles appear on the home page as an onboarding discovery aid.",
+    "category": "Home Page (Landing)",
     "priority": "Low",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /"
+        "description": "Navigate to the home page (/)"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Regional\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Scroll to \"Regional\" section"
+        "description": "Verify element \"Starter bundles section\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Regional pick\" is visible"
+        "description": "Verify element \"At least one starter bundle card\" is visible"
       },
       {
         "type": "action",
-        "description": "Click on the first visible \"Regional pick\""
+        "description": "Scroll to the \"Starter bundles section\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"At least one starter bundle card\" is visible"
       }
     ]
   },
   {
     "id": "TC007",
-    "title": "Search for a valid keyword returns matching product results",
-    "description": "Verifies that entering a keyword and running search shows a visible results list.",
-    "category": "Product Search",
+    "title": "Home page remains usable when banners fail to load (fallback content visible)",
+    "description": "Verifies that a banner loading failure does not break the landing page and the rest of the sections remain visible.",
+    "category": "Home Page (Landing)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /search"
+        "description": "Navigate to the home page (/)"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Search\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Type \"beras\" into the search input field"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Search\" button"
+        "description": "Verify element \"Hero banners section\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Results\" is visible"
+        "description": "Verify text \"Pilihan Daerah\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Search results list\" is visible"
+        "description": "Verify element \"Categories section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Featured products section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Starter bundles section\" is visible"
       }
     ]
   },
   {
     "id": "TC008",
-    "title": "Search results can be opened from the results list",
-    "description": "Verifies that tapping a search result navigates away from the search page to a product detail page.",
-    "category": "Product Search",
-    "priority": "High",
+    "title": "Landing page shows a loading state during initial content fetch",
+    "description": "Verifies that the UI presents an in-progress state before content appears to prevent a blank screen experience.",
+    "category": "Home Page (Landing)",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /search"
-      },
-      {
-        "type": "action",
-        "description": "Type \"beras\" into the search input field"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Search\" button"
+        "description": "Navigate to the home page (/)"
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Search results list\" is visible"
+        "description": "Verify element \"Loading indicator or skeleton placeholders\" is visible"
       },
       {
         "type": "action",
-        "description": "Click on the first product result in the results list"
+        "description": "Wait for 2 seconds"
       },
       {
         "type": "assertion",
-        "description": "Verify URL does not contain \"/search\""
+        "description": "Verify element \"Hero banners section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Categories section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Featured products section\" is visible"
       }
     ]
   },
   {
     "id": "TC009",
-    "title": "Empty search input shows validation message or empty-state feedback",
-    "description": "Verifies the UI prevents or clearly handles searching with an empty term.",
-    "category": "Product Search",
+    "title": "Browse products from Etalase and view product cards",
+    "description": "Verifies the Etalase page shows a list of product cards with key visible information.",
+    "category": "Product Browsing (Etalase) & Search",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /search"
+        "description": "Navigate to the Etalase (product browsing) page from the app entry point."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Search input\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Search\" button"
+        "description": "Verify text \"Etalase\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Please enter a search term\" is visible"
+        "description": "Verify element \"Product list\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"A product card\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Product image in a product card\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Product price in a product card\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Seller summary in a product card\" is visible."
       }
     ]
   },
   {
     "id": "TC010",
-    "title": "Whitespace-only search is treated as empty and shows user feedback",
-    "description": "Verifies that spaces-only input does not run a normal search and shows a validation/empty-state message.",
-    "category": "Product Search",
-    "priority": "Medium",
+    "title": "Filter products by a category (e.g., Beras)",
+    "description": "Verifies category selection filters the product list and updates visible results.",
+    "category": "Product Browsing (Etalase) & Search",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /search"
-      },
-      {
-        "type": "action",
-        "description": "Type \"   \" into the search input field"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Search\" button"
+        "description": "Navigate to the Etalase (product browsing) page from the app entry point."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Please enter a search term\" is visible"
+        "description": "Verify element \"Category list\" is visible."
+      },
+      {
+        "type": "action",
+        "description": "Click on category \"Beras\"."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Beras\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Filtered product list\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"A product card\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Seller summary in a product card\" is visible."
       }
     ]
   },
   {
     "id": "TC011",
-    "title": "Search with a nonsense keyword shows an empty results state",
-    "description": "Verifies the UI shows a clear empty-state when there are no matches.",
-    "category": "Product Search",
-    "priority": "Medium",
+    "title": "Search products by keyword and see results list",
+    "description": "Verifies keyword search returns a visible results list on the UI.",
+    "category": "Product Browsing (Etalase) & Search",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /search"
-      },
-      {
-        "type": "action",
-        "description": "Type \"zzzxqvnonexistent\" into the search input field"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Search\" button"
+        "description": "Navigate to the Etalase (product browsing) page from the app entry point."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"No results\" is visible"
+        "description": "Verify element \"Search input\" is visible."
+      },
+      {
+        "type": "action",
+        "description": "Type \"beras\" into the search input."
+      },
+      {
+        "type": "action",
+        "description": "Press Enter."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"beras\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Search results list\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"A product card\" is visible."
       }
     ]
   },
   {
     "id": "TC012",
-    "title": "Search is case-insensitive from the user perspective",
-    "description": "Verifies that changing case of the same keyword still yields results (or at minimum does not error).",
-    "category": "Product Search",
-    "priority": "Low",
+    "title": "Search results show product card essentials (image, price, seller summary)",
+    "description": "Verifies that items returned by search still render all essential product card fields.",
+    "category": "Product Browsing (Etalase) & Search",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /search"
+        "description": "Navigate to the Etalase (product browsing) page from the app entry point."
       },
       {
         "type": "action",
-        "description": "Type \"BERAS\" into the search input field"
+        "description": "Type \"beras\" into the search input."
       },
       {
         "type": "action",
-        "description": "Click the \"Search\" button"
+        "description": "Press Enter."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Search results list\" is visible"
+        "description": "Verify element \"A product card\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"No results\" is not visible"
+        "description": "Verify element \"Product image in a product card\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Product price in a product card\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Seller summary in a product card\" is visible."
       }
     ]
   },
   {
     "id": "TC013",
-    "title": "Running a second search replaces the prior results list",
-    "description": "Verifies that a new search updates the visible results rather than keeping stale results.",
-    "category": "Product Search",
+    "title": "Pagination or load-more shows additional products",
+    "description": "Verifies that the user can move beyond the first page of products and see more results.",
+    "category": "Product Browsing (Etalase) & Search",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /search"
-      },
-      {
-        "type": "action",
-        "description": "Type \"beras\" into the search input field"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Search\" button"
+        "description": "Navigate to the Etalase (product browsing) page from the app entry point."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Search results list\" is visible"
+        "description": "Verify element \"Product list\" is visible."
       },
       {
         "type": "action",
-        "description": "Type \"zzzxqvnonexistent\" into the search input field"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Search\" button"
+        "description": "Scroll to the bottom of the product list."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"No results\" is visible"
+        "description": "Verify element \"Load more button\" is visible."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Load more\"."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Additional product cards\" is visible."
       }
     ]
   },
   {
     "id": "TC014",
-    "title": "Search page remains usable after viewing a product and returning to search",
-    "description": "Verifies that after opening a result, the user can return to search and run another query.",
-    "category": "Product Search",
-    "priority": "Low",
+    "title": "Empty search shows a friendly no-results state",
+    "description": "Verifies a keyword with no matches results in a visible no-results message and no crash.",
+    "category": "Product Browsing (Etalase) & Search",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /search"
+        "description": "Navigate to the Etalase (product browsing) page from the app entry point."
       },
       {
         "type": "action",
-        "description": "Type \"beras\" into the search input field"
+        "description": "Type \"zzzzzz-not-a-real-product\" into the search input."
       },
       {
         "type": "action",
-        "description": "Click the \"Search\" button"
-      },
-      {
-        "type": "action",
-        "description": "Click on the first product result in the results list"
+        "description": "Press Enter."
       },
       {
         "type": "assertion",
-        "description": "Verify URL does not contain \"/search\""
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Back\" or \"Search\" link/button on the page"
+        "description": "Verify element \"No results message\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/search\""
+        "description": "Verify text \"Try a different keyword\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Search input\" is visible."
       }
     ]
   },
   {
     "id": "TC015",
-    "title": "Product Detail renders key sections (images, price, seller info, reviews, related products)",
-    "description": "Verifies the product detail page loads and shows the core product information and supporting sections.",
-    "category": "Product Detail",
-    "priority": "High",
+    "title": "Clear search returns to browsing results",
+    "description": "Verifies the user can clear the current search and return to the default browsing list.",
+    "category": "Product Browsing (Etalase) & Search",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to the Etalase (product browsing) page from the app entry point."
+      },
+      {
+        "type": "action",
+        "description": "Type \"beras\" into the search input."
+      },
+      {
+        "type": "action",
+        "description": "Press Enter."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Order via WhatsApp\" is visible"
+        "description": "Verify element \"Search results list\" is visible."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Clear search\"."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Price\" is visible"
+        "description": "Verify element \"Product list\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Seller\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Related products\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Reviews\" is visible"
+        "description": "Verify element \"A product card\" is visible."
       }
     ]
   },
   {
     "id": "TC016",
-    "title": "Order via WhatsApp redirects to wa.me with a pre-filled message (valid seller WhatsApp)",
-    "description": "Verifies clicking the primary CTA opens the WhatsApp redirect URL when seller contact is available.",
-    "category": "Product Detail",
+    "title": "View product detail page shows core product information",
+    "description": "Verifies the product detail page renders photo(s), name, description, and price for an existing product.",
+    "category": "Product Detail & WhatsApp Order",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to a product detail page URL for a known existing product (static URL provided by the test environment)."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Order via WhatsApp\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Order via WhatsApp\""
+        "description": "Verify element \"Product title\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"wa.me\""
+        "description": "Verify element \"Product image\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"text=\""
+        "description": "Verify text \"Price\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Product description\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Order via WhatsApp\" is visible."
       }
     ]
   },
   {
     "id": "TC017",
-    "title": "Order via WhatsApp shows error when seller contact is not available (no redirect)",
-    "description": "Verifies the app shows the correct error message and does not redirect if the seller has no valid WhatsApp number.",
-    "category": "Product Detail",
+    "title": "Order via WhatsApp CTA opens WhatsApp with a pre-filled message",
+    "description": "Verifies clicking the WhatsApp order CTA redirects to a wa.me URL containing a pre-filled text parameter.",
+    "category": "Product Detail & WhatsApp Order",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to a product detail page URL for a known existing product (static URL provided by the test environment)."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Order via WhatsApp\" is visible"
+        "description": "Verify element \"Order via WhatsApp\" is visible."
       },
       {
         "type": "action",
-        "description": "Click on \"Order via WhatsApp\""
+        "description": "Click on \"Order via WhatsApp\"."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Seller contact not available\" is visible"
+        "description": "Verify URL contains \"wa.me\"."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/product/123\""
+        "description": "Verify URL contains \"text=\"."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"%20\"."
       }
     ]
   },
   {
     "id": "TC018",
-    "title": "Product images are visible and can be changed (if multiple images exist)",
-    "description": "Verifies the user can view the product image area and switch images using the on-page controls.",
-    "category": "Product Detail",
+    "title": "Order via WhatsApp CTA is prominent and discoverable without scrolling",
+    "description": "Verifies the WhatsApp order CTA is visible in the initial viewport on product detail.",
+    "category": "Product Detail & WhatsApp Order",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to a product detail page URL for a known existing product (static URL provided by the test environment)."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Product image\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Next image\""
+        "description": "Verify element \"Order via WhatsApp\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Product image\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Previous image\""
+        "description": "Verify element \"Product title\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Product image\" is visible"
+        "description": "Verify text \"Price\" is visible."
       }
     ]
   },
   {
     "id": "TC019",
-    "title": "Seller information section is present and readable",
-    "description": "Verifies seller details are visible on the product detail page for trust and ordering context.",
-    "category": "Product Detail",
-    "priority": "Medium",
+    "title": "Product not found UI appears for an invalid product URL",
+    "description": "Verifies an invalid/non-existent product detail page shows a clear \"Product not found\" message.",
+    "category": "Product Detail & WhatsApp Order",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to a product detail page URL for a known non-existent product (static URL provided by the test environment)."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Seller\" is visible"
+        "description": "Verify text \"Product not found\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Seller name\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Seller location\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Seller rating\" is visible"
+        "description": "Verify element \"Order via WhatsApp\" is not visible."
       }
     ]
   },
   {
     "id": "TC020",
-    "title": "Related products section is visible and allows navigation to another product",
-    "description": "Verifies the related products list is shown and selecting a related item loads a different product detail page.",
-    "category": "Product Detail",
-    "priority": "Medium",
+    "title": "Product detail page still loads when images fail to render",
+    "description": "Verifies the page remains usable and key info is visible even if a product image cannot be displayed.",
+    "category": "Product Detail & WhatsApp Order",
+    "priority": "Low",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to a product detail page URL for a product that is known to have a broken/missing image (static URL provided by the test environment)."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Related products\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on the first related product card"
+        "description": "Verify element \"Product title\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/product/\""
+        "description": "Verify text \"Price\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Order via WhatsApp\" is visible"
+        "description": "Verify element \"Product description\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Order via WhatsApp\" is visible."
       }
     ]
   },
   {
     "id": "TC021",
-    "title": "Reviews section is visible and shows at least the empty state or existing reviews",
-    "description": "Verifies the reviews area renders and communicates either review items or an empty state message.",
-    "category": "Product Detail",
-    "priority": "Low",
+    "title": "Long product description is readable and does not hide the WhatsApp CTA",
+    "description": "Verifies long descriptions can be viewed and the WhatsApp CTA remains accessible.",
+    "category": "Product Detail & WhatsApp Order",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to a product detail page URL for a product with a long description (static URL provided by the test environment)."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Reviews\" is visible"
+        "description": "Verify element \"Product description\" is visible."
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the bottom of the product detail page."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Reviews list\" is visible"
+        "description": "Verify element \"Order via WhatsApp\" is visible."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Order via WhatsApp\"."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"No reviews\" is visible"
+        "description": "Verify URL contains \"wa.me\"."
       }
     ]
   },
   {
     "id": "TC022",
-    "title": "Product description is visible and supports longer text without breaking the page",
-    "description": "Verifies the product description section is present and can display longer content while keeping the CTA accessible.",
-    "category": "Product Detail",
+    "title": "WhatsApp redirect includes seller phone number in the URL",
+    "description": "Verifies the redirect URL includes the seller phone number (not just the message text).",
+    "category": "Product Detail & WhatsApp Order",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Description\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Product description\" is visible"
+        "description": "Navigate to a product detail page URL for a known existing product (static URL provided by the test environment)."
       },
       {
         "type": "action",
-        "description": "Scroll to \"Order via WhatsApp\""
+        "description": "Click on \"Order via WhatsApp\"."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Order via WhatsApp\" is visible"
+        "description": "Verify URL contains \"wa.me/\"."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"?text=\"."
       }
     ]
   },
   {
     "id": "TC023",
-    "title": "Seller shop page shows seller header details",
-    "description": "Verifies the seller storefront displays the seller name and WhatsApp contact information in the header area.",
-    "category": "Seller Shop",
+    "title": "Open a seller shop page and see seller info and product listings",
+    "description": "Verifies a seller shop page shows seller identity details and a list of that seller’s products for focused browsing.",
+    "category": "Seller Shop Page",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /seller/abc"
+        "description": "Navigate to the Seller Shop Page using a valid seller shop URL provided by the test environment."
       },
       {
         "type": "assertion",
-        "description": "Verify page title contains \"Seller\""
+        "description": "Verify page title contains \"Shop\"."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"WhatsApp\" is visible"
+        "description": "Verify element \"Seller name\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"seller header\" is visible"
+        "description": "Verify element \"Seller information section\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Product listings section\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify at least one \"Product card\" is visible."
       }
     ]
   },
   {
     "id": "TC024",
-    "title": "Browse seller product grid by scrolling",
-    "description": "Verifies the user can scroll the seller product grid and continue seeing product listings.",
-    "category": "Seller Shop",
-    "priority": "High",
+    "title": "Seller shop page loads with zero products (empty state)",
+    "description": "Verifies the shop page handles a seller with no products by showing an empty state message instead of a broken list.",
+    "category": "Seller Shop Page",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /seller/abc"
+        "description": "Navigate to the Seller Shop Page using a valid seller shop URL for a seller that has no products in the test environment."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"product grid\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Scroll to \"product grid\""
+        "description": "Verify element \"Seller name\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"product card\" is visible"
+        "description": "Verify element \"Product listings section\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"No products\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Product card\" is not visible."
       }
     ]
   },
   {
     "id": "TC025",
-    "title": "Open a product from seller shop navigates to product details",
-    "description": "Verifies tapping a product in the seller shop navigates to a product details page.",
-    "category": "Seller Shop",
+    "title": "Non-existent seller shows 'Seller not found' message",
+    "description": "Verifies an invalid seller shop page shows a clear not-found message for buyer guidance.",
+    "category": "Seller Shop Page",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /seller/abc"
+        "description": "Navigate to the Seller Shop Page using an invalid/non-existent seller shop URL provided by the test environment."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"product card\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"product card\""
+        "description": "Verify text \"Seller not found\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/product/\""
+        "description": "Verify text \"Search\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"product details\" is visible"
+        "description": "Verify text \"Home\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Search suggestion\" is visible."
       }
     ]
   },
   {
     "id": "TC026",
-    "title": "Seller shop shows seller not found state for unknown seller",
-    "description": "Verifies an unknown seller route displays a clear 'Seller not found' message and a link back to the homepage.",
-    "category": "Seller Shop",
+    "title": "From 'Seller not found', return to home or search entry point",
+    "description": "Verifies the not-found state provides a working path back to continue browsing.",
+    "category": "Seller Shop Page",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /seller/unknown"
+        "description": "Navigate to the Seller Shop Page using an invalid/non-existent seller shop URL provided by the test environment."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Seller not found\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Back to home\" is visible"
+        "description": "Verify text \"Seller not found\" is visible."
       },
       {
         "type": "action",
-        "description": "Click on \"Back to home\""
+        "description": "Click on \"Home\"."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/\""
+        "description": "Verify page title contains \"Home\"."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Search input\" is visible."
       }
     ]
   },
   {
     "id": "TC027",
-    "title": "Seller shop shows inactive seller state when seller is not active",
-    "description": "Verifies an inactive seller displays a 'Seller is not active' message and provides navigation back to the homepage.",
-    "category": "Seller Shop",
+    "title": "Seller identity information remains visible while browsing product list",
+    "description": "Verifies seller details stay present and visible so buyers maintain trust context while viewing items.",
+    "category": "Seller Shop Page",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /seller/unknown"
+        "description": "Navigate to the Seller Shop Page using a valid seller shop URL provided by the test environment."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Seller is not active\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Back to home\" is visible"
+        "description": "Verify element \"Seller name\" is visible."
       },
       {
         "type": "action",
-        "description": "Click on \"Back to home\""
+        "description": "Scroll to the \"Product listings section\"."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/\""
+        "description": "Verify element \"Product card\" is visible."
+      },
+      {
+        "type": "action",
+        "description": "Scroll back to the top of the page."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Seller information section\" is visible."
       }
     ]
   },
   {
     "id": "TC028",
-    "title": "Seller shop product grid remains visible after returning from product details via in-app navigation",
-    "description": "Verifies the user can open a product and return using an in-app control without breaking the seller product list view.",
-    "category": "Seller Shop",
+    "title": "Product listings show basic product information on cards",
+    "description": "Verifies each product card shows recognizable basic info needed for browsing (name and price if applicable).",
+    "category": "Seller Shop Page",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /seller/abc"
+        "description": "Navigate to the Seller Shop Page using a valid seller shop URL provided by the test environment."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"product card\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"product card\""
+        "description": "Verify element \"Product card\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/product/\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Back\""
+        "description": "Verify element \"Product name\" is visible within a product card."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/seller/abc\""
+        "description": "Verify element \"Product price\" is visible within a product card."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"product grid\" is visible"
+        "description": "Verify element \"Product image\" is visible within a product card."
       }
     ]
   },
   {
     "id": "TC029",
-    "title": "Seller shop renders without products message when seller has no products",
-    "description": "Verifies the seller shop shows an empty-state message when there are no products for the seller.",
-    "category": "Seller Shop",
-    "priority": "Low",
+    "title": "Refresh-like revisit: shop page still renders correctly on direct load",
+    "description": "Verifies the shop page supports being opened directly (simulating a shared link) without missing content.",
+    "category": "Seller Shop Page",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /seller/abc"
+        "description": "Navigate to the Seller Shop Page using a valid seller shop URL provided by the test environment."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"seller header\" is visible"
+        "description": "Verify element \"Seller name\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"No products\" is visible"
+        "description": "Verify element \"Product listings section\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"product grid\" is visible"
+        "description": "Verify at least one \"Product card\" is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/shops\"."
       }
     ]
   },
   {
     "id": "TC030",
-    "title": "Browse categories from Etalase landing page",
-    "description": "Verifies the catalog page loads and shows a visible list of categories for browsing.",
-    "category": "Etalase (Catalog)",
+    "title": "Add a product to the cart and see it in the cart list (happy path)",
+    "description": "Verifies a user can add an item to the client-side cart and the cart shows the saved item.",
+    "category": "Cart (Client-side, optional v1.1)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /etalase"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Etalase\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Kategori\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"category list\" is visible"
+        "description": "Navigate to the home page."
       },
       {
         "type": "action",
-        "description": "Scroll to the bottom of the category list"
+        "description": "Click on the first visible product in the catalog list."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"category list\" is visible"
+        "description": "Verify an \"Add to cart\" button is visible."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Add to cart\"."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Cart\" (or cart icon/link) in the header or navigation."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected product name is visible in the cart list."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Quantity\" is visible for the cart item."
       }
     ]
   },
   {
     "id": "TC031",
-    "title": "Filter products by selecting a category that has products",
-    "description": "Verifies selecting a category shows a filtered product list for that category.",
-    "category": "Etalase (Catalog)",
+    "title": "Increase quantity for a cart item and verify it persists within the session",
+    "description": "Verifies the cart quantity updates and remains correct after leaving and returning to the cart.",
+    "category": "Cart (Client-side, optional v1.1)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /etalase"
+        "description": "Navigate to the home page."
       },
       {
         "type": "action",
-        "description": "Click on a visible category that appears selectable (not disabled)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"product list\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"at least one product card\" is visible"
+        "description": "Click on the first visible product in the catalog list."
       },
       {
         "type": "action",
-        "description": "Scroll to the bottom of the product list"
+        "description": "Click on \"Add to cart\"."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Cart\" (or cart icon/link) in the header or navigation."
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"+\" control (increase quantity) for the cart item."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"product list\" is visible"
+        "description": "Verify text \"2\" is visible as the quantity for the cart item."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Continue shopping\" (or \"Back\" link within the app UI) to return to the catalog."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Cart\" (or cart icon/link) in the header or navigation."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"2\" is visible as the quantity for the cart item."
       }
     ]
   },
   {
     "id": "TC032",
-    "title": "Open a product details page from a filtered category",
-    "description": "Verifies tapping a product from a category result navigates to a product detail URL.",
-    "category": "Etalase (Catalog)",
-    "priority": "High",
+    "title": "Add two different products and verify both appear in the cart list",
+    "description": "Verifies multiple distinct items can be saved and retrieved into the cart list.",
+    "category": "Cart (Client-side, optional v1.1)",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /etalase"
+        "description": "Navigate to the home page."
       },
       {
         "type": "action",
-        "description": "Click on a visible category that appears selectable (not disabled)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"product list\" is visible"
+        "description": "Click on the first visible product in the catalog list."
       },
       {
         "type": "action",
-        "description": "Click on the first visible product card"
+        "description": "Click on \"Add to cart\"."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Back\" (or \"Continue shopping\") within the app UI to return to the catalog."
+      },
+      {
+        "type": "action",
+        "description": "Click on a second, different visible product in the catalog list."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Add to cart\"."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Cart\" (or cart icon/link) in the header or navigation."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/product/\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"product details\" is visible"
+        "description": "Verify at least two cart items are visible in the cart list."
       }
     ]
   },
   {
     "id": "TC033",
-    "title": "Empty-state shown for a category with no products",
-    "description": "Verifies selecting an empty category shows the expected empty-state message and guidance.",
-    "category": "Etalase (Catalog)",
+    "title": "Remove an item from the cart and verify it no longer appears",
+    "description": "Verifies a user can remove a saved item from the client-side cart list.",
+    "category": "Cart (Client-side, optional v1.1)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /etalase"
+        "description": "Navigate to the home page."
       },
       {
         "type": "action",
-        "description": "Click on a category that is expected to have no products (choose the first category that results in no product cards)"
+        "description": "Click on the first visible product in the catalog list."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Add to cart\"."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Cart\" (or cart icon/link) in the header or navigation."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"No products in this category\" is visible"
+        "description": "Verify the selected product name is visible in the cart list."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Remove\" (or trash/delete icon) for the cart item."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"try another category\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"product list\" is not visible"
+        "description": "Verify the selected product name is not visible in the cart list."
       }
     ]
   },
   {
     "id": "TC034",
-    "title": "Recover from empty category by selecting a different category",
-    "description": "Verifies users can switch categories after an empty-state and see products for another category.",
-    "category": "Etalase (Catalog)",
-    "priority": "Medium",
+    "title": "Add a product to wishlist and verify it appears in wishlist view",
+    "description": "Verifies a buyer can add a product to the wishlist and sees it reflected in the wishlist UI (client-side storage-backed).",
+    "category": "Wishlist (Client-side)",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /etalase"
+        "description": "Navigate to the home page."
       },
       {
         "type": "action",
-        "description": "Click on a category that results in the empty-state"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"No products in this category\" is visible"
+        "description": "Scroll to a visible product card in the product listing."
       },
       {
         "type": "action",
-        "description": "Click on a different visible category"
+        "description": "Click on the wishlist control for that product (for example, a heart icon or 'Save' button)."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"product list\" is visible"
+        "description": "Verify text \"Added to wishlist\" is visible."
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Wishlist\" in the main navigation (header or menu)."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"at least one product card\" is visible"
+        "description": "Verify the previously wishlisted product is visible in the wishlist list."
       }
     ]
   },
   {
     "id": "TC035",
-    "title": "Category selection updates the visible content (products vs empty-state)",
-    "description": "Verifies the page updates correctly when switching between categories with products and categories without products.",
-    "category": "Etalase (Catalog)",
-    "priority": "Medium",
+    "title": "Remove a product from wishlist and verify it no longer appears",
+    "description": "Verifies a buyer can remove an item from the wishlist and the UI updates accordingly.",
+    "category": "Wishlist (Client-side)",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /etalase"
+        "description": "Navigate to the home page."
       },
       {
         "type": "action",
-        "description": "Click on a visible category that shows at least one product card"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"at least one product card\" is visible"
+        "description": "Scroll to a visible product card in the product listing."
       },
       {
         "type": "action",
-        "description": "Click on a different category that results in the empty-state"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"No products in this category\" is visible"
+        "description": "Click on the wishlist control for that product (for example, a heart icon or 'Save' button)."
       },
       {
         "type": "action",
-        "description": "Click on the original category again"
+        "description": "Click on \"Wishlist\" in the main navigation (header or menu)."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"at least one product card\" is visible"
+        "description": "Verify the previously wishlisted product is visible in the wishlist list."
+      },
+      {
+        "type": "action",
+        "description": "Click on the remove-from-wishlist control for that product (for example, filled heart toggle or \"Remove\")."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Wishlist is empty\" is visible."
       }
     ]
   },
   {
     "id": "TC036",
-    "title": "Etalase page remains usable after reload via direct entry",
-    "description": "Verifies the Etalase route can be opened directly and still shows categories for browsing.",
-    "category": "Etalase (Catalog)",
-    "priority": "Low",
+    "title": "View e-learning modules list (happy path)",
+    "description": "Verifies the user can open the e-learning area and see a list of educational modules.",
+    "category": "E-Learning (Educational Modules)",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /etalase"
+        "description": "Navigate to the E-Learning page from the application entry point (use the primary navigation or menu link labeled \"E-Learning\" or \"Learning\")."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"category list\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Wait for element \"category list\" to appear"
-      },
-      {
-        "type": "action",
-        "description": "Click on any visible category"
+        "description": "Verify page title contains \"E-Learning\" or \"Learning\"."
       },
       {
         "type": "assertion",
-        "description": "Verify element \"product list\" is visible"
+        "description": "Verify text \"Modules\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/etalase\""
+        "description": "Verify at least one module card/list item is visible."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify each visible module entry shows a module title."
       }
     ]
   },
   {
     "id": "TC037",
-    "title": "Save a product to cart and start a WhatsApp order from the cart",
-    "description": "Verifies a user can save a product to the cart, see it in /cart, and initiate an order via WhatsApp redirect.",
-    "category": "Cart",
+    "title": "Open a module detail from the modules list",
+    "description": "Verifies selecting a module from the list opens its detail view.",
+    "category": "E-Learning (Educational Modules)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to the E-Learning page from the application entry point (use the primary navigation or menu link labeled \"E-Learning\" or \"Learning\")."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify at least one module card/list item is visible."
       },
       {
         "type": "action",
-        "description": "Click on the \"Save to Cart\" button"
+        "description": "Click on the first visible module card/list item."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Saved to cart\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on the \"Cart\" link or cart icon in the app header/navigation"
+        "description": "Verify a module detail heading (module title) is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/cart\""
+        "description": "Verify a module content section (such as \"Overview\", \"Description\", or the lesson content) is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify the saved item is visible in the cart list"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Order via WhatsApp\" for the saved item"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"wa.me\""
+        "description": "Verify a \"Back\" control or breadcrumb to return to the modules list is visible."
       }
     ]
   },
   {
     "id": "TC038",
-    "title": "Saving the same product twice does not create duplicate cart entries",
-    "description": "Verifies the cart handles repeated saves of the same product without showing duplicated line items.",
-    "category": "Cart",
+    "title": "Return to modules list from a module detail",
+    "description": "Verifies the user can navigate back from a module detail view to the module list.",
+    "category": "E-Learning (Educational Modules)",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to the E-Learning page from the application entry point (use the primary navigation or menu link labeled \"E-Learning\" or \"Learning\")."
       },
       {
         "type": "action",
-        "description": "Click on the \"Save to Cart\" button"
+        "description": "Click on the first visible module card/list item."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Saved to cart\" is visible"
+        "description": "Verify a module detail heading (module title) is visible."
       },
       {
         "type": "action",
-        "description": "Click on the \"Save to Cart\" button"
-      },
-      {
-        "type": "action",
-        "description": "Click on the \"Cart\" link or cart icon in the app header/navigation"
+        "description": "Click on \"Back\" (or the breadcrumb/link that returns to the modules list)."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/cart\""
+        "description": "Verify text \"Modules\" is visible."
       },
       {
         "type": "assertion",
-        "description": "Verify the cart list shows only one entry for the product"
+        "description": "Verify at least one module card/list item is visible."
       }
     ]
   },
   {
     "id": "TC039",
-    "title": "Cart page empty state is shown when no items are saved",
-    "description": "Verifies the cart page provides a clear empty state when there are no saved items.",
-    "category": "Cart",
+    "title": "Modules list shows loading state while fetching",
+    "description": "Verifies a visible loading indicator or placeholder appears while modules are being retrieved.",
+    "category": "E-Learning (Educational Modules)",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /cart"
+        "description": "Navigate to the E-Learning page from the application entry point (use the primary navigation or menu link labeled \"E-Learning\" or \"Learning\")."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/cart\""
+        "description": "Verify a loading indicator is visible (such as \"Loading\", a spinner, or skeleton placeholders)."
+      },
+      {
+        "type": "action",
+        "description": "Wait for the modules list to finish loading."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Your cart is empty\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify that an \"Order via WhatsApp\" button is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify that a cart items list is not visible"
+        "description": "Verify at least one module card/list item is visible."
       }
     ]
   },
   {
     "id": "TC040",
-    "title": "Multiple saved items: order one item without removing other items",
-    "description": "Verifies ordering one cart item via WhatsApp does not remove other saved items from the cart list.",
-    "category": "Cart",
+    "title": "Module detail shows loading state while fetching detail",
+    "description": "Verifies a visible loading indicator or placeholder appears while module detail is being retrieved.",
+    "category": "E-Learning (Educational Modules)",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
-      },
-      {
-        "type": "action",
-        "description": "Click on the \"Save to Cart\" button"
+        "description": "Navigate to the E-Learning page from the application entry point (use the primary navigation or menu link labeled \"E-Learning\" or \"Learning\")."
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Saved to cart\" is visible"
+        "description": "Verify at least one module card/list item is visible."
       },
       {
         "type": "action",
-        "description": "Navigate to /product/124"
-      },
-      {
-        "type": "action",
-        "description": "Click on the \"Save to Cart\" button"
-      },
-      {
-        "type": "action",
-        "description": "Navigate to /cart"
+        "description": "Click on the first visible module card/list item."
       },
       {
         "type": "assertion",
-        "description": "Verify two saved items are visible in the cart list"
+        "description": "Verify a loading indicator is visible on the detail view (such as \"Loading\", a spinner, or skeleton placeholders)."
       },
       {
         "type": "action",
-        "description": "Click on \"Order via WhatsApp\" for one of the saved items"
+        "description": "Wait for the module detail content to finish loading."
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"wa.me\""
+        "description": "Verify a module detail heading (module title) is visible."
       }
     ]
   },
   {
     "id": "TC041",
-    "title": "Cart item details are visible on the cart page",
-    "description": "Verifies each cart item presents basic identifying info so low-literacy users can confirm what they saved.",
-    "category": "Cart",
-    "priority": "Low",
+    "title": "Render analytics dashboard with valid session",
+    "description": "Verifies the admin analytics dashboard loads and displays key metric sections when the session is valid.",
+    "category": "Admin Dashboard (Analytics)",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to /admin/login"
       },
       {
         "type": "action",
-        "description": "Click on the \"Save to Cart\" button"
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
         "type": "action",
-        "description": "Navigate to /cart"
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Log in\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify the cart item name text is visible"
+        "description": "Verify URL contains \"/admin\""
       },
       {
         "type": "assertion",
-        "description": "Verify the seller name text is visible on the cart item"
+        "description": "Verify text \"Dashboard\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify the \"Order via WhatsApp\" button is visible for the cart item"
+        "description": "Verify text \"Top clicked products\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Most viewed products\" is visible"
       }
     ]
   },
   {
     "id": "TC042",
-    "title": "Add a product to wishlist and verify it appears on the Wishlist page",
-    "description": "Verifies a user can add a product to the wishlist and see it listed on the Wishlist page.",
-    "category": "Wishlist",
+    "title": "Dashboard shows top search keywords section",
+    "description": "Verifies the dashboard includes a visible section for top search keywords after loading.",
+    "category": "Admin Dashboard (Analytics)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to /admin/login"
       },
       {
         "type": "action",
-        "description": "Click the \"Add to Wishlist\" icon"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Added to wishlist\" is visible"
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
         "type": "action",
-        "description": "Click on \"Wishlist\" in the site navigation"
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Log in\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/wishlist\""
+        "description": "Verify URL contains \"/admin\""
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Wishlist\" is visible"
+        "description": "Verify text \"Top search keywords\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Product\" is visible"
+        "description": "Verify element \"Top search keywords\" section is visible"
       }
     ]
   },
   {
     "id": "TC043",
-    "title": "Open a wishlisted product from the Wishlist page",
-    "description": "Verifies a user can open a product details page by clicking a product in the wishlist.",
-    "category": "Wishlist",
-    "priority": "High",
+    "title": "Dashboard shows top-performing sellers section",
+    "description": "Verifies the dashboard includes a visible section for top-performing sellers after loading.",
+    "category": "Admin Dashboard (Analytics)",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to /admin/login"
       },
       {
         "type": "action",
-        "description": "Click the \"Add to Wishlist\" icon"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Added to wishlist\" is visible"
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
         "type": "action",
-        "description": "Click on \"Wishlist\" in the site navigation"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/wishlist\""
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
       },
       {
         "type": "action",
-        "description": "Click the wishlisted product in the list"
+        "description": "Click on the \"Log in\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/product/"
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Top-performing sellers\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Top-performing sellers\" section is visible"
       }
     ]
   },
   {
     "id": "TC044",
-    "title": "Prevent duplicate wishlist entries when adding the same product twice",
-    "description": "Verifies adding the same product again does not create duplicate entries in the wishlist.",
-    "category": "Wishlist",
+    "title": "Dashboard loads without visible error message",
+    "description": "Verifies that after a successful login, the analytics dashboard does not show an obvious error state to the admin.",
+    "category": "Admin Dashboard (Analytics)",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to /admin/login"
       },
       {
         "type": "action",
-        "description": "Click the \"Add to Wishlist\" icon"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Added to wishlist\" is visible"
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
         "type": "action",
-        "description": "Click the \"Add to Wishlist\" icon again"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Added to wishlist\" is visible"
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
       },
       {
         "type": "action",
-        "description": "Click on \"Wishlist\" in the site navigation"
+        "description": "Click on the \"Log in\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/wishlist\""
+        "description": "Verify URL contains \"/admin\""
       },
       {
         "type": "assertion",
-        "description": "Verify text \"1\" is visible"
+        "description": "Verify text \"Unauthorized\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Something went wrong\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Error\" is not visible"
       }
     ]
   },
   {
     "id": "TC045",
-    "title": "Remove a product from wishlist from the Wishlist page",
-    "description": "Verifies a user can remove an item from the wishlist and it no longer appears in the list.",
-    "category": "Wishlist",
-    "priority": "High",
+    "title": "Dashboard displays lists with at least one visible entry (when data exists)",
+    "description": "Verifies that metric sections render visible list/table content rather than staying blank when analytics data is available.",
+    "category": "Admin Dashboard (Analytics)",
+    "priority": "Low",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to /admin/login"
       },
       {
         "type": "action",
-        "description": "Click the \"Add to Wishlist\" icon"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Added to wishlist\" is visible"
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
         "type": "action",
-        "description": "Click on \"Wishlist\" in the site navigation"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/wishlist\""
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
       },
       {
         "type": "action",
-        "description": "Click the \"Remove from Wishlist\" icon for the listed product"
+        "description": "Click on the \"Log in\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Removed from wishlist\" is visible"
+        "description": "Verify URL contains \"/admin\""
       },
       {
         "type": "assertion",
-        "description": "Verify text \"No items\" is visible"
+        "description": "Verify element \"Top clicked products\" section is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Most viewed products\" section is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify at least one visible row/item is present under \"Top clicked products\" or \"Most viewed products\""
       }
     ]
   },
   {
     "id": "TC046",
-    "title": "Wishlist persists after page reload",
-    "description": "Verifies wishlist contents remain after reloading the Wishlist page (client-side persistence).",
-    "category": "Wishlist",
-    "priority": "Medium",
+    "title": "Create a new seller profile and confirm it appears in the seller list",
+    "description": "Verifies an admin can create a seller profile and see it listed afterward.",
+    "category": "Admin Shop Management (CRUD)",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /product/123"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Click the \"Add to Wishlist\" icon"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Added to wishlist\" is visible"
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
         "type": "action",
-        "description": "Click on \"Wishlist\" in the site navigation"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/wishlist\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the wishlisted product is visible"
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
       },
       {
         "type": "action",
-        "description": "Navigate to /wishlist"
+        "description": "Click the \"Log in\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify the wishlisted product is visible"
+        "description": "Verify URL contains \"admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Shops\" or \"Sellers\" in the admin navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Shops\" or \"Sellers\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add shop\" or \"Create\" button"
       }
     ]
   },
   {
     "id": "TC047",
-    "title": "E-Learning module list page loads and shows modules",
-    "description": "Verifies the E-Learning landing page renders a visible list of learning modules.",
-    "category": "E-Learning",
+    "title": "Create seller profile with valid fields and verify success confirmation",
+    "description": "Verifies the create-seller form accepts valid inputs and shows a visible success state.",
+    "category": "Admin Shop Management (CRUD)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /e-learning"
+        "description": "Navigate to /login"
       },
       {
-        "type": "assertion",
-        "description": "Verify page title contains \"E-Learning\""
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
-        "type": "assertion",
-        "description": "Verify text \"Modules\" is visible"
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
       },
       {
-        "type": "assertion",
-        "description": "Verify element \"module list\" is visible"
+        "type": "action",
+        "description": "Click the \"Log in\" button"
       },
       {
-        "type": "assertion",
-        "description": "Verify element \"module list item\" is visible"
+        "type": "action",
+        "description": "Click on \"Shops\" or \"Sellers\" in the admin navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add shop\" or \"Create\" button"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Green Valley Store\" into the shop name field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"+2348012345678\" into the WhatsApp number field"
       }
     ]
   },
   {
     "id": "TC048",
-    "title": "Open a module from the list and view module detail content",
-    "description": "Verifies a user can open a module from the list and see its content on the module detail page.",
-    "category": "E-Learning",
+    "title": "Finish creating seller profile and verify it is visible in the list",
+    "description": "Verifies saving a seller profile returns to the list and the new seller is visible.",
+    "category": "Admin Shop Management (CRUD)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /e-learning"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"module list\" is visible"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Click on the first \"module list item\""
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
-        "type": "assertion",
-        "description": "Verify URL contains \"/modules/\""
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
       },
       {
-        "type": "assertion",
-        "description": "Verify element \"module title\" is visible"
+        "type": "action",
+        "description": "Click the \"Log in\" button"
       },
       {
-        "type": "assertion",
-        "description": "Verify element \"module content\" is visible"
+        "type": "action",
+        "description": "Click on \"Shops\" or \"Sellers\" in the admin navigation"
       },
       {
-        "type": "assertion",
-        "description": "Verify element \"lessons list\" is visible"
+        "type": "action",
+        "description": "Click the \"Add shop\" or \"Create\" button"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Green Valley Store\" into the shop name field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save\" or \"Create shop\" button"
       }
     ]
   },
   {
     "id": "TC049",
-    "title": "Module detail page shows lessons section when opened from a module card",
-    "description": "Verifies the module detail view includes a visible lessons section for the selected module.",
-    "category": "E-Learning",
-    "priority": "Medium",
+    "title": "Validation: attempt to create seller with missing required fields shows messages",
+    "description": "Verifies required-field validation prevents saving and shows visible validation messages.",
+    "category": "Admin Shop Management (CRUD)",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /e-learning"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Click on the first \"module list item\""
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Shops\" or \"Sellers\" in the admin navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add shop\" or \"Create\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save\" or \"Create shop\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/modules/\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Lessons\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"lesson item\" is visible"
+        "description": "Verify text \"required\" is visible"
       }
     ]
   },
   {
     "id": "TC050",
-    "title": "E-Learning module list handles empty state gracefully",
-    "description": "Verifies the E-Learning page shows a clear empty state when there are no modules to display.",
-    "category": "E-Learning",
-    "priority": "Low",
+    "title": "Validation: missing WhatsApp number shows specific error and blocks save",
+    "description": "Verifies creating a seller without a WhatsApp number shows a visible field error and does not create the seller.",
+    "category": "Admin Shop Management (CRUD)",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /e-learning"
+        "description": "Navigate to /login"
       },
       {
-        "type": "assertion",
-        "description": "Verify page title contains \"E-Learning\""
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
-        "type": "assertion",
-        "description": "Verify element \"module list\" is visible"
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
       },
       {
-        "type": "assertion",
-        "description": "Verify text \"No modules\" is visible"
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Shops\" or \"Sellers\" in the admin navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add shop\" or \"Create\" button"
+      },
+      {
+        "type": "action",
+        "description": "Type \"No WhatsApp Shop\" into the shop name field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save\" or \"Create shop\" button"
       }
     ]
   },
   {
     "id": "TC051",
-    "title": "Admin can view dashboard widgets after logging in",
-    "description": "Verifies an authenticated admin can access the Admin Dashboard and see core analytics widgets.",
-    "category": "Admin Dashboard",
-    "priority": "High",
+    "title": "List view: seller list loads and displays at least one row with expected columns",
+    "description": "Verifies the seller listing screen renders and shows key seller fields in the UI.",
+    "category": "Admin Shop Management (CRUD)",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /admin/login"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
         "type": "action",
@@ -1610,40 +1722,40 @@
       },
       {
         "type": "action",
-        "description": "Click on the \"Log in\" button"
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Shops\" or \"Sellers\" in the admin navigation"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/admin\""
+        "description": "Verify element \"Seller list\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Top clicked products\" is visible"
+        "description": "Verify text \"WhatsApp\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Top searches\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Seller performance\" is visible"
+        "description": "Verify text \"Description\" is visible"
       }
     ]
   },
   {
     "id": "TC052",
-    "title": "Admin dashboard shows WhatsApp click metrics widget",
-    "description": "Verifies the dashboard includes a visible section for WhatsApp click metrics.",
-    "category": "Admin Dashboard",
+    "title": "Create a product without an image and verify it saves successfully",
+    "description": "Verifies an admin can create a product record without uploading an image (if supported) and it appears in the list.",
+    "category": "Admin Product Management (CRUD + Image Upload & Cropping)",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /admin/login"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
         "type": "action",
@@ -1651,73 +1763,60 @@
       },
       {
         "type": "action",
-        "description": "Click on the \"Log in\" button"
+        "description": "Click the \"Log in\" button"
       },
       {
         "type": "assertion",
         "description": "Verify URL contains \"/admin\""
       },
       {
+        "type": "action",
+        "description": "Click on \"Products\" in the admin navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add product\" button"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Test Product No Image\" into the \"Product name\" field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"10\" into the \"Price\" field"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Category\" option \"Grains\" from the category dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save\" button"
+      },
+      {
         "type": "assertion",
-        "description": "Verify text \"WhatsApp\" is visible"
+        "description": "Verify text \"Product created\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Test Product No Image\" is visible"
       }
     ]
   },
   {
     "id": "TC053",
-    "title": "Admin can open a top product from dashboard and reach edit page",
-    "description": "Verifies clicking an item in the Top clicked products list routes to the product edit screen.",
-    "category": "Admin Dashboard",
+    "title": "Validate required fields when creating a product (missing name)",
+    "description": "Verifies the UI prevents saving when required fields are missing and shows a visible validation message.",
+    "category": "Admin Product Management (CRUD + Image Upload & Cropping)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /admin/login"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Type \"{{LOGIN_USER}}\" into the email field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
-      },
-      {
-        "type": "action",
-        "description": "Click on the \"Log in\" button"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Top clicked products\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on the first product shown in the \"Top clicked products\" widget"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/admin/products/\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/edit\""
-      }
-    ]
-  },
-  {
-    "id": "TC054",
-    "title": "Admin dashboard renders top searches list content area",
-    "description": "Verifies the Top searches widget is present and shows a list area (even if empty).",
-    "category": "Admin Dashboard",
-    "priority": "Low",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/login"
-      },
-      {
-        "type": "action",
-        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
         "type": "action",
@@ -1725,40 +1824,7 @@
       },
       {
         "type": "action",
-        "description": "Click on the \"Log in\" button"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Top searches\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Top searches\" widget is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC055",
-    "title": "Admin dashboard renders seller performance section",
-    "description": "Verifies the seller performance widget/section is visible on the dashboard.",
-    "category": "Admin Dashboard",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/login"
-      },
-      {
-        "type": "action",
-        "description": "Type \"{{LOGIN_USER}}\" into the email field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
-      },
-      {
-        "type": "action",
-        "description": "Click on the \"Log in\" button"
+        "description": "Click the \"Log in\" button"
       },
       {
         "type": "assertion",
@@ -1766,110 +1832,23 @@
       },
       {
         "type": "action",
-        "description": "Scroll to the \"Seller performance\" section"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Seller performance\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC056",
-    "title": "Create a new shop with required fields and save successfully",
-    "description": "Verifies an admin can create a new shop and see it listed in the shops table after saving.",
-    "category": "Admin Shop Management",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/shops"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"New Shop\" is visible"
+        "description": "Click on \"Products\" in the admin navigation"
       },
       {
         "type": "action",
-        "description": "Click on \"New Shop\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/admin/shops/new\""
+        "description": "Click the \"Add product\" button"
       },
       {
         "type": "action",
-        "description": "Type \"Green Valley Farms\" into the seller name field"
+        "description": "Type \"25\" into the \"Price\" field"
       },
       {
         "type": "action",
-        "description": "Type \"+15551234567\" into the WhatsApp number field"
+        "description": "Select \"Category\" option \"Dairy\" from the category dropdown"
       },
       {
         "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Green Valley Farms\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC057",
-    "title": "Validate WhatsApp number is required on new shop form",
-    "description": "Verifies the form shows a required-field validation message and does not save when WhatsApp number is missing.",
-    "category": "Admin Shop Management",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/shops/new"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Save\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Type \"No WhatsApp Seller\" into the seller name field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"WhatsApp number is required\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/admin/shops/new\""
-      }
-    ]
-  },
-  {
-    "id": "TC058",
-    "title": "Prevent saving when seller name is empty (required field validation)",
-    "description": "Verifies the new shop form blocks saving and shows a validation message when the seller name is missing.",
-    "category": "Admin Shop Management",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/shops/new"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Save\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Type \"+15550001111\" into the WhatsApp number field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
+        "description": "Click the \"Save\" button"
       },
       {
         "type": "assertion",
@@ -1877,184 +1856,373 @@
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/admin/shops/new\""
+        "description": "Verify text \"Product created\" is not visible"
+      }
+    ]
+  },
+  {
+    "id": "TC054",
+    "title": "Verify products list renders and supports basic search/filter (if present)",
+    "description": "Verifies the products list loads and any available search/filter controls update visible results.",
+    "category": "Admin Product Management (CRUD + Image Upload & Cropping)",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Products\" in the admin navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Products\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products table/list\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Test Product\" into the \"Search\" field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Test Product\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC055",
+    "title": "Create a new marketing banner/promotion and see it in the list",
+    "description": "Verifies an admin can add a new marketing item and it appears in the marketing list UI.",
+    "category": "Admin Marketing Management (Banners & Promotions)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Marketing\" in the admin navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Marketing\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add\" or \"New Banner/Promotion\" button"
+      }
+    ]
+  },
+  {
+    "id": "TC056",
+    "title": "Create banner with valid inputs and verify success confirmation",
+    "description": "Verifies the create form accepts valid title, image URL, and link and shows a visible success state.",
+    "category": "Admin Marketing Management (Banners & Promotions)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Marketing\" in the admin navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add\" or \"New Banner/Promotion\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Create\" or \"New Marketing\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC057",
+    "title": "Create banner: required fields validation (empty submit)",
+    "description": "Verifies the create form shows visible validation errors when submitting with missing required fields.",
+    "category": "Admin Marketing Management (Banners & Promotions)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Marketing\" in the admin navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add\" or \"New Banner/Promotion\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save\" or \"Create\" button"
+      }
+    ]
+  },
+  {
+    "id": "TC058",
+    "title": "Create banner: invalid image_url shows validation error",
+    "description": "Verifies the UI displays a validation error when the image URL is invalid.",
+    "category": "Admin Marketing Management (Banners & Promotions)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Marketing\" in the admin navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add\" or \"New Banner/Promotion\" button"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Summer Sale\" into the Title field"
       }
     ]
   },
   {
     "id": "TC059",
-    "title": "Reject invalid WhatsApp number format on new shop form",
-    "description": "Verifies the form shows an error and prevents saving when the WhatsApp number format is invalid.",
-    "category": "Admin Shop Management",
-    "priority": "Medium",
+    "title": "Create banner: invalid image_url error remains visible after submit attempt",
+    "description": "Verifies the admin cannot save with an invalid image URL and an error message is visible after submission.",
+    "category": "Admin Marketing Management (Banners & Promotions)",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /admin/shops/new"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Save\" is visible"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Type \"Invalid WhatsApp Format Seller\" into the seller name field"
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
         "type": "action",
-        "description": "Type \"not-a-number\" into the WhatsApp number field"
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
       },
       {
         "type": "action",
-        "description": "Click on \"Save\""
+        "description": "Click the \"Log in\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Invalid WhatsApp number\" is visible"
+        "description": "Verify URL contains \"/admin\""
       },
       {
-        "type": "assertion",
-        "description": "Verify URL contains \"/admin/shops/new\""
+        "type": "action",
+        "description": "Click on \"Marketing\" in the admin navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add\" or \"New Banner/Promotion\" button"
+      },
+      {
+        "type": "action",
+        "description": "Type \"not-a-url\" into the Image URL field"
       }
     ]
   },
   {
     "id": "TC060",
-    "title": "Cancel out of new shop creation without saving",
-    "description": "Verifies an admin can leave the new shop form via Cancel/Back without creating a shop.",
-    "category": "Admin Shop Management",
-    "priority": "Low",
+    "title": "Cancel banner creation returns to marketing list without adding",
+    "description": "Verifies canceling out of the create form returns to the list view and does not show a new item created in that session.",
+    "category": "Admin Marketing Management (Banners & Promotions)",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /admin/shops/new"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Cancel\" is visible"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Type \"Should Not Save Seller\" into the seller name field"
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
       },
       {
         "type": "action",
-        "description": "Type \"+15559998888\" into the WhatsApp number field"
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
       },
       {
         "type": "action",
-        "description": "Click on \"Cancel\""
+        "description": "Click the \"Log in\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/admin/shops\""
+        "description": "Verify URL contains \"/admin\""
       },
       {
-        "type": "assertion",
-        "description": "Verify text \"Should Not Save Seller\" is not visible"
+        "type": "action",
+        "description": "Click on \"Marketing\" in the admin navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add\" or \"New Banner/Promotion\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Cancel\" button"
       }
     ]
   },
   {
     "id": "TC061",
-    "title": "Create a new product successfully from Admin Products list",
-    "description": "Verifies an admin can create a product and see it listed in the admin products table after saving.",
-    "category": "Admin Product Management",
+    "title": "Admin can open Trending Management page",
+    "description": "Verifies the trending management screen loads and shows expected page content.",
+    "category": "Admin Trending Management",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /admin/products"
+        "description": "Navigate to /admin/trending"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Products\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"New Product\""
+        "description": "Verify URL contains \"/admin/trending\""
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/admin/products/new\""
+        "description": "Verify page title contains \"Trending\""
       },
       {
-        "type": "action",
-        "description": "Type \"Test Product Alpha\" into the \"Product name\" field"
-      },
-      {
-        "type": "action",
-        "description": "Select the first available option from the \"Seller\" dropdown"
-      },
-      {
-        "type": "action",
-        "description": "Select the first available option from the \"Category\" dropdown"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
+        "type": "assertion",
+        "description": "Verify text \"Trending\" is visible"
       }
     ]
   },
   {
     "id": "TC062",
-    "title": "Validation blocks save when required fields are missing on New Product",
-    "description": "Verifies the New Product form prevents saving when required fields (like name/seller/category/price) are not provided.",
-    "category": "Admin Product Management",
+    "title": "Trending list displays items after initial load",
+    "description": "Verifies the page loads and displays a visible list of trending items (or an explicit empty state).",
+    "category": "Admin Trending Management",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /admin/products/new"
+        "description": "Navigate to /admin/trending"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"New Product\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
+        "description": "Verify text \"Trending\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Required\" is visible"
+        "description": "Verify element \"Trending items list\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/admin/products/new\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Save\" is visible"
+        "description": "Verify element \"Save\" is visible"
       }
     ]
   },
   {
     "id": "TC063",
-    "title": "Edit an existing product and save changes",
-    "description": "Verifies an admin can open an existing product edit screen, change fields, and save successfully.",
-    "category": "Admin Product Management",
+    "title": "Reorder trending items and save successfully",
+    "description": "Verifies an admin can change ordering of trending items and persist the update via Save.",
+    "category": "Admin Trending Management",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /admin/products"
+        "description": "Navigate to /admin/trending"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Products\" is visible"
+        "description": "Verify element \"Trending items list\" is visible"
       },
       {
         "type": "action",
-        "description": "Click on the first visible \"Edit\" button in the products list"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Edit Product\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Type \" (Updated)\" into the \"Product name\" field"
+        "description": "Click on \"Move down\" for the first trending item"
       },
       {
         "type": "action",
@@ -2063,35 +2231,27 @@
       {
         "type": "assertion",
         "description": "Verify text \"Saved\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Trending items list\" is visible"
       }
     ]
   },
   {
     "id": "TC064",
-    "title": "Toggle Featured flag on Edit Product",
-    "description": "Verifies an admin can toggle the Featured flag and save the change.",
-    "category": "Admin Product Management",
+    "title": "Save without changes does not break and shows stable state",
+    "description": "Verifies clicking Save with no ordering changes completes without visible errors.",
+    "category": "Admin Trending Management",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /admin/products"
+        "description": "Navigate to /admin/trending"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Products\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on the first visible \"Edit\" button in the products list"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Edit Product\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on the \"Featured\" checkbox or toggle"
+        "description": "Verify element \"Save\" is visible"
       },
       {
         "type": "action",
@@ -2100,294 +2260,18 @@
       {
         "type": "assertion",
         "description": "Verify text \"Saved\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Error\" is not visible"
       }
     ]
   },
   {
     "id": "TC065",
-    "title": "Delete an existing product from Admin Products list",
-    "description": "Verifies an admin can delete a product and it no longer appears in the admin products list.",
-    "category": "Admin Product Management",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/products"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Products\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on the first visible \"Delete\" button in the products list"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Confirm\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Deleted\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Scroll to the products list/table"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"No products\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC066",
-    "title": "Cancel out of New Product without saving",
-    "description": "Verifies an admin can leave the New Product form without creating a product using a Cancel/Back control.",
-    "category": "Admin Product Management",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/products/new"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"New Product\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Test Product Not Saved\" into the \"Product name\" field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Cancel\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/admin/products\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Products\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Test Product Not Saved\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC067",
-    "title": "New banner form blocks save when no image is provided",
-    "description": "Verifies the new banner form shows a validation error and does not save when the banner image is missing.",
-    "category": "Admin Marketing",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/marketing/new"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"New Banner\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Banner image required\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/admin/marketing/new\""
-      }
-    ]
-  },
-  {
-    "id": "TC068",
-    "title": "Cancel out of new banner creation without saving",
-    "description": "Verifies an admin can leave the new banner page using cancel/back UI and the banner is not created.",
-    "category": "Admin Marketing",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/marketing/new"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"New Banner\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Fill \"https://example.com/should-not-save\" into the \"Link\" field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Cancel\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/admin/marketing\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"https://example.com/should-not-save\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC069",
-    "title": "Edit an existing banner link and verify list reflects the change",
-    "description": "Verifies an admin can open an existing banner for editing, change its link, save, and see the update in the marketing list.",
-    "category": "Admin Marketing",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/marketing"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Banner list\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Edit\" for the first banner in the list"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/admin/marketing\""
-      },
-      {
-        "type": "action",
-        "description": "Fill \"https://example.com/updated-link\" into the \"Link\" field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"https://example.com/updated-link\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC070",
-    "title": "Remove an existing banner and verify it no longer appears in the list",
-    "description": "Verifies an admin can delete a banner and it is removed from the Admin Marketing list.",
-    "category": "Admin Marketing",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/marketing"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Banner list\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Delete\" for the first banner in the list"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Confirm\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Banner deleted\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Banner list\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC071",
-    "title": "New banner form blocks save when link format is invalid (if link field is validated)",
-    "description": "Verifies the new banner form shows a validation error and does not save when the link is not a valid URL (if URL validation is implemented).",
-    "category": "Admin Marketing",
-    "priority": "Low",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/marketing/new"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"New Banner\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Fill \"not-a-url\" into the \"Link\" field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Invalid\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/admin/marketing/new\""
-      }
-    ]
-  },
-  {
-    "id": "TC072",
-    "title": "Add a product to Trending and verify it appears in the Trending list",
-    "description": "Verifies an admin can add a product to the trending list and sees it listed afterward.",
-    "category": "Admin Trending",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/trending"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Trending\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Add Trending\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Select product\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Select the first available product from the product list dropdown"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Trending\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the selected product name is visible in the trending list"
-      }
-    ]
-  },
-  {
-    "id": "TC073",
-    "title": "Cancel adding a Trending product does not change the list",
-    "description": "Verifies exiting the add flow without saving does not add a new trending product.",
-    "category": "Admin Trending",
+    "title": "Cancel/Discard changes restores the original ordering",
+    "description": "Verifies a user can discard ordering edits and see the original list ordering restored.",
+    "category": "Admin Trending Management",
     "priority": "Medium",
     "steps": [
       {
@@ -2396,150 +2280,23 @@
       },
       {
         "type": "assertion",
-        "description": "Verify page title contains \"Trending\""
+        "description": "Verify element \"Trending items list\" is visible"
       },
       {
         "type": "action",
-        "description": "Click on \"Add Trending\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Select product\" is visible"
+        "description": "Click on \"Move up\" for the second trending item"
       },
       {
         "type": "action",
-        "description": "Press \"Escape\""
+        "description": "Click on \"Discard changes\""
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Select product\" is not visible"
+        "description": "Verify text \"Changes discarded\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Trending\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC074",
-    "title": "Attempt to save Trending without selecting a product shows validation and does not add",
-    "description": "Verifies the Save action is blocked or shows an error when no product is selected.",
-    "category": "Admin Trending",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/trending"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Trending\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Add Trending\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Select product\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Select product\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Selected product not found\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC075",
-    "title": "Attempt to add a deleted product shows 'Selected product not found' and does not add",
-    "description": "Verifies selecting a product that no longer exists results in the expected error and no list update.",
-    "category": "Admin Trending",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/trending"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Trending\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Add Trending\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Select product\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Select the product option labeled \"(deleted)\" or an option that indicates it is missing (if present)"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Selected product not found\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the selected product name is not visible in the trending list"
-      }
-    ]
-  },
-  {
-    "id": "TC076",
-    "title": "Add Trending then verify homepage shows highlighted Trending section",
-    "description": "Verifies that after adding a trending item, the highlighted homepage section reflects the change.",
-    "category": "Admin Trending",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /admin/trending"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Trending\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Add Trending\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Select product\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Select the first available product from the product list dropdown"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the selected product name is visible in the trending list"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Home\" in the primary navigation"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Trending\" is visible"
+        "description": "Verify element \"Trending items list\" is visible"
       }
     ]
   }

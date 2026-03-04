@@ -1,110 +1,152 @@
 version: "2"
 type: frontend
 tech_stack:
-  - TypeScript
   - React 18
-  - Vite
+  - TypeScript
+  - Vite 7
+  - Supabase (BaaS)
   - React Router v6
-  - Tailwind CSS
-  - Supabase (Backend-as-a-Service)
-  - Lucide React (Icons)
+  - TailwindCSS 3
+  - Lucide React (icons)
   - react-easy-crop
 features:
-  - name: Homepage
-    description: Walmart-inspired mobile-first landing page with search bar, featured categories, banners, pilihan daerah (regional picks), and product listings
+  - name: Home Page
+    description: Landing page with hero banners, product categories, regional product highlights (Pilihan Daerah), trending products, starter bundles, and sought-after items
     files:
       - src/pages/Home.tsx
-      - src/components/Header.tsx
-      - src/components/BottomNavbar.tsx
-      - src/components/ProductCard.tsx
       - src/components/PilihanDaerahStrip.tsx
+      - src/components/PilihanDaerahStripSimple.tsx
       - src/services/banners.ts
       - src/services/categories.ts
-
-  - name: Product Search
-    description: Full-text product search with keyword tracking and results display
-    files:
-      - src/pages/Search.tsx
-      - src/services/products.ts
-
-  - name: Product Detail
-    description: Product detail page with images, descriptions, pricing, seller info, related products, reviews, and WhatsApp order CTA button
-    files:
-      - src/pages/ProductDetail.tsx
-      - src/services/product.ts
-      - src/services/products.ts
-
-  - name: Seller Shop
-    description: Dedicated seller storefront page showing all products from a specific seller
-    files:
-      - src/pages/SellerShop.tsx
-
-  - name: Etalase (Catalog)
-    description: Category-based product browsing and catalog display
+      - src/services/pilihanDaerah.ts
+      - src/services/soughtAfter.ts
+      - src/services/starterBundles.ts
+    routes:
+      - path: /
+        description: Main landing page
+  - name: Product Browsing
+    description: Users can browse products by category via the Etalase page, search for products, and view product details with images, descriptions, pricing, and seller information
     files:
       - src/pages/Etalase.tsx
-      - src/services/categories.ts
-
+      - src/pages/ProductDetail.tsx
+      - src/pages/Search.tsx
+      - src/components/ProductCard.tsx
+      - src/services/products.ts
+      - src/services/product.ts
+    routes:
+      - path: /etalase
+        description: Product catalog/browse page
+      - path: /product/:slug
+        description: Product detail page
+      - path: /search
+        description: Product search page
   - name: Cart
-    description: Client-side shopping cart for saved items with WhatsApp order functionality
+    description: Shopping cart functionality allowing users to add, remove, and manage products in their cart with quantity controls
     files:
       - src/pages/Cart.tsx
       - src/context/CartContext.tsx
-
+    routes:
+      - path: /cart
+        description: Shopping cart page
   - name: Wishlist
-    description: Client-side wishlist for saving favorite products
+    description: Users can save products to their wishlist for later viewing
     files:
       - src/pages/Wishlist.tsx
-
+      - src/context/WishlistContext.tsx
+    routes:
+      - path: /wishlist
+        description: Wishlist page
+  - name: Seller Shop
+    description: Dedicated seller profile page showing seller information and their product listings
+    files:
+      - src/pages/SellerShop.tsx
+    routes:
+      - path: /shop/:seller_id
+        description: Seller shop page
   - name: E-Learning
-    description: Educational content modules for community knowledge sharing
+    description: Educational content module with learning modules and module detail views for sustainability education
     files:
       - src/pages/ELearning.tsx
       - src/pages/ModuleDetail.tsx
-
+    routes:
+      - path: /e-learning
+        description: E-learning modules listing
+      - path: /e-learning/:moduleId
+        description: E-learning module detail
   - name: Admin Authentication
-    description: Secure admin login portal for the founder using Supabase authentication
+    description: Admin login functionality with protected routes using Supabase authentication
     files:
       - src/pages/admin/AdminLogin.tsx
       - src/components/ProtectedRoute.tsx
       - src/context/AuthContext.tsx
-
+      - src/lib/supabase.ts
+    routes:
+      - path: /admin/login
+        description: Admin login page
   - name: Admin Dashboard
-    description: Analytics dashboard showing top products, search keywords, WhatsApp click metrics, and seller performance
+    description: Admin overview dashboard with key metrics and management summaries
     files:
       - src/pages/AdminDashboard.tsx
-
+      - src/components/AdminLayout.tsx
+    routes:
+      - path: /admin
+        description: Admin dashboard
   - name: Admin Shop Management
-    description: CRUD operations for managing seller shops including name, WhatsApp number, logo, and description
+    description: CRUD operations for managing seller shops including creating, editing, and listing shops
     files:
       - src/pages/admin/AdminShops.tsx
       - src/pages/admin/AdminShopNew.tsx
       - src/pages/admin/AdminShopEdit.tsx
-
+    routes:
+      - path: /admin/shops
+        description: List all shops
+      - path: /admin/shops/new
+        description: Create new shop
+      - path: /admin/shops/:seller_id/edit
+        description: Edit existing shop
   - name: Admin Product Management
-    description: CRUD operations for managing products per seller including images, pricing, categories, and descriptions
+    description: CRUD operations for managing products per shop including creating, editing, and listing products with image upload and cropping
     files:
       - src/pages/admin/AdminProducts.tsx
       - src/pages/admin/AdminProductNew.tsx
       - src/pages/admin/AdminProductEdit.tsx
-
-  - name: Admin Marketing
-    description: Banner and promotional content management for the homepage
+      - src/components/ImageCropperModal.tsx
+      - src/lib/cropImage.ts
+    routes:
+      - path: /admin/shops/:seller_id/products
+        description: List products for a shop
+      - path: /admin/shops/:seller_id/products/new
+        description: Create new product
+      - path: /admin/shops/:seller_id/products/:product_id/edit
+        description: Edit existing product
+  - name: Admin Marketing Management
+    description: CRUD operations for managing marketing banners and promotional content
     files:
       - src/pages/admin/AdminMarketing.tsx
       - src/pages/admin/AdminMarketingNew.tsx
       - src/pages/admin/AdminMarketingEdit.tsx
-
-  - name: Admin Trending
-    description: Management of trending/sought-after products display
+    routes:
+      - path: /admin/marketing
+        description: List marketing content
+      - path: /admin/marketing/new
+        description: Create marketing content
+      - path: /admin/marketing/:id/edit
+        description: Edit marketing content
+  - name: Admin Trending Management
+    description: Management of trending product configurations
     files:
       - src/pages/admin/AdminTrending.tsx
-      - src/services/soughtAfter.ts
-
-known_limitations:
-  - issue: No automated tests exist in the codebase
-    location: package.json
-    impact: No test coverage for any features
-  - issue: Admin routes rely on client-side route protection only
-    location: src/components/ProtectedRoute.tsx
-    impact: Security depends on Supabase backend auth enforcement
+    routes:
+      - path: /admin/trending
+        description: Manage trending items
+  - name: Navigation and Layout
+    description: App shell with header, bottom navbar, scroll-to-top functionality, and responsive layout
+    files:
+      - src/components/AppShell.tsx
+      - src/components/Header.tsx
+      - src/components/Navbar.tsx
+      - src/components/BottomNavbar.tsx
+      - src/components/ScrollToTop.tsx
+      - src/Shell.tsx
+      - src/main.tsx
+known_limitations: []
