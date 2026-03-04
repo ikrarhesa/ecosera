@@ -72,7 +72,6 @@ export default function AdminProductNew() {
         if (cropSrc) URL.revokeObjectURL(cropSrc);
         setCropSrc(null);
         // Skip remaining pending files too
-        pendingFiles.forEach((f) => {/* no object URLs to revoke for pending files */ });
         setPendingFiles([]);
     };
 
