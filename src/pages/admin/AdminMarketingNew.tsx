@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Image as ImageIcon, Upload, Loader2, Link as LinkIcon, ArrowLeft } from "lucide-react";
 import { useToast } from "../../context/ToastContext";
 import { createBanner, uploadBannerImage } from "../../services/banners";
+import ImageCropperModal from "../../components/ImageCropperModal";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 
@@ -19,12 +20,28 @@ export default function AdminMarketingNew() {
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+    // Cropper state
+    const [cropSrc, setCropSrc] = useState<string | null>(null);
+
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         if (file.size > 2 * 1024 * 1024) { show("Ukuran gambar maksimal 2MB"); return; }
-        setImageFile(file);
-        setPreviewUrl(URL.createObjectURL(file));
+        const url = URL.createObjectURL(file);
+        setCropSrc(url);
+        e.target.value = "";
+    };
+
+    const handleCropComplete = (croppedFile: File) => {
+        setImageFile(croppedFile);
+        setPreviewUrl(URL.createObjectURL(croppedFile));
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        setCropSrc(null);
+    };
+
+    const handleCropCancel = () => {
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        setCropSrc(null);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -88,7 +105,7 @@ export default function AdminMarketingNew() {
                                     <Upload className="h-4 w-4" /> Ganti Gambar
                                 </div>
                             </div>
-                            <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" disabled={loading} required />
+                            <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" disabled={loading} required={!imageFile} />
                         </div>
                     </div>
 
@@ -140,6 +157,16 @@ export default function AdminMarketingNew() {
                     </button>
                 </form>
             </div>
+
+            {/* Crop Modal */}
+            {cropSrc && (
+                <ImageCropperModal
+                    imageSrc={cropSrc}
+                    aspect={21 / 9}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                />
+            )}
         </div>
     );
 }

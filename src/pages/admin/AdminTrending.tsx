@@ -13,6 +13,7 @@ import {
     uploadSoughtAfterImage,
     SoughtAfterItem,
 } from "../../services/soughtAfter";
+import ImageCropperModal from "../../components/ImageCropperModal";
 
 const C = {
     blue: "#0071DC",
@@ -24,6 +25,10 @@ export default function AdminTrending() {
     const [items, setItems] = useState<SoughtAfterItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState<number | null>(null);
+
+    // Cropper state
+    const [cropSrc, setCropSrc] = useState<string | null>(null);
+    const [cropPosition, setCropPosition] = useState<number | null>(null);
 
     useEffect(() => {
         loadItems();
@@ -58,15 +63,27 @@ export default function AdminTrending() {
         }
     };
 
-    const handleImageChange = async (position: number, file: File) => {
+    const handleFileSelect = (position: number, file: File) => {
         if (file.size > 2 * 1024 * 1024) {
             show("Ukuran gambar maksimal 2MB");
             return;
         }
+        const url = URL.createObjectURL(file);
+        setCropSrc(url);
+        setCropPosition(position);
+    };
+
+    const handleCropComplete = async (croppedFile: File) => {
+        if (cropPosition === null) return;
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        setCropSrc(null);
+        const position = cropPosition;
+        setCropPosition(null);
+
         try {
             setSaving(position);
             show("Mengunggah gambar...");
-            const imageUrl = await uploadSoughtAfterImage(file);
+            const imageUrl = await uploadSoughtAfterImage(croppedFile);
             setItems((prev) =>
                 prev.map((item) =>
                     item.position === position
@@ -80,6 +97,12 @@ export default function AdminTrending() {
         } finally {
             setSaving(null);
         }
+    };
+
+    const handleCropCancel = () => {
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        setCropSrc(null);
+        setCropPosition(null);
     };
 
     const handleSave = async (position: number) => {
@@ -187,10 +210,11 @@ export default function AdminTrending() {
                                         onChange={(e) => {
                                             const file = e.target.files?.[0];
                                             if (file)
-                                                handleImageChange(
+                                                handleFileSelect(
                                                     item.position,
                                                     file
                                                 );
+                                            e.target.value = "";
                                         }}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                         disabled={saving === item.position}
@@ -301,6 +325,16 @@ export default function AdminTrending() {
                         </div>
                     ))}
                 </div>
+            )}
+
+            {/* Crop Modal */}
+            {cropSrc && (
+                <ImageCropperModal
+                    imageSrc={cropSrc}
+                    aspect={4 / 3}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                />
             )}
         </div>
     );

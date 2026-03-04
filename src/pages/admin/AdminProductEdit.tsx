@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { Plus, Trash2, Upload, Check, Save, X, ArrowLeft } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { generateSlug } from "../../lib/utils";
+import ImageCropperModal from "../../components/ImageCropperModal";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 const MAX_IMAGES = 3;
@@ -38,6 +39,10 @@ export default function AdminProductEdit() {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
+    // Cropper state
+    const [cropSrc, setCropSrc] = useState<string | null>(null);
+    const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+
     useEffect(() => {
         if (!product_id) return;
         (async () => {
@@ -65,7 +70,37 @@ export default function AdminProductEdit() {
     }, [newImageFiles]);
 
     const totalImages = existingImageUrls.length + newImageFiles.length;
-    const addNewFiles = (files: FileList | null) => { if (!files) return; const picked = Array.from(files).slice(0, MAX_IMAGES - totalImages); if (picked.length > 0) setNewImageFiles((prev) => [...prev, ...picked]); };
+
+    const addNewFiles = (files: FileList | null) => {
+        if (!files) return;
+        const picked = Array.from(files).slice(0, MAX_IMAGES - totalImages);
+        if (picked.length === 0) return;
+        // Queue files for cropping one at a time
+        setPendingFiles(picked.slice(1));
+        const url = URL.createObjectURL(picked[0]);
+        setCropSrc(url);
+    };
+
+    const handleCropComplete = (croppedFile: File) => {
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        setCropSrc(null);
+        setNewImageFiles((prev) => [...prev, croppedFile]);
+
+        // Process next pending file if any
+        if (pendingFiles.length > 0) {
+            const [next, ...rest] = pendingFiles;
+            setPendingFiles(rest);
+            const url = URL.createObjectURL(next);
+            setCropSrc(url);
+        }
+    };
+
+    const handleCropCancel = () => {
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        setCropSrc(null);
+        setPendingFiles([]);
+    };
+
     const removeExistingImage = (index: number) => {
         setExistingImageUrls((prev) => {
             const removed = prev[index];
@@ -91,7 +126,7 @@ export default function AdminProductEdit() {
         try {
             const newUploadedUrls: string[] = [];
             for (let i = 0; i < newImageFiles.length; i++) {
-                const file = newImageFiles[i]; const ext = file.name.split(".").pop() || "png";
+                const file = newImageFiles[i]; const ext = file.name.split(".").pop() || "webp";
                 const filePath = `products/${slug}-${Date.now()}-${i}.${ext}`;
                 const { error: uploadErr } = await supabase.storage.from("product-images").upload(filePath, file, { cacheControl: "3600", contentType: file.type, upsert: true });
                 if (uploadErr) { setFormError(`Gagal upload gambar ${i + 1}: ${uploadErr.message}`); setSubmitting(false); return; }
@@ -185,7 +220,7 @@ export default function AdminProductEdit() {
                             <label className="aspect-square rounded-lg border-2 border-dashed border-slate-200 hover:border-blue-400 cursor-pointer flex flex-col items-center justify-center gap-1 transition-colors bg-white">
                                 <Upload className="h-6 w-6 text-slate-400" />
                                 <span className="text-[11px] text-slate-500 text-center leading-tight">Tambah<br />Foto</span>
-                                <input type="file" accept="image/*" className="hidden" multiple onChange={(e) => addNewFiles(e.target.files)} />
+                                <input type="file" accept="image/*" className="hidden" multiple onChange={(e) => { addNewFiles(e.target.files); e.target.value = ""; }} />
                             </label>
                         )}
                     </div>
@@ -253,6 +288,16 @@ export default function AdminProductEdit() {
                     {submitting ? "Menyimpan…" : "Simpan Perubahan"}
                 </button>
             </form>
+
+            {/* Crop Modal */}
+            {cropSrc && (
+                <ImageCropperModal
+                    imageSrc={cropSrc}
+                    aspect={1}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                />
+            )}
         </div>
     );
 }

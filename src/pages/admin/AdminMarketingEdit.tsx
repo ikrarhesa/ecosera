@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { Image as ImageIcon, Upload, Loader2, Link as LinkIcon, ArrowLeft } from "lucide-react";
 import { useToast } from "../../context/ToastContext";
 import { getBannerById, updateBanner, uploadBannerImage, type Banner } from "../../services/banners";
+import ImageCropperModal from "../../components/ImageCropperModal";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 
@@ -23,6 +24,9 @@ export default function AdminMarketingEdit() {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [existingImageUrl, setExistingImageUrl] = useState("");
 
+    // Cropper state
+    const [cropSrc, setCropSrc] = useState<string | null>(null);
+
     useEffect(() => {
         if (!id) return;
         const fetchBanner = async () => {
@@ -42,7 +46,21 @@ export default function AdminMarketingEdit() {
         const file = e.target.files?.[0];
         if (!file) return;
         if (file.size > 2 * 1024 * 1024) { show("Ukuran gambar maksimal 2MB"); return; }
-        setImageFile(file); setPreviewUrl(URL.createObjectURL(file));
+        const url = URL.createObjectURL(file);
+        setCropSrc(url);
+        e.target.value = "";
+    };
+
+    const handleCropComplete = (croppedFile: File) => {
+        setImageFile(croppedFile);
+        setPreviewUrl(URL.createObjectURL(croppedFile));
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        setCropSrc(null);
+    };
+
+    const handleCropCancel = () => {
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        setCropSrc(null);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -166,6 +184,16 @@ export default function AdminMarketingEdit() {
                     </button>
                 </form>
             </div>
+
+            {/* Crop Modal */}
+            {cropSrc && (
+                <ImageCropperModal
+                    imageSrc={cropSrc}
+                    aspect={21 / 9}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                />
+            )}
         </div>
     );
 }

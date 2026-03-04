@@ -13,6 +13,7 @@ import {
     Navigation,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import ImageCropperModal from "../../components/ImageCropperModal";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 
@@ -45,6 +46,11 @@ export default function AdminShopEdit() {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+
+    // Cropper state
+    const [cropSrc, setCropSrc] = useState<string | null>(null);
+    const [cropAspect, setCropAspect] = useState<number>(1);
+    const [cropTarget, setCropTarget] = useState<"logo" | "banner" | null>(null);
 
     useEffect(() => {
         if (!seller_id) return;
@@ -100,6 +106,43 @@ export default function AdminShopEdit() {
     const updateSocial = (key: keyof SocialMedia, value: string) =>
         setSocial((prev) => ({ ...prev, [key]: value || undefined }));
 
+    const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        setCropSrc(url);
+        setCropAspect(1);
+        setCropTarget("logo");
+        e.target.value = "";
+    };
+
+    const handleBannerSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        setCropSrc(url);
+        setCropAspect(3);
+        setCropTarget("banner");
+        e.target.value = "";
+    };
+
+    const handleCropComplete = (croppedFile: File) => {
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        if (cropTarget === "logo") {
+            setLogoFile(croppedFile);
+        } else if (cropTarget === "banner") {
+            setBannerFile(croppedFile);
+        }
+        setCropSrc(null);
+        setCropTarget(null);
+    };
+
+    const handleCropCancel = () => {
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        setCropSrc(null);
+        setCropTarget(null);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setFormError(null);
@@ -112,7 +155,7 @@ export default function AdminShopEdit() {
         try {
             let logoUrl = currentLogo;
             if (logoFile) {
-                const ext = logoFile.name.split(".").pop() || "png";
+                const ext = logoFile.name.split(".").pop() || "webp";
                 const filePath = `logos/${seller_id}-${Date.now()}.${ext}`;
                 const { error: uploadErr } = await supabase.storage
                     .from("shop-logos")
@@ -134,7 +177,7 @@ export default function AdminShopEdit() {
 
             let bannerUrl = currentBanner;
             if (bannerFile) {
-                const ext = bannerFile.name.split(".").pop() || "png";
+                const ext = bannerFile.name.split(".").pop() || "webp";
                 const filePath = `banners/${seller_id}-${Date.now()}.${ext}`;
                 const { error: uploadErr } = await supabase.storage
                     .from("shop-logos")
@@ -272,11 +315,7 @@ export default function AdminShopEdit() {
                                 type="file"
                                 accept="image/*"
                                 className="hidden"
-                                onChange={(e) =>
-                                    setBannerFile(
-                                        e.target.files?.[0] || null
-                                    )
-                                }
+                                onChange={handleBannerSelect}
                             />
                         </label>
                     </div>
@@ -301,11 +340,7 @@ export default function AdminShopEdit() {
                                 type="file"
                                 accept="image/*"
                                 className="hidden"
-                                onChange={(e) =>
-                                    setLogoFile(
-                                        e.target.files?.[0] || null
-                                    )
-                                }
+                                onChange={handleLogoSelect}
                             />
                         </label>
                         <div className="flex-1">
@@ -569,6 +604,16 @@ export default function AdminShopEdit() {
                     {submitting ? "Menyimpan…" : "Simpan Profil"}
                 </button>
             </form>
+
+            {/* Crop Modal */}
+            {cropSrc && (
+                <ImageCropperModal
+                    imageSrc={cropSrc}
+                    aspect={cropAspect}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                />
+            )}
         </div>
     );
 }

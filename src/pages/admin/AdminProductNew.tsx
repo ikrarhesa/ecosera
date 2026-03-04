@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { Plus, Trash2, Upload, Check, X, ArrowLeft } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { generateSlug } from "../../lib/utils";
+import ImageCropperModal from "../../components/ImageCropperModal";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 const MAX_IMAGES = 3;
@@ -26,6 +27,10 @@ export default function AdminProductNew() {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
+    // Cropper state
+    const [cropSrc, setCropSrc] = useState<string | null>(null);
+    const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+
     useEffect(() => {
         (async () => {
             const { data } = await supabase.from("categories").select("*").order("name");
@@ -42,8 +47,35 @@ export default function AdminProductNew() {
     const addImageFiles = (files: FileList | null) => {
         if (!files) return;
         const newFiles = Array.from(files).slice(0, MAX_IMAGES - imageFiles.length);
-        if (newFiles.length > 0) setImageFiles((prev) => [...prev, ...newFiles]);
+        if (newFiles.length === 0) return;
+        // Queue files for cropping one at a time
+        setPendingFiles(newFiles.slice(1));
+        const url = URL.createObjectURL(newFiles[0]);
+        setCropSrc(url);
     };
+
+    const handleCropComplete = (croppedFile: File) => {
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        setCropSrc(null);
+        setImageFiles((prev) => [...prev, croppedFile]);
+
+        // Process next pending file if any
+        if (pendingFiles.length > 0) {
+            const [next, ...rest] = pendingFiles;
+            setPendingFiles(rest);
+            const url = URL.createObjectURL(next);
+            setCropSrc(url);
+        }
+    };
+
+    const handleCropCancel = () => {
+        if (cropSrc) URL.revokeObjectURL(cropSrc);
+        setCropSrc(null);
+        // Skip remaining pending files too
+        pendingFiles.forEach((f) => {/* no object URLs to revoke for pending files */ });
+        setPendingFiles([]);
+    };
+
     const removeImageFile = (index: number) => setImageFiles((prev) => prev.filter((_, i) => i !== index));
     const slug = generateSlug(name);
 
@@ -68,7 +100,7 @@ export default function AdminProductNew() {
             const uploadedUrls: string[] = [];
             for (let i = 0; i < imageFiles.length; i++) {
                 const file = imageFiles[i];
-                const ext = file.name.split(".").pop() || "png";
+                const ext = file.name.split(".").pop() || "webp";
                 const filePath = `products/${slug}-${Date.now()}-${i}.${ext}`;
                 const { error: uploadErr } = await supabase.storage
                     .from("product-images")
@@ -153,7 +185,7 @@ export default function AdminProductNew() {
                             <label className="aspect-square rounded-lg border-2 border-dashed border-slate-200 hover:border-blue-400 cursor-pointer flex flex-col items-center justify-center gap-1 transition-colors bg-white">
                                 <Upload className="h-6 w-6 text-slate-400" />
                                 <span className="text-[11px] text-slate-500 text-center leading-tight">Tambah<br />Foto</span>
-                                <input type="file" accept="image/*" className="hidden" multiple onChange={(e) => addImageFiles(e.target.files)} />
+                                <input type="file" accept="image/*" className="hidden" multiple onChange={(e) => { addImageFiles(e.target.files); e.target.value = ""; }} />
                             </label>
                         )}
                     </div>
@@ -220,6 +252,16 @@ export default function AdminProductNew() {
                     {submitting ? "Menyimpan…" : "Simpan Produk"}
                 </button>
             </form>
+
+            {/* Crop Modal */}
+            {cropSrc && (
+                <ImageCropperModal
+                    imageSrc={cropSrc}
+                    aspect={1}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                />
+            )}
         </div>
     );
 }
