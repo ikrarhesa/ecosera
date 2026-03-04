@@ -98,7 +98,7 @@ function normalize(raw: any): Product {
     location: raw._sellerAddress ?? raw.location ?? "",
     sellerLat: raw._sellerLat ?? undefined,
     sellerLng: raw._sellerLng ?? undefined,
-    rating: Number(raw.rating ?? 4.8),  // Default rating if missing
+    rating: Number(raw.rating ?? 0),  // 0 = no real reviews yet
     sold: raw._waClicks ?? Number(raw.sold ?? 0),
     tags: Array.isArray(raw.tags) ? raw.tags : [],  // Ensure tags are an array
     seller_id: raw.seller_id ?? null,

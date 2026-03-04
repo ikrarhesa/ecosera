@@ -6,6 +6,15 @@ import { generateSlug } from "../../lib/utils";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 const MAX_IMAGES = 3;
+const BUCKET = "product-images";
+
+/** Extract the storage path from a Supabase public URL */
+const extractStoragePath = (publicUrl: string): string | null => {
+    const marker = `/object/public/${BUCKET}/`;
+    const idx = publicUrl.indexOf(marker);
+    if (idx === -1) return null;
+    return decodeURIComponent(publicUrl.slice(idx + marker.length));
+};
 
 interface Category { id: string; name: string; }
 interface Variant { id?: string; variant_name: string; price_override: string; stock: string; }
@@ -23,6 +32,7 @@ export default function AdminProductEdit() {
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
+    const [removedImageUrls, setRemovedImageUrls] = useState<string[]>([]);
     const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
     const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
     const [submitting, setSubmitting] = useState(false);
@@ -56,7 +66,13 @@ export default function AdminProductEdit() {
 
     const totalImages = existingImageUrls.length + newImageFiles.length;
     const addNewFiles = (files: FileList | null) => { if (!files) return; const picked = Array.from(files).slice(0, MAX_IMAGES - totalImages); if (picked.length > 0) setNewImageFiles((prev) => [...prev, ...picked]); };
-    const removeExistingImage = (index: number) => setExistingImageUrls((prev) => prev.filter((_, i) => i !== index));
+    const removeExistingImage = (index: number) => {
+        setExistingImageUrls((prev) => {
+            const removed = prev[index];
+            if (removed) setRemovedImageUrls((r) => [...r, removed]);
+            return prev.filter((_, i) => i !== index);
+        });
+    };
     const removeNewImage = (index: number) => setNewImageFiles((prev) => prev.filter((_, i) => i !== index));
     const slug = generateSlug(name);
 
@@ -85,6 +101,14 @@ export default function AdminProductEdit() {
             const allImages = [...existingImageUrls, ...newUploadedUrls];
             const { error: updateErr } = await supabase.from("products").update({ name: trimmedName, description: description.trim() || null, price: numPrice, image_url: allImages[0] || null, images: allImages.length > 0 ? allImages : null, slug }).eq("id", product_id);
             if (updateErr) { setFormError(`Gagal update produk: ${updateErr.message}`); setSubmitting(false); return; }
+
+            // Delete removed images from storage
+            if (removedImageUrls.length > 0) {
+                const pathsToRemove = removedImageUrls.map(extractStoragePath).filter(Boolean) as string[];
+                if (pathsToRemove.length > 0) {
+                    await supabase.storage.from(BUCKET).remove(pathsToRemove);
+                }
+            }
 
             await supabase.from("product_categories").delete().eq("product_id", product_id!);
             if (selectedCategories.length > 0) { await supabase.from("product_categories").insert(selectedCategories.map((cid) => ({ product_id: product_id!, category_id: cid }))); }

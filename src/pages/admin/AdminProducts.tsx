@@ -4,6 +4,15 @@ import { Plus, Package, Pencil, Trash2, ToggleLeft, ToggleRight, ArrowLeft } fro
 import { supabase } from "../../lib/supabase";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
+const BUCKET = "product-images";
+
+/** Extract the storage path from a Supabase public URL */
+const extractStoragePath = (publicUrl: string): string | null => {
+    const marker = `/object/public/${BUCKET}/`;
+    const idx = publicUrl.indexOf(marker);
+    if (idx === -1) return null;
+    return decodeURIComponent(publicUrl.slice(idx + marker.length));
+};
 
 interface ProductRow {
     id: string;
@@ -62,6 +71,19 @@ export default function AdminProducts() {
 
     const deleteProduct = async (p: ProductRow) => {
         if (!confirm(`Hapus "${p.name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+
+        // Fetch product images to clean up storage
+        const { data: prodData } = await supabase.from("products").select("images, image_url").eq("id", p.id).single();
+        if (prodData) {
+            const imageUrls: string[] = Array.isArray(prodData.images) && prodData.images.length > 0
+                ? prodData.images
+                : prodData.image_url ? [prodData.image_url] : [];
+            const pathsToRemove = imageUrls.map(extractStoragePath).filter(Boolean) as string[];
+            if (pathsToRemove.length > 0) {
+                await supabase.storage.from(BUCKET).remove(pathsToRemove);
+            }
+        }
+
         await supabase.from("product_categories").delete().eq("product_id", p.id);
         await supabase.from("product_variants").delete().eq("product_id", p.id);
         const { error: err } = await supabase.from("products").delete().eq("id", p.id);

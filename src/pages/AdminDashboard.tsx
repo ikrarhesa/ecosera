@@ -162,17 +162,20 @@ export default function AdminDashboard() {
           }
         }
 
+        // Only include products that still exist in the DB
         setMetrics(
-          ids.map((pid) => ({
-            product_id: pid,
-            product_name: nameMap[pid] || "–",
-            views: agg[pid].views,
-            clicks: agg[pid].clicks,
-            conversion_rate:
-              agg[pid].views > 0
-                ? agg[pid].clicks / agg[pid].views
-                : null,
-          }))
+          ids
+            .filter((pid) => nameMap[pid])
+            .map((pid) => ({
+              product_id: pid,
+              product_name: nameMap[pid],
+              views: agg[pid].views,
+              clicks: agg[pid].clicks,
+              conversion_rate:
+                agg[pid].views > 0
+                  ? agg[pid].clicks / agg[pid].views
+                  : null,
+            }))
         );
       }
     } catch (err) {

@@ -234,9 +234,13 @@ export default function ProductDetail() {
   };
 
   const displayRating = useMemo(() => {
-    if (reviews.length === 0) return product?.rating?.toFixed(1) ?? "4.8";
-    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-    return (sum / reviews.length).toFixed(1);
+    if (reviews.length > 0) {
+      const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+      return (sum / reviews.length).toFixed(1);
+    }
+    // No reviews – only show rating if the product has a real one (> 0)
+    if (product?.rating && product.rating > 0) return product.rating.toFixed(1);
+    return null; // no rating to display
   }, [reviews, product]);
 
   const images = useMemo(() => allImagesOf(product), [product]);
@@ -468,10 +472,20 @@ export default function ProductDetail() {
           </div>
 
           <div className="mt-1 flex items-center gap-1 text-sm text-gray-700">
-            <Star className="fill-amber-400 stroke-amber-400" size={16} />
-            <span>{displayRating}</span>
-            <span className="text-gray-400">•</span>
-            <span>{reviews.length > 0 ? `${reviews.length} ulasan` : ((selectedVariant?.stock ?? product.stock) == null ? "Stok tersedia" : `Stok ${selectedVariant?.stock ?? product.stock}`)}</span>
+            {displayRating ? (
+              <>
+                <Star className="fill-amber-400 stroke-amber-400" size={16} />
+                <span>{displayRating}</span>
+                <span className="text-gray-400">•</span>
+                <span>{reviews.length > 0 ? `${reviews.length} ulasan` : ((selectedVariant?.stock ?? product.stock) == null ? "Stok tersedia" : `Stok ${selectedVariant?.stock ?? product.stock}`)}</span>
+              </>
+            ) : (
+              <>
+                <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white bg-blue-600 rounded-full">Produk Baru</span>
+                <span className="text-gray-400">•</span>
+                <span>{(selectedVariant?.stock ?? product.stock) == null ? "Stok tersedia" : `Stok ${selectedVariant?.stock ?? product.stock}`}</span>
+              </>
+            )}
           </div>
 
           {/* Seller / Lokasi */}
