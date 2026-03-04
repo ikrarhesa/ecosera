@@ -17,6 +17,7 @@ export default function AdminMarketingNew() {
     const [ctaText, setCtaText] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [textColor, setTextColor] = useState<'white' | 'navy'>('white');
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -57,6 +58,7 @@ export default function AdminMarketingNew() {
                 title: title.trim(),
                 link_url: linkUrl.trim() || undefined,
                 cta_text: ctaText.trim() || undefined,
+                text_color: textColor,
                 image_url: imageUrl,
                 start_date: startDate ? new Date(startDate).toISOString() : undefined,
                 end_date: endDate ? new Date(endDate).toISOString() : undefined,
@@ -126,6 +128,15 @@ export default function AdminMarketingNew() {
                                 <input type="url" value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="https://... atau /category/..." className={`${inputCls} pl-9`} disabled={loading} />
                             </div>
                             <p className="text-[11px] text-slate-500 mt-1.5">Ke mana pelanggan diarahkan saat banner diketuk.</p>
+                        </div>
+
+                        <div>
+                            <label className={labelCls}>Warna Teks Banner</label>
+                            <select value={textColor} onChange={(e) => setTextColor(e.target.value as 'white' | 'navy')} className={inputCls} disabled={loading}>
+                                <option value="white">Putih (Untuk Background Gelap)</option>
+                                <option value="navy">Navy (Untuk Background Terang)</option>
+                            </select>
+                            <p className="text-[11px] text-slate-500 mt-1.5">Pilih warna teks dan tombol agar kontras dengan gambar banner.</p>
                         </div>
 
                         <div>

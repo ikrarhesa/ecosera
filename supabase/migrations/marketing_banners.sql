@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS public.banners (
     title TEXT NOT NULL,
     image_url TEXT NOT NULL,
     link_url TEXT,
+    cta_text TEXT,
+    text_color TEXT DEFAULT 'white',
     is_active BOOLEAN DEFAULT true,
     sort_order INTEGER DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL

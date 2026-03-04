@@ -66,15 +66,18 @@ function BannerCarousel() {
           {banners.map((b) => (
             <div key={b.id} className="inline-block w-full h-full relative align-top">
               <img src={b.image_url} alt={b.title} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-black/25" />
-              <div className="absolute left-4 right-4 bottom-4 text-white">
+              <div className={`absolute inset-0 ${b.text_color === 'navy' ? 'bg-white/10' : 'bg-black/15'}`} />
+              <div className={`absolute left-4 right-4 bottom-4 ${b.text_color === 'navy' ? 'text-[#041E42]' : 'text-white'}`}>
                 <h3 className="text-lg font-bold leading-tight">{b.title}</h3>
                 {b.link_url && (
                   <a
                     href={b.link_url}
                     target={b.link_url.startsWith('http') ? "_blank" : "_self"}
                     rel="noreferrer"
-                    className="mt-2 inline-flex items-center gap-1 rounded-full bg-white text-slate-900 px-3 py-1.5 text-xs font-semibold hover:bg-slate-100 transition-colors"
+                    className={`mt-2 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors
+                      ${b.text_color === 'navy'
+                        ? 'bg-white text-[#041E42] border border-[#041E42] hover:bg-slate-50'
+                        : 'bg-white text-slate-900 border border-transparent hover:bg-slate-100'}`}
                   >
                     {b.cta_text || "Lihat Promo"} <ArrowRight className="h-3.5 w-3.5" />
                   </a>

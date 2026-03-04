@@ -17,6 +17,7 @@ export default function AdminMarketingEdit() {
     const [title, setTitle] = useState("");
     const [linkUrl, setLinkUrl] = useState("");
     const [ctaText, setCtaText] = useState("");
+    const [textColor, setTextColor] = useState<'white' | 'navy'>('white');
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [isActive, setIsActive] = useState(true);
@@ -34,6 +35,7 @@ export default function AdminMarketingEdit() {
                 const banner = await getBannerById(id);
                 if (!banner) { show("Banner tidak ditemukan."); navigate("/admin/marketing"); return; }
                 setTitle(banner.title); setLinkUrl(banner.link_url || ""); setCtaText(banner.cta_text || "");
+                setTextColor(banner.text_color || "white");
                 setExistingImageUrl(banner.image_url); setPreviewUrl(banner.image_url); setIsActive(banner.is_active);
                 if (banner.start_date) { const sd = new Date(banner.start_date); setStartDate(new Date(sd.getTime() - sd.getTimezoneOffset() * 60000).toISOString().slice(0, 16)); }
                 if (banner.end_date) { const ed = new Date(banner.end_date); setEndDate(new Date(ed.getTime() - ed.getTimezoneOffset() * 60000).toISOString().slice(0, 16)); }
@@ -75,6 +77,7 @@ export default function AdminMarketingEdit() {
             show("Menyimpan perubahan...");
             await updateBanner(id, {
                 title: title.trim(), link_url: linkUrl.trim() || null, cta_text: ctaText.trim() || null,
+                text_color: textColor,
                 image_url: finalImageUrl, start_date: startDate ? new Date(startDate).toISOString() : null,
                 end_date: endDate ? new Date(endDate).toISOString() : null, is_active: isActive,
             } as Partial<Banner>);
@@ -160,6 +163,15 @@ export default function AdminMarketingEdit() {
                         <div>
                             <label className={labelCls}>Teks Tombol CTA (Opsional)</label>
                             <input type="text" value={ctaText} onChange={(e) => setCtaText(e.target.value)} placeholder="Cth: Beli Sekarang..." className={inputCls} disabled={saving} />
+                        </div>
+
+                        <div>
+                            <label className={labelCls}>Warna Teks Banner</label>
+                            <select value={textColor} onChange={(e) => setTextColor(e.target.value as 'white' | 'navy')} className={inputCls} disabled={saving}>
+                                <option value="white">Putih (Untuk Background Gelap)</option>
+                                <option value="navy">Navy (Untuk Background Terang)</option>
+                            </select>
+                            <p className="text-[11px] text-slate-500 mt-1.5">Pilih warna teks dan tombol agar kontras dengan gambar banner.</p>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">

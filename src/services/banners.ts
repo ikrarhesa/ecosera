@@ -6,6 +6,7 @@ export interface Banner {
     image_url: string;
     link_url?: string;
     cta_text?: string;
+    text_color?: 'white' | 'navy';
     is_active: boolean;
     sort_order: number;
     start_date?: string | null;
