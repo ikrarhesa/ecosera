@@ -44,7 +44,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         ) : (
           <div className="flex items-center gap-1 mt-1">
-            <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white bg-blue-600 rounded-full">Produk Baru</span>
+            <span className="inline-block px-1.5 py-px text-[9px] font-semibold tracking-wide text-white bg-blue-600 rounded-[4px]">Produk Baru</span>
             {product.sold != null && (
               <>
                 <span className="text-xs text-slate-400">•</span>

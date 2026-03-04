@@ -1,0 +1,110 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - React 18
+  - Vite
+  - React Router v6
+  - Tailwind CSS
+  - Supabase (Backend-as-a-Service)
+  - Lucide React (Icons)
+  - react-easy-crop
+features:
+  - name: Homepage
+    description: Walmart-inspired mobile-first landing page with search bar, featured categories, banners, pilihan daerah (regional picks), and product listings
+    files:
+      - src/pages/Home.tsx
+      - src/components/Header.tsx
+      - src/components/BottomNavbar.tsx
+      - src/components/ProductCard.tsx
+      - src/components/PilihanDaerahStrip.tsx
+      - src/services/banners.ts
+      - src/services/categories.ts
+
+  - name: Product Search
+    description: Full-text product search with keyword tracking and results display
+    files:
+      - src/pages/Search.tsx
+      - src/services/products.ts
+
+  - name: Product Detail
+    description: Product detail page with images, descriptions, pricing, seller info, related products, reviews, and WhatsApp order CTA button
+    files:
+      - src/pages/ProductDetail.tsx
+      - src/services/product.ts
+      - src/services/products.ts
+
+  - name: Seller Shop
+    description: Dedicated seller storefront page showing all products from a specific seller
+    files:
+      - src/pages/SellerShop.tsx
+
+  - name: Etalase (Catalog)
+    description: Category-based product browsing and catalog display
+    files:
+      - src/pages/Etalase.tsx
+      - src/services/categories.ts
+
+  - name: Cart
+    description: Client-side shopping cart for saved items with WhatsApp order functionality
+    files:
+      - src/pages/Cart.tsx
+      - src/context/CartContext.tsx
+
+  - name: Wishlist
+    description: Client-side wishlist for saving favorite products
+    files:
+      - src/pages/Wishlist.tsx
+
+  - name: E-Learning
+    description: Educational content modules for community knowledge sharing
+    files:
+      - src/pages/ELearning.tsx
+      - src/pages/ModuleDetail.tsx
+
+  - name: Admin Authentication
+    description: Secure admin login portal for the founder using Supabase authentication
+    files:
+      - src/pages/admin/AdminLogin.tsx
+      - src/components/ProtectedRoute.tsx
+      - src/context/AuthContext.tsx
+
+  - name: Admin Dashboard
+    description: Analytics dashboard showing top products, search keywords, WhatsApp click metrics, and seller performance
+    files:
+      - src/pages/AdminDashboard.tsx
+
+  - name: Admin Shop Management
+    description: CRUD operations for managing seller shops including name, WhatsApp number, logo, and description
+    files:
+      - src/pages/admin/AdminShops.tsx
+      - src/pages/admin/AdminShopNew.tsx
+      - src/pages/admin/AdminShopEdit.tsx
+
+  - name: Admin Product Management
+    description: CRUD operations for managing products per seller including images, pricing, categories, and descriptions
+    files:
+      - src/pages/admin/AdminProducts.tsx
+      - src/pages/admin/AdminProductNew.tsx
+      - src/pages/admin/AdminProductEdit.tsx
+
+  - name: Admin Marketing
+    description: Banner and promotional content management for the homepage
+    files:
+      - src/pages/admin/AdminMarketing.tsx
+      - src/pages/admin/AdminMarketingNew.tsx
+      - src/pages/admin/AdminMarketingEdit.tsx
+
+  - name: Admin Trending
+    description: Management of trending/sought-after products display
+    files:
+      - src/pages/admin/AdminTrending.tsx
+      - src/services/soughtAfter.ts
+
+known_limitations:
+  - issue: No automated tests exist in the codebase
+    location: package.json
+    impact: No test coverage for any features
+  - issue: Admin routes rely on client-side route protection only
+    location: src/components/ProtectedRoute.tsx
+    impact: Security depends on Supabase backend auth enforcement
