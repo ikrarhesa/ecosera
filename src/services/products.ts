@@ -7,6 +7,9 @@ const PLACEHOLDER = "https://placehold.co/800x800/png?text=Ecosera";
 // Cache seller names to avoid repeated lookups
 const sellerCache: Record<string, { name: string; phone: string; address: string; lat?: number; lng?: number }> = {};
 const productCache: Record<string, Product> = {};
+let waClickCache: Record<string, number> | null = null;
+let waClickCacheTime = 0;
+const WA_CLICK_CACHE_TTL = 60_000; // 1 minute
 
 export function getCachedProductBySlug(slug: string): Product | null {
   return productCache[slug] || null;
@@ -35,6 +38,41 @@ async function fetchSellerInfo(sellerId: string) {
   return sellerCache[sellerId] || null;
 }
 
+/**
+ * Fetch wa_click counts from event_logs grouped by product_id.
+ * Results are cached for 1 minute to avoid excessive queries.
+ */
+async function fetchWaClickCounts(forceRefresh = false): Promise<Record<string, number>> {
+  const now = Date.now();
+  if (!forceRefresh && waClickCache && now - waClickCacheTime < WA_CLICK_CACHE_TTL) {
+    return waClickCache;
+  }
+  try {
+    const { data, error } = await supabase
+      .from("event_logs")
+      .select("product_id")
+      .eq("event_type", "wa_click");
+
+    if (error) {
+      console.error("[Products] Error fetching wa_click counts:", error);
+      return waClickCache ?? {};
+    }
+
+    const counts: Record<string, number> = {};
+    for (const row of data || []) {
+      if (row.product_id) {
+        counts[row.product_id] = (counts[row.product_id] || 0) + 1;
+      }
+    }
+    waClickCache = counts;
+    waClickCacheTime = now;
+    return counts;
+  } catch (err) {
+    console.error("[Products] Unexpected error fetching wa_click counts:", err);
+    return waClickCache ?? {};
+  }
+}
+
 // Function to normalize the product data from Supabase
 function normalize(raw: any): Product {
   const stockRaw = raw.stock ?? raw.inventory ?? raw.qty ?? null;
@@ -61,7 +99,7 @@ function normalize(raw: any): Product {
     sellerLat: raw._sellerLat ?? undefined,
     sellerLng: raw._sellerLng ?? undefined,
     rating: Number(raw.rating ?? 4.8),  // Default rating if missing
-    sold: Number(raw.sold ?? 0),  // Default sold count if missing
+    sold: raw._waClicks ?? Number(raw.sold ?? 0),
     tags: Array.isArray(raw.tags) ? raw.tags : [],  // Ensure tags are an array
     seller_id: raw.seller_id ?? null,
   };
@@ -96,15 +134,18 @@ export async function getAllProducts(): Promise<Product[]> {
       return [];
     }
 
-    // Enrich with seller names
+    // Enrich with seller names + wa_click counts
     const products = data || [];
     const sellerIds = [...new Set(products.map((p: any) => p.seller_id).filter(Boolean))];
-    await Promise.all(sellerIds.map(fetchSellerInfo));
+    const [, waClicks] = await Promise.all([
+      Promise.all(sellerIds.map(fetchSellerInfo)),
+      fetchWaClickCounts(),
+    ]);
 
     const result = products.map((raw: any) => {
       const info = sellerCache[raw.seller_id];
       const category = raw.product_categories?.[0]?.category_id || "general";
-      const normalized = normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng });
+      const normalized = normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[raw.id] ?? 0 });
       if (normalized.slug) {
         productCache[normalized.slug] = normalized;
       }
@@ -132,10 +173,13 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     }
     if (!data) return null;
 
-    // Enrich with seller name
-    const info = await fetchSellerInfo(data.seller_id);
+    // Enrich with seller name + wa_click count
+    const [info, waClicks] = await Promise.all([
+      fetchSellerInfo(data.seller_id),
+      fetchWaClickCounts(),
+    ]);
     const category = data.product_categories?.[0]?.category_id || "general";
-    const normalized = normalize({ ...data, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng });
+    const normalized = normalize({ ...data, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[data.id] ?? 0 });
 
     if (normalized.slug) {
       productCache[normalized.slug] = normalized;
@@ -212,12 +256,15 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 
     const products = data || [];
     const sellerIds = [...new Set(products.map((p: any) => p.seller_id).filter(Boolean))];
-    await Promise.all(sellerIds.map(fetchSellerInfo));
+    const [, waClicks] = await Promise.all([
+      Promise.all(sellerIds.map(fetchSellerInfo)),
+      fetchWaClickCounts(),
+    ]);
 
     return products.map((raw: any) => {
       const info = sellerCache[raw.seller_id];
       const category = raw.product_categories?.[0]?.category_id || "general";
-      return normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng });
+      return normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[raw.id] ?? 0 });
     });
   } catch (err) {
     console.error("Unexpected error fetching featured products:", err);
