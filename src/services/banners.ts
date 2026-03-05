@@ -7,6 +7,8 @@ export interface Banner {
     link_url?: string;
     cta_text?: string;
     text_color?: 'white' | 'navy';
+    overlay_color?: string;
+    overlay_opacity?: number;
     is_active: boolean;
     sort_order: number;
     start_date?: string | null;

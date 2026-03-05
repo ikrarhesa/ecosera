@@ -18,6 +18,8 @@ export default function AdminMarketingNew() {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [textColor, setTextColor] = useState<'white' | 'navy'>('white');
+    const [overlayColor, setOverlayColor] = useState("#000000");
+    const [overlayOpacity, setOverlayOpacity] = useState(60);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -59,6 +61,8 @@ export default function AdminMarketingNew() {
                 link_url: linkUrl.trim() || undefined,
                 cta_text: ctaText.trim() || undefined,
                 text_color: textColor,
+                overlay_color: overlayColor,
+                overlay_opacity: overlayOpacity,
                 image_url: imageUrl,
                 start_date: startDate ? new Date(startDate).toISOString() : undefined,
                 end_date: endDate ? new Date(endDate).toISOString() : undefined,
@@ -132,11 +136,32 @@ export default function AdminMarketingNew() {
 
                         <div>
                             <label className={labelCls}>Warna Teks Banner</label>
-                            <select value={textColor} onChange={(e) => setTextColor(e.target.value as 'white' | 'navy')} className={inputCls} disabled={loading}>
+                            <select value={textColor} onChange={(e) => {
+                                const newColor = e.target.value as 'white' | 'navy';
+                                setTextColor(newColor);
+                                if (newColor === 'white' && overlayColor === '#ffffff') setOverlayColor('#000000');
+                                if (newColor === 'navy' && overlayColor === '#000000') setOverlayColor('#ffffff');
+                            }} className={inputCls} disabled={loading}>
                                 <option value="white">Putih (Untuk Background Gelap)</option>
                                 <option value="navy">Navy (Untuk Background Terang)</option>
                             </select>
                             <p className="text-[11px] text-slate-500 mt-1.5">Pilih warna teks dan tombol agar kontras dengan gambar banner.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className={labelCls}>Warna Overlay</label>
+                                <div className="flex items-center gap-3">
+                                    <input type="color" value={overlayColor} onChange={(e) => setOverlayColor(e.target.value)} className="w-12 h-10 p-1 border border-slate-200 rounded cursor-pointer bg-white" disabled={loading} />
+                                    <input type="text" value={overlayColor} onChange={(e) => setOverlayColor(e.target.value)} className={`${inputCls} flex-1 uppercase`} disabled={loading} maxLength={7} />
+                                </div>
+                            </div>
+                            <div>
+                                <label className={labelCls}>Opasitas Overlay ({overlayOpacity}%)</label>
+                                <div className="flex items-center h-10">
+                                    <input type="range" min="0" max="100" value={overlayOpacity} onChange={(e) => setOverlayOpacity(parseInt(e.target.value))} className="w-full accent-blue-600 cursor-pointer" disabled={loading} />
+                                </div>
+                            </div>
                         </div>
 
                         <div>

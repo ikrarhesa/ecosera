@@ -11,6 +11,10 @@ let waClickCache: Record<string, number> | null = null;
 let waClickCacheTime = 0;
 const WA_CLICK_CACHE_TTL = 60_000; // 1 minute
 
+let reviewsCache: Record<string, { count: number, totalRating: number }> | null = null;
+let reviewsCacheTime = 0;
+const REVIEWS_CACHE_TTL = 60_000; // 1 minute
+
 export function getCachedProductBySlug(slug: string): Product | null {
   return productCache[slug] || null;
 }
@@ -70,6 +74,38 @@ async function fetchWaClickCounts(forceRefresh = false): Promise<Record<string, 
   } catch (err) {
     console.error("[Products] Unexpected error fetching wa_click counts:", err);
     return waClickCache ?? {};
+  }
+}
+
+async function fetchAllReviews(forceRefresh = false): Promise<Record<string, { count: number, totalRating: number }>> {
+  const now = Date.now();
+  if (!forceRefresh && reviewsCache && now - reviewsCacheTime < REVIEWS_CACHE_TTL) {
+    return reviewsCache;
+  }
+  try {
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("product_id, rating");
+
+    if (error) {
+      console.error("[Products] Error fetching reviews:", error);
+      return reviewsCache ?? {};
+    }
+
+    const counts: Record<string, { count: number, totalRating: number }> = {};
+    for (const row of data || []) {
+      if (row.product_id && typeof row.rating === "number") {
+        if (!counts[row.product_id]) counts[row.product_id] = { count: 0, totalRating: 0 };
+        counts[row.product_id].count += 1;
+        counts[row.product_id].totalRating += row.rating;
+      }
+    }
+    reviewsCache = counts;
+    reviewsCacheTime = now;
+    return counts;
+  } catch (err) {
+    console.error("[Products] Unexpected error fetching reviews:", err);
+    return reviewsCache ?? {};
   }
 }
 
@@ -134,18 +170,25 @@ export async function getAllProducts(): Promise<Product[]> {
       return [];
     }
 
-    // Enrich with seller names + wa_click counts
+    // Enrich with seller names + wa_click counts + reviews
     const products = data || [];
     const sellerIds = [...new Set(products.map((p: any) => p.seller_id).filter(Boolean))];
-    const [, waClicks] = await Promise.all([
+    const [, waClicks, reviews] = await Promise.all([
       Promise.all(sellerIds.map(fetchSellerInfo)),
       fetchWaClickCounts(),
+      fetchAllReviews(),
     ]);
 
     const result = products.map((raw: any) => {
       const info = sellerCache[raw.seller_id];
       const category = raw.product_categories?.[0]?.category_id || "general";
-      const normalized = normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[raw.id] ?? 0 });
+
+      let calculatedRating = raw.rating ?? 0;
+      if (reviews[raw.id]) {
+        calculatedRating = Number((reviews[raw.id].totalRating / reviews[raw.id].count).toFixed(1));
+      }
+
+      const normalized = normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[raw.id] ?? 0, rating: calculatedRating });
       if (normalized.slug) {
         productCache[normalized.slug] = normalized;
       }
@@ -173,13 +216,20 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     }
     if (!data) return null;
 
-    // Enrich with seller name + wa_click count
-    const [info, waClicks] = await Promise.all([
+    // Enrich with seller name + wa_click count + reviews
+    const [info, waClicks, reviews] = await Promise.all([
       fetchSellerInfo(data.seller_id),
       fetchWaClickCounts(),
+      fetchAllReviews(),
     ]);
     const category = data.product_categories?.[0]?.category_id || "general";
-    const normalized = normalize({ ...data, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[data.id] ?? 0 });
+
+    let calculatedRating = data.rating ?? 0;
+    if (reviews[data.id]) {
+      calculatedRating = Number((reviews[data.id].totalRating / reviews[data.id].count).toFixed(1));
+    }
+
+    const normalized = normalize({ ...data, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[data.id] ?? 0, rating: calculatedRating });
 
     if (normalized.slug) {
       productCache[normalized.slug] = normalized;
@@ -256,15 +306,22 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 
     const products = data || [];
     const sellerIds = [...new Set(products.map((p: any) => p.seller_id).filter(Boolean))];
-    const [, waClicks] = await Promise.all([
+    const [, waClicks, reviews] = await Promise.all([
       Promise.all(sellerIds.map(fetchSellerInfo)),
       fetchWaClickCounts(),
+      fetchAllReviews(),
     ]);
 
     return products.map((raw: any) => {
       const info = sellerCache[raw.seller_id];
       const category = raw.product_categories?.[0]?.category_id || "general";
-      return normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[raw.id] ?? 0 });
+
+      let calculatedRating = raw.rating ?? 0;
+      if (reviews[raw.id]) {
+        calculatedRating = Number((reviews[raw.id].totalRating / reviews[raw.id].count).toFixed(1));
+      }
+
+      return normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[raw.id] ?? 0, rating: calculatedRating });
     });
   } catch (err) {
     console.error("Unexpected error fetching featured products:", err);
@@ -319,6 +376,10 @@ export async function submitProductReview(review: ProductReview): Promise<boolea
       console.error("Error submitting review:", error);
       return false;
     }
+
+    // Invalidate reviews cache
+    reviewsCache = null;
+
     return true;
   } catch (err) {
     console.error("Unexpected error submitting review:", err);

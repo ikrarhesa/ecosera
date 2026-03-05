@@ -66,7 +66,12 @@ function BannerCarousel() {
           {banners.map((b) => (
             <div key={b.id} className="inline-block w-full h-full relative align-top">
               <img src={b.image_url} alt={b.title} className="w-full h-full object-cover" />
-              <div className={`absolute inset-0 ${b.text_color === 'navy' ? 'bg-white/10' : 'bg-black/15'}`} />
+              <div
+                className="absolute inset-x-0 bottom-0 h-[40%]"
+                style={{
+                  background: `linear-gradient(to top, ${b.overlay_color || (b.text_color === 'navy' ? '#ffffff' : '#000000')}${Math.round((b.overlay_opacity !== undefined ? b.overlay_opacity : 60) * 2.55).toString(16).padStart(2, '0')}, transparent)`
+                }}
+              />
               <div className={`absolute left-4 right-4 bottom-4 ${b.text_color === 'navy' ? 'text-[#041E42]' : 'text-white'}`}>
                 <h3 className="text-lg font-bold leading-tight">{b.title}</h3>
                 {b.link_url && (

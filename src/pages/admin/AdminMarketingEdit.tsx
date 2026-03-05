@@ -18,6 +18,8 @@ export default function AdminMarketingEdit() {
     const [linkUrl, setLinkUrl] = useState("");
     const [ctaText, setCtaText] = useState("");
     const [textColor, setTextColor] = useState<'white' | 'navy'>('white');
+    const [overlayColor, setOverlayColor] = useState("#000000");
+    const [overlayOpacity, setOverlayOpacity] = useState(60);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [isActive, setIsActive] = useState(true);
@@ -36,6 +38,8 @@ export default function AdminMarketingEdit() {
                 if (!banner) { show("Banner tidak ditemukan."); navigate("/admin/marketing"); return; }
                 setTitle(banner.title); setLinkUrl(banner.link_url || ""); setCtaText(banner.cta_text || "");
                 setTextColor(banner.text_color || "white");
+                setOverlayColor(banner.overlay_color || (banner.text_color === "navy" ? "#ffffff" : "#000000"));
+                setOverlayOpacity(banner.overlay_opacity !== undefined ? banner.overlay_opacity : 60);
                 setExistingImageUrl(banner.image_url); setPreviewUrl(banner.image_url); setIsActive(banner.is_active);
                 if (banner.start_date) { const sd = new Date(banner.start_date); setStartDate(new Date(sd.getTime() - sd.getTimezoneOffset() * 60000).toISOString().slice(0, 16)); }
                 if (banner.end_date) { const ed = new Date(banner.end_date); setEndDate(new Date(ed.getTime() - ed.getTimezoneOffset() * 60000).toISOString().slice(0, 16)); }
@@ -78,6 +82,8 @@ export default function AdminMarketingEdit() {
             await updateBanner(id, {
                 title: title.trim(), link_url: linkUrl.trim() || null, cta_text: ctaText.trim() || null,
                 text_color: textColor,
+                overlay_color: overlayColor,
+                overlay_opacity: overlayOpacity,
                 image_url: finalImageUrl, start_date: startDate ? new Date(startDate).toISOString() : null,
                 end_date: endDate ? new Date(endDate).toISOString() : null, is_active: isActive,
             } as Partial<Banner>);
@@ -167,11 +173,32 @@ export default function AdminMarketingEdit() {
 
                         <div>
                             <label className={labelCls}>Warna Teks Banner</label>
-                            <select value={textColor} onChange={(e) => setTextColor(e.target.value as 'white' | 'navy')} className={inputCls} disabled={saving}>
+                            <select value={textColor} onChange={(e) => {
+                                const newColor = e.target.value as 'white' | 'navy';
+                                setTextColor(newColor);
+                                if (newColor === 'white' && overlayColor === '#ffffff') setOverlayColor('#000000');
+                                if (newColor === 'navy' && overlayColor === '#000000') setOverlayColor('#ffffff');
+                            }} className={inputCls} disabled={saving}>
                                 <option value="white">Putih (Untuk Background Gelap)</option>
                                 <option value="navy">Navy (Untuk Background Terang)</option>
                             </select>
                             <p className="text-[11px] text-slate-500 mt-1.5">Pilih warna teks dan tombol agar kontras dengan gambar banner.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className={labelCls}>Warna Overlay</label>
+                                <div className="flex items-center gap-3">
+                                    <input type="color" value={overlayColor} onChange={(e) => setOverlayColor(e.target.value)} className="w-12 h-10 p-1 border border-slate-200 rounded cursor-pointer bg-white" disabled={saving} />
+                                    <input type="text" value={overlayColor} onChange={(e) => setOverlayColor(e.target.value)} className={`${inputCls} flex-1 uppercase`} disabled={saving} maxLength={7} />
+                                </div>
+                            </div>
+                            <div>
+                                <label className={labelCls}>Opasitas Overlay ({overlayOpacity}%)</label>
+                                <div className="flex items-center h-10">
+                                    <input type="range" min="0" max="100" value={overlayOpacity} onChange={(e) => setOverlayOpacity(parseInt(e.target.value))} className="w-full accent-blue-600 cursor-pointer" disabled={saving} />
+                                </div>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
