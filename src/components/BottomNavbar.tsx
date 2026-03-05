@@ -11,9 +11,9 @@ export default function BottomNavbar() {
   };
 
   return (
-    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-40 w-full max-w-md md:max-w-lg lg:max-w-xl">
-      <div className="px-4 pb-3">
-        <div className="relative bg-white/80 backdrop-blur-md border border-white/20 rounded-full shadow-[0_8px_32px_rgba(15,23,42,0.15)] px-6 py-3">
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-40 w-full max-w-md md:max-w-lg lg:max-w-xl pb-[env(safe-area-inset-bottom)]">
+      <div className="px-4 pb-3 pt-2">
+        <div className="relative bg-white/80 backdrop-blur-md border border-white/20 rounded-full shadow-[0_8px_32px_rgba(15,23,42,0.15)] px-6 py-1.5">
           <div className="flex items-center justify-around text-slate-700 text-xs">
             <Link
               to="/"

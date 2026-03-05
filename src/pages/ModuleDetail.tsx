@@ -160,7 +160,7 @@ export default function ModuleDetail() {
   const { moduleId } = useParams<{ moduleId: string }>();
   const [isPlaying, setIsPlaying] = useState(false);
   const [showTranscription, setShowTranscription] = useState(false);
-  
+
   const module = moduleId ? MODULE_CONTENT[moduleId as keyof typeof MODULE_CONTENT] : null;
 
   if (!module) {
@@ -180,12 +180,12 @@ export default function ModuleDetail() {
   return (
     <div className="min-h-screen bg-[#F6F8FC] pb-28">
       <Navbar />
-      
+
       <div className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <Link 
-            to="/e-learning" 
+        <div className="flex items-center gap-3 pb-6 pt-[calc(16px+env(safe-area-inset-top))]">
+          <Link
+            to="/e-learning"
             className="p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50"
           >
             <ArrowLeft className="h-5 w-5 text-slate-600" />
@@ -217,7 +217,7 @@ export default function ModuleDetail() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 text-sm text-slate-600">
               <div className="flex items-center gap-1">
@@ -229,7 +229,7 @@ export default function ModuleDetail() {
                 <span>{module.lessons.length} pelajaran</span>
               </div>
             </div>
-            
+
             <button
               onClick={() => setShowTranscription(!showTranscription)}
               className="text-blue-600 text-sm font-medium hover:underline"
@@ -252,7 +252,7 @@ export default function ModuleDetail() {
         {/* Lessons List */}
         <div className="bg-white rounded-xl border border-slate-100 p-4">
           <h3 className="font-semibold text-slate-900 mb-4">Daftar Pelajaran</h3>
-          
+
           <div className="space-y-3">
             {module.lessons.map((lesson, index) => (
               <div
@@ -268,12 +268,12 @@ export default function ModuleDetail() {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-slate-900 line-clamp-1">{lesson.title}</h4>
                   <p className="text-sm text-slate-600">{lesson.duration}</p>
                 </div>
-                
+
                 <ChevronRight className="h-4 w-4 text-slate-400" />
               </div>
             ))}
