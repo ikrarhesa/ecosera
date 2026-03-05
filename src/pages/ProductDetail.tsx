@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useParams, useNavigate, Link, useNavigationType } from "react-router-dom";
 import {
-  ArrowLeft, Heart, Share2, Star, MapPin, ChevronLeft, ChevronRight, ChevronDown,
-  MessageCircle, ShoppingCart, ShieldCheck, Truck, PackageOpen, Check
+  ArrowLeft, Heart, Star, MapPin, ChevronLeft, ChevronRight, ChevronDown,
+  MessageCircle, ShieldCheck, Truck, PackageOpen, Check, Plus, Search, ShoppingCart
 } from "lucide-react";
 import type { Product, ProductVariant } from "../types/product";
 import { getProductBySlug, getCachedProductBySlug, getRelatedProducts, allImagesOf, getProductReviews, submitProductReview, type ProductReview } from "../services/products";
@@ -359,25 +359,21 @@ export default function ProductDetail() {
         onAnimationEnd={handleAnimationEnd}
       >
         {/* Header */}
-        <div className="sticky top-0 z-20 flex items-center justify-between bg-white/90 backdrop-blur px-3 py-3 border-b">
-          <button onClick={goBack} className="p-2 rounded-full" aria-label="Back" style={{ color: ACCENT }}>
-            <ArrowLeft />
+        <div className="sticky top-0 z-20 flex items-center justify-between bg-white/90 backdrop-blur px-3 py-[14px] border-b">
+          <button onClick={goBack} className="p-1.5 rounded-full" aria-label="Back" style={{ color: ACCENT }}>
+            <ArrowLeft size={22} strokeWidth={1.5} />
           </button>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                if (product) {
-                  toggleWishlist(product);
-                  show(liked ? "Dihapus dari wishlist" : "Disimpan ke wishlist 💖");
-                }
-              }}
-              className={`p-2 rounded-full border ${liked ? "bg-red-50 border-red-200" : "bg-white"}`}
-              aria-label="Like"
-            >
-              <Heart className={liked ? "fill-red-500 stroke-red-500" : ""} />
+          <div className="flex items-center gap-1.5">
+            <button onClick={() => navigate('/search')} className="p-1.5 rounded-full border bg-white" aria-label="Search">
+              <Search size={20} strokeWidth={1.5} className="text-slate-700" />
             </button>
-            <button onClick={onShare} className="p-2 rounded-full border bg-white" aria-label="Share">
-              <Share2 />
+            <button onClick={onShare} className="p-1.5 rounded-full border bg-white" aria-label="Share">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-700">
+                <path d="M12 2v6c-6.5 0-10 4.5-10 12 2.5-4 6-6 10-6v6l10-9-10-9z" />
+              </svg>
+            </button>
+            <button onClick={() => navigate('/cart')} className="p-1.5 rounded-full border bg-white" aria-label="Cart">
+              <ShoppingCart size={20} strokeWidth={1.5} className="text-slate-700" />
             </button>
           </div>
         </div>
@@ -464,28 +460,49 @@ export default function ProductDetail() {
         <div className="px-4 pb-32">
           <h1 className="mt-4 text-lg font-semibold">{product.name}</h1>
 
-          <div className="mt-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold" style={{ color: ACCENT }}>{fmtIDR(currentPrice)}</span>
-              <span className="text-sm text-gray-500">/ {product.unit}</span>
-            </div>
-          </div>
+          <div className="flex items-end justify-between">
+            <div>
+              <div className="mt-2 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold" style={{ color: ACCENT }}>{fmtIDR(currentPrice)}</span>
+                  <span className="text-sm text-gray-500">/ {product.unit}</span>
+                </div>
+              </div>
 
-          <div className="mt-1 flex items-center gap-1 text-sm text-gray-700">
-            {displayRating ? (
-              <>
-                <Star className="fill-amber-400 stroke-amber-400" size={16} />
-                <span>{displayRating}</span>
-                <span className="text-gray-400">•</span>
-                <span>{reviews.length > 0 ? `${reviews.length} ulasan` : ((selectedVariant?.stock ?? product.stock) == null ? "Stok tersedia" : `Stok ${selectedVariant?.stock ?? product.stock}`)}</span>
-              </>
-            ) : (
-              <>
-                <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white bg-blue-600 rounded-full">Produk Baru</span>
-                <span className="text-gray-400">•</span>
-                <span>{(selectedVariant?.stock ?? product.stock) == null ? "Stok tersedia" : `Stok ${selectedVariant?.stock ?? product.stock}`}</span>
-              </>
-            )}
+              <div className="mt-1 flex items-center gap-1 text-sm text-gray-700">
+                {displayRating ? (
+                  <>
+                    <Star className="fill-amber-400 stroke-amber-400" size={16} />
+                    <span>{displayRating}</span>
+                    <span className="text-gray-400">•</span>
+                    <span>{reviews.length > 0 ? `${reviews.length} ulasan` : ((selectedVariant?.stock ?? product.stock) == null ? "Stok tersedia" : `Stok ${selectedVariant?.stock ?? product.stock}`)}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white bg-blue-600 rounded-full">Produk Baru</span>
+                    <span className="text-gray-400">•</span>
+                    <span>{(selectedVariant?.stock ?? product.stock) == null ? "Stok tersedia" : `Stok ${selectedVariant?.stock ?? product.stock}`}</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                if (product) {
+                  toggleWishlist(product);
+                  show(liked ? "Dihapus dari wishlist" : "Disimpan ke wishlist 💖");
+                }
+              }}
+              className="p-2 mb-1"
+              aria-label="Like"
+            >
+              <Heart
+                size={20}
+                strokeWidth={1.5}
+                className={liked ? "fill-red-500 stroke-red-500" : "text-slate-400 hover:text-red-500 hover:scale-110 active:scale-95 transition-all"}
+              />
+            </button>
           </div>
 
           {/* Seller / Lokasi */}
@@ -669,7 +686,7 @@ export default function ProductDetail() {
               <button onClick={onAddToCart} disabled={outOfStock}
                 className={`flex-1 h-11 rounded-xl border border-slate-300 inline-flex items-center justify-center gap-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors ${outOfStock ? "opacity-50" : ""}`}
                 aria-label="Tambahkan ke Keranjang">
-                <ShoppingCart size={18} /> Keranjang
+                <Plus size={18} /> Keranjang
               </button>
               <button onClick={onChatWA}
                 className="flex-[2] h-11 rounded-xl inline-flex items-center justify-center gap-2 text-sm font-semibold text-white transition-colors"
