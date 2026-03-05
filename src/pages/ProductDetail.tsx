@@ -359,21 +359,26 @@ export default function ProductDetail() {
         onAnimationEnd={handleAnimationEnd}
       >
         {/* Header */}
-        <div className="sticky top-0 z-20 flex items-center justify-between bg-white/90 backdrop-blur px-3 pb-[14px] pt-[calc(14px+env(safe-area-inset-top))] border-b">
-          <button onClick={goBack} className="p-1.5 rounded-full" aria-label="Back" style={{ color: ACCENT }}>
-            <ArrowLeft size={22} strokeWidth={1.5} />
+        <div
+          className="sticky top-0 z-20 flex items-center justify-between px-3 pb-[14px] pt-[calc(14px+env(safe-area-inset-top))] border-b border-white/10"
+          style={{
+            background: 'linear-gradient(129deg, rgba(34, 84, 197, 1) 28%, rgba(69, 193, 255, 1) 100%)'
+          }}
+        >
+          <button onClick={goBack} className="p-1.5 rounded-full text-white" aria-label="Back">
+            <ArrowLeft size={22} strokeWidth={2} />
           </button>
-          <div className="flex items-center gap-1.5">
-            <button onClick={() => navigate('/search')} className="p-1.5 rounded-full border bg-white" aria-label="Search">
-              <Search size={20} strokeWidth={1.5} className="text-slate-700" />
+          <div className="flex items-center gap-2">
+            <button onClick={() => navigate('/search')} className="p-1.5 rounded-full bg-white/20 text-white" aria-label="Search">
+              <Search size={20} strokeWidth={2} />
             </button>
-            <button onClick={onShare} className="p-1.5 rounded-full border bg-white" aria-label="Share">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-700">
+            <button onClick={onShare} className="p-1.5 rounded-full bg-white/20 text-white" aria-label="Share">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 2v6c-6.5 0-10 4.5-10 12 2.5-4 6-6 10-6v6l10-9-10-9z" />
               </svg>
             </button>
-            <button onClick={() => navigate('/cart')} className="p-1.5 rounded-full border bg-white" aria-label="Cart">
-              <ShoppingCart size={20} strokeWidth={1.5} className="text-slate-700" />
+            <button onClick={() => navigate('/cart')} className="p-1.5 rounded-full bg-white/20 text-white" aria-label="Cart">
+              <ShoppingCart size={20} strokeWidth={2} />
             </button>
           </div>
         </div>

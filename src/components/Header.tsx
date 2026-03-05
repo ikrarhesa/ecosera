@@ -7,23 +7,23 @@ export default function Header() {
   const initialQuery = searchParams.get("q") || "";
 
   return (
-    <div className="sticky top-0 z-20">
-      <header
-        className="w-full relative overflow-hidden"
+    <div
+      className="sticky top-0 z-20 w-full relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(129deg, rgba(34, 84, 197, 1) 28%, rgba(69, 193, 255, 1) 100%)'
+      }}
+    >
+      {/* Pattern Background */}
+      <div
+        className="absolute inset-0 opacity-20 bg-cover bg-center bg-no-repeat pointer-events-none"
         style={{
-          background: 'linear-gradient(129deg, rgba(34, 84, 197, 1) 28%, rgba(69, 193, 255, 1) 100%)'
+          backgroundImage: 'url("/images/header-pattern.svg")',
+          backgroundSize: '50%'
         }}
-      >
-        {/* Pattern Background */}
-        <div
-          className="absolute inset-0 opacity-20 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: 'url("/images/header-pattern.svg")',
-            backgroundSize: '50%'
-          }}
-        />
+      />
+      <header className="w-full relative z-10">
         {/* Content Layer */}
-        <div className="relative z-10 px-[20px] pb-[21px] flex items-center gap-[40px] pt-[calc(17px+env(safe-area-inset-top))]">
+        <div className="relative px-[20px] pb-[21px] flex items-center gap-[40px] pt-[calc(17px+env(safe-area-inset-top))]">
           {/* Logo */}
           <img
             src="/images/favicon.svg"
