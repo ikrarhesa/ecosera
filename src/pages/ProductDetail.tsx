@@ -271,7 +271,7 @@ export default function ProductDetail() {
           onAnimationEnd={handleAnimationEnd}
         >
           {/* Header Skeleton */}
-          <div className="sticky top-0 z-20 flex items-center justify-between bg-white px-3 py-3 border-b">
+          <div className="sticky top-0 z-20 flex items-center justify-between bg-white px-3 pb-3 pt-[calc(12px+env(safe-area-inset-top))] border-b">
             <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse" />
             <div className="flex gap-2">
               <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse" />
@@ -359,7 +359,7 @@ export default function ProductDetail() {
         onAnimationEnd={handleAnimationEnd}
       >
         {/* Header */}
-        <div className="sticky top-0 z-20 flex items-center justify-between bg-white/90 backdrop-blur px-3 py-[14px] border-b">
+        <div className="sticky top-0 z-20 flex items-center justify-between bg-white/90 backdrop-blur px-3 pb-[14px] pt-[calc(14px+env(safe-area-inset-top))] border-b">
           <button onClick={goBack} className="p-1.5 rounded-full" aria-label="Back" style={{ color: ACCENT }}>
             <ArrowLeft size={22} strokeWidth={1.5} />
           </button>

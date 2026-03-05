@@ -132,7 +132,7 @@ export default function AdminLayout() {
             {/* ── Main content ────────────────────────────────────────  */}
             <div className="flex-1 lg:pl-[260px] min-h-screen">
                 {/* Mobile topbar */}
-                <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200/80 px-4 py-3 flex items-center gap-3">
+                <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200/80 px-4 pb-3 flex items-center gap-3 pt-[calc(12px+env(safe-area-inset-top))]">
                     <button
                         onClick={() => setSidebarOpen(true)}
                         className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600"

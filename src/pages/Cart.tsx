@@ -312,7 +312,7 @@ export default function Cart() {
         }}>
         {/* Header */}
         <div className="sticky top-0 z-20 bg-white border-b border-slate-200">
-          <div className="px-4 py-3 flex items-center justify-between">
+          <div className="px-4 pb-3 flex items-center justify-between pt-[calc(12px+env(safe-area-inset-top))]">
             <div className="flex items-center gap-3">
               <button
                 onClick={goBack}

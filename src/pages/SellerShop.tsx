@@ -171,7 +171,7 @@ export default function SellerShop() {
         <div className="min-h-screen pb-24" style={{ background: C.bg }}>
             {/* ── Header / Search ── */}
             <div className="sticky top-0 z-40 bg-white shadow-sm border-b border-slate-200 w-full">
-                <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
+                <div className="max-w-3xl mx-auto px-4 pb-3 flex items-center gap-3 pt-[calc(12px+env(safe-area-inset-top))]">
                     <button
                         onClick={() => navigate(-1)}
                         className="p-2 sm:p-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all active:scale-95 shrink-0"

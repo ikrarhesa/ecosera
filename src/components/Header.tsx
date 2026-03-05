@@ -23,7 +23,7 @@ export default function Header() {
           }}
         />
         {/* Content Layer */}
-        <div className="relative z-10 px-[20px] pt-[17px] pb-[21px] flex items-center gap-[40px]">
+        <div className="relative z-10 px-[20px] pb-[21px] flex items-center gap-[40px] pt-[calc(17px+env(safe-area-inset-top))]">
           {/* Logo */}
           <img
             src="/images/favicon.svg"

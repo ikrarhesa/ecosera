@@ -154,7 +154,7 @@ export default function Search() {
         <div className="min-h-screen bg-[#F6F8FC] pb-28">
             {/* Search Header */}
             <div className="sticky top-0 z-20 bg-white border-b border-slate-200 shadow-sm">
-                <div className="px-4 py-3 pb-2 flex items-center gap-3">
+                <div className="px-4 pb-2 flex items-center gap-3 pt-[calc(12px+env(safe-area-inset-top))]">
                     <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-xl text-slate-700 hover:bg-slate-100">
                         <ArrowLeft className="h-5 w-5" />
                     </button>
