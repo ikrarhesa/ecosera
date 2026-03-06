@@ -20,7 +20,7 @@ export default function Header() {
       />
       <header className="w-full relative z-10">
         {/* Content Layer */}
-        <div className="relative px-[20px] pb-[21px] flex items-center gap-[40px] pt-[17px]">
+        <div className="relative px-4 pb-[21px] flex items-center gap-3 pt-[17px]">
           {/* Logo */}
           <img
             src="/images/favicon.svg"
@@ -47,10 +47,11 @@ export default function Header() {
 
           {/* Cart Icon */}
           <button
-            className="flex-shrink-0 relative"
+            className="p-1.5 rounded-full bg-white/20 text-white flex-shrink-0 relative transition-colors hover:bg-white/30"
             onClick={() => navigate('/cart')}
+            aria-label="Cart"
           >
-            <ShoppingCart className="h-6 w-6 text-white" />
+            <ShoppingCart size={20} strokeWidth={2} />
           </button>
         </div>
       </header>
