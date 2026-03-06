@@ -21,7 +21,9 @@ export default function Header() {
           <img
             src="/images/favicon.svg"
             alt="Ecosera Logo"
-            className="h-8 w-auto flex-shrink-0"
+            width={32}
+            height={32}
+            className="h-8 w-8 flex-shrink-0 object-contain"
           />
 
           {/* Search Bar - Walmart Style */}
