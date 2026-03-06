@@ -10,7 +10,8 @@ export default function Header() {
     <div
       className="sticky top-0 z-20 w-full relative overflow-hidden"
       style={{
-        background: 'linear-gradient(129deg, rgba(34, 84, 197, 1) 28%, rgba(69, 193, 255, 1) 100%)'
+        backgroundColor: 'rgba(34, 84, 197, 1)',
+        paddingTop: 'env(safe-area-inset-top)'
       }}
     >
       {/* Pattern Background */}
@@ -23,7 +24,7 @@ export default function Header() {
       />
       <header className="w-full relative z-10">
         {/* Content Layer */}
-        <div className="relative px-[20px] pb-[21px] flex items-center gap-[40px] pt-[calc(17px+env(safe-area-inset-top))]">
+        <div className="relative px-[20px] pb-[21px] flex items-center gap-[40px] pt-[17px]">
           {/* Logo */}
           <img
             src="/images/favicon.svg"

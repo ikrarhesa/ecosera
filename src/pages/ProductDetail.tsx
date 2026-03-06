@@ -362,7 +362,7 @@ export default function ProductDetail() {
         <div
           className="sticky top-0 z-20 flex items-center justify-between px-3 pb-[14px] pt-[calc(14px+env(safe-area-inset-top))] border-b border-white/10"
           style={{
-            background: 'linear-gradient(129deg, rgba(34, 84, 197, 1) 28%, rgba(69, 193, 255, 1) 100%)'
+            backgroundColor: 'rgba(34, 84, 197, 1)'
           }}
         >
           <button onClick={goBack} className="p-1.5 rounded-full text-white" aria-label="Back">
