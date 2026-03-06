@@ -54,7 +54,6 @@ export default function Etalase() {
   }, [all, selectedCategory]);
 
   return (
-  return (
     <>
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
 
