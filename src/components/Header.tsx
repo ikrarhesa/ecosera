@@ -8,10 +8,7 @@ export default function Header() {
 
   return (
     <div
-      className="sticky top-0 z-20 w-full relative overflow-hidden pt-[env(safe-area-inset-top)]"
-      style={{
-        backgroundColor: 'rgba(34, 84, 197, 1)'
-      }}
+      className="sticky top-0 z-20 w-full relative overflow-hidden pt-[env(safe-area-inset-top)] bg-[rgba(34,84,197,1)]"
     >
       {/* Pattern Background */}
       <div
