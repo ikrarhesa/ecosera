@@ -206,8 +206,6 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />
-
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
         <main className="px-4 pt-1">
           {/* Banner carousel */}

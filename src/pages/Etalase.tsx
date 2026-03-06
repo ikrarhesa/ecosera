@@ -54,9 +54,8 @@ export default function Etalase() {
   }, [all, selectedCategory]);
 
   return (
+  return (
     <>
-      <Navbar />
-
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
 
         {/* Top Category Strip - Always visible */}

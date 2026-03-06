@@ -52,7 +52,6 @@ export default function Wishlist() {
 
     return (
         <>
-            <Navbar />
             <div className="px-4 pb-2 flex items-center justify-between sticky top-0 bg-white z-10 border-b border-white pt-[calc(24px+env(safe-area-inset-top))]">
                 <div>
                     <h1 className="font-bold text-slate-900 text-2xl">Tersimpan</h1>

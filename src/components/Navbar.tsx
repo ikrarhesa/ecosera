@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import Header from "./Header";
 import BottomNavbar from "./BottomNavbar";
 
@@ -11,9 +12,26 @@ export default function Navbar({
   showSearchBar = false,
   children,
 }: NavbarProps) {
+  const location = useLocation();
+  const path = location.pathname;
+
+  // Pages that SHOULD HAVE the main Ecosera Header
+  const showHeader =
+    path === "/" ||
+    path === "/etalase" ||
+    path === "/wishlist" ||
+    path === "/e-learning" ||
+    path.startsWith("/e-learning/");
+
+  // Pages that SHOULD HAVE the Bottom Navigation Bar
+  const showBottomNav =
+    path === "/" ||
+    path === "/etalase" ||
+    path === "/wishlist";
+
   return (
     <>
-      <Header />
+      {showHeader && <Header />}
 
       {/* Optional Additional Content */}
       {showSearchBar && children && (
@@ -22,7 +40,7 @@ export default function Navbar({
         </div>
       )}
 
-      <BottomNavbar />
+      {showBottomNav && <BottomNavbar />}
     </>
   );
 }
