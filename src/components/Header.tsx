@@ -16,7 +16,7 @@ export default function Header() {
     >
       <header className="w-full relative z-10">
         {/* Content Layer */}
-        <div className="relative px-4 pb-[16px] flex items-center justify-between gap-4 pt-[14px]">
+        <div className="relative px-5 pb-5 flex items-center justify-between gap-5 pt-[18px]">
           {/* Logo */}
           <img
             src="/images/favicon.svg"
