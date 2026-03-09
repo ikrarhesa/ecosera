@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { useLocation } from "react-router-dom";
-import Navbar from "./Navbar";
 
 /**
  * AppShell wraps the entire app content in a centered mobile-width container.
@@ -17,9 +16,12 @@ export default function AppShell({ children }: { children: ReactNode }) {
     }
 
     return (
-        <div className="min-h-screen bg-slate-100">
-            <div className="mx-auto max-w-md md:max-w-lg lg:max-w-xl min-h-screen bg-white shadow-xl relative">
-                <Navbar />
+        <div className="fixed inset-0 bg-slate-100 flex justify-center z-0" style={{ zIndex: 0 }}>
+            {/* The main phone layout wrapper - strict overflow hidden so sliders are perfectly clipped */}
+            <div 
+                id="main-scroll-container"
+                className="w-full max-w-md md:max-w-lg lg:max-w-xl h-full bg-white shadow-xl relative overflow-hidden"
+            >
                 {children}
             </div>
         </div>

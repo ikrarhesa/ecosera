@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { useParams, useNavigate, Link, useNavigationType } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft, Heart, Star, MapPin, ChevronLeft, ChevronRight, ChevronDown,
   MessageCircle, ShieldCheck, Truck, PackageOpen, Check, Plus, Search, ShoppingCart
@@ -20,7 +20,6 @@ const fmtIDR = (n: number) =>
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const navType = useNavigationType();
   const { show } = useToast();
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -45,39 +44,9 @@ export default function ProductDetail() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
 
-  const [closing, setClosing] = useState(false);
-  const goBack = useCallback(() => setClosing(true), []);
-
-  const animationStyle = {
-    animation: closing
-      ? "slideOutRight 0.25s cubic-bezier(0.4, 0, 1, 1) forwards"
-      : navType === "POP"
-        ? "none"
-        : "slideInRight 0.25s cubic-bezier(0, 0, 0.2, 1) forwards",
-    willChange: "transform",
-    backfaceVisibility: "hidden" as const,
-    overflow: closing ? "hidden" : undefined,
-  };
-
-  const handleAnimationEnd = () => {
-    if (closing) navigate(-1);
-  };
-
-  const styleTag = (
-    <style>{`
-      @keyframes slideInRight {
-        from { transform: translate3d(100%, 0, 0); }
-        to   { transform: translate3d(0, 0, 0); }
-      }
-      @keyframes slideOutRight {
-        from { transform: translate3d(0, 0, 0); }
-        to   { transform: translate3d(100%, 0, 0); }
-      }
-    `}</style>
-  );
+  const goBack = useCallback(() => navigate(-1), [navigate]);
 
   useEffect(() => {
-    setClosing(false);
     setProduct(cachedProduct);
     setLoading(!cachedProduct);
     setQty(1);
@@ -267,12 +236,7 @@ export default function ProductDetail() {
   if (loading) {
     return (
       <>
-        {styleTag}
-        <div
-          className="w-full min-h-screen bg-white"
-          style={animationStyle}
-          onAnimationEnd={handleAnimationEnd}
-        >
+        <div className="w-full min-h-screen bg-white">
           {/* Header Skeleton */}
           <div className="sticky top-0 z-20 flex items-center justify-between bg-white px-3 pb-3 pt-[calc(12px+env(safe-area-inset-top))] border-b">
             <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse" />
@@ -334,12 +298,7 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <>
-        {styleTag}
-        <div
-          className="mx-auto w-full max-w-md min-h-screen bg-white"
-          style={animationStyle}
-          onAnimationEnd={handleAnimationEnd}
-        >
+        <div className="mx-auto w-full max-w-md min-h-screen bg-white">
           <div className="p-4">
             <button onClick={goBack} className="inline-flex items-center gap-2 text-sm" style={{ color: ACCENT }}>
               <ArrowLeft size={18} /> Kembali
@@ -355,12 +314,7 @@ export default function ProductDetail() {
 
   return (
     <>
-      {styleTag}
-      <div
-        className="w-full min-h-screen bg-white text-gray-900"
-        style={animationStyle}
-        onAnimationEnd={handleAnimationEnd}
-      >
+      <div className="w-full min-h-screen bg-white text-gray-900">
         {/* Header */}
         <div
           className="sticky top-0 z-20 flex items-center justify-between px-3 pb-[14px] pt-[calc(14px+env(safe-area-inset-top))] border-b border-white/10"

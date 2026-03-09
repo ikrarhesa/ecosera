@@ -263,11 +263,9 @@ export default function Cart() {
   const { items, removeFromCart, clearCart, updateQty } = useCart();
   const { show } = useToast();
   const navigate = useNavigate();
-  const [closing, setClosing] = useState(false);
-
   const goBack = useCallback(() => {
-    setClosing(true);
-  }, []);
+    navigate(-1);
+  }, [navigate]);
 
   // Group items by seller
   const groupedBySeller = useMemo(() => {
@@ -286,30 +284,7 @@ export default function Cart() {
 
   return (
     <>
-      <style>{`
-        @keyframes slideInRight {
-          from { transform: translate3d(100%, 0, 0); }
-          to   { transform: translate3d(0, 0, 0); }
-        }
-        @keyframes slideOutRight {
-          from { transform: translate3d(0, 0, 0); }
-          to   { transform: translate3d(100%, 0, 0); }
-        }
-      `}</style>
-
-      <div
-        className="min-h-screen bg-[#F6F8FC]"
-        style={{
-          animation: closing
-            ? "slideOutRight 0.25s cubic-bezier(0.4, 0, 1, 1) forwards"
-            : "slideInRight 0.25s cubic-bezier(0, 0, 0.2, 1) forwards",
-          willChange: "transform",
-          backfaceVisibility: "hidden",
-          overflow: closing ? "hidden" : undefined,
-        }}
-        onAnimationEnd={() => {
-          if (closing) navigate(-1);
-        }}>
+      <div className="min-h-screen bg-[#F6F8FC]">
         {/* Header */}
         <div className="sticky top-0 z-20 bg-white border-b border-slate-200">
           <div className="px-4 pb-3 flex items-center justify-between pt-[calc(12px+env(safe-area-inset-top))]">
@@ -374,7 +349,7 @@ export default function Cart() {
             </div>
           )}
         </main>
-      </div >
+      </div>
     </>
   );
 }
