@@ -28,7 +28,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(cachedProduct);
   const [loading, setLoading] = useState(!cachedProduct);
   const liked = product ? isInWishlist(product.id) : false;
-  const [qty, setQty] = useState(1);
+  const [qty, setQty] = useState(0);
   const [related, setRelated] = useState<Product[]>([]);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
 
@@ -49,7 +49,7 @@ export default function ProductDetail() {
   useEffect(() => {
     setProduct(cachedProduct);
     setLoading(!cachedProduct);
-    setQty(1);
+    setQty(0);
     setIdx(0);
 
     let mounted = true;
@@ -83,7 +83,7 @@ export default function ProductDetail() {
       if (!mounted) return;
       setReviews(revs);
 
-      setQty(1);
+      setQty(0);
       setIdx(0);
       if (p) setRelated(await getRelatedProducts(p.category || "default", p.id, 10));
       else setRelated([]);
@@ -103,7 +103,7 @@ export default function ProductDetail() {
   const clampQty = (n: number) => {
     const maxStock = selectedVariant?.stock ?? product?.stock;
     const max = maxStock == null ? 999 : Number(maxStock);
-    if (n < 1) return 1;
+    if (n < 0) return 0;
     if (n > max) return max;
     return n;
   };
@@ -468,19 +468,19 @@ export default function ProductDetail() {
           </div>
 
           {/* Seller / Lokasi */}
-          <div className="mt-3 flex items-center justify-between rounded-2xl border p-3">
-            <Link to={product.seller_id ? `/shop/${product.seller_id}` : "#"} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <div className="h-9 w-9 rounded-full bg-gray-100 grid place-items-center font-medium">
+          <div className="mt-3 flex items-center justify-between rounded-2xl border p-3 gap-2">
+            <Link to={product.seller_id ? `/shop/${product.seller_id}` : "#"} className="flex items-center gap-2 hover:opacity-80 transition-opacity min-w-0">
+              <div className="h-9 w-9 rounded-full bg-gray-100 grid place-items-center font-medium shrink-0">
                 {(product.sellerName ?? "UMKM")[0]}
               </div>
-              <div>
-                <p className="text-sm font-semibold">{product.sellerName ?? "UMKM Lokal"}</p>
-                <p className="text-xs text-gray-500 flex items-center gap-1">
-                  <MapPin size={14} /> {product.location || "Lokasi belum diatur"}
+              <div className="min-w-0">
+                <p className="text-sm font-semibold truncate">{product.sellerName ?? "UMKM Lokal"}</p>
+                <p className="text-xs text-gray-500 flex items-center gap-1 truncate">
+                  <MapPin size={14} className="shrink-0" /> <span className="truncate">{product.location || "Lokasi belum diatur"}</span>
                 </p>
               </div>
             </Link>
-            <div className="flex items-center gap-2 text-[11px] text-gray-600">
+            <div className="flex flex-col items-end gap-1 text-[11px] text-gray-600 shrink-0">
               <span className="inline-flex items-center gap-1"><ShieldCheck size={14} /> Terverifikasi</span>
               <span className="inline-flex items-center gap-1"><Truck size={14} /> COD/Antar</span>
             </div>
@@ -519,10 +519,10 @@ export default function ProductDetail() {
               <div className="flex items-center gap-2">
                 <button onClick={() => setQty(q => clampQty(q - 1))} className="h-9 w-9 rounded-full border grid place-items-center text-lg" aria-label="Kurangi">-</button>
                 <input
-                  type="number" inputMode="numeric" value={qty}
-                  onChange={(e) => setQty(clampQty(parseInt(e.target.value || "1", 10)))}
+                  type="number" inputMode="numeric" value={qty === 0 ? "" : qty}
+                  onChange={(e) => setQty(clampQty(parseInt(e.target.value || "0", 10)))}
                   className="w-14 text-center border rounded-lg py-1"
-                  min={1} max={(selectedVariant?.stock ?? product.stock) == null ? undefined : Number(selectedVariant?.stock ?? product.stock)}
+                  min={0} max={(selectedVariant?.stock ?? product.stock) == null ? undefined : Number(selectedVariant?.stock ?? product.stock)}
                 />
                 <button onClick={() => setQty(q => clampQty(q + 1))} className="h-9 w-9 rounded-full border grid place-items-center text-lg" aria-label="Tambah">+</button>
               </div>
@@ -645,14 +645,14 @@ export default function ProductDetail() {
         <div className="sticky bottom-0 z-30 w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto">
           <div className="w-full border-t bg-white px-3 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3">
             <div className="flex items-center gap-2">
-              <button onClick={onAddToCart} disabled={outOfStock}
-                className={`flex-1 h-11 rounded-xl border border-slate-300 inline-flex items-center justify-center gap-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors ${outOfStock ? "opacity-50" : ""}`}
+              <button onClick={onAddToCart} disabled={outOfStock || qty === 0}
+                className={`flex-1 h-11 rounded-xl border border-slate-300 inline-flex items-center justify-center gap-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors ${(outOfStock || qty === 0) ? "opacity-50 cursor-not-allowed" : ""}`}
                 aria-label="Tambahkan ke Keranjang">
                 <Plus size={18} /> Keranjang
               </button>
-              <button onClick={onChatWA}
-                className="flex-[2] h-11 rounded-xl inline-flex items-center justify-center gap-2 text-sm font-semibold text-white transition-colors"
-                style={{ backgroundColor: ACCENT }}
+              <button onClick={onChatWA} disabled={outOfStock || qty === 0}
+                className={`flex-[2] h-11 rounded-xl inline-flex items-center justify-center gap-2 text-sm font-semibold text-white transition-colors ${(outOfStock || qty === 0) ? "opacity-50 cursor-not-allowed" : ""}`}
+                style={{ backgroundColor: (outOfStock || qty === 0) ? "#9ca3af" : ACCENT }}
                 aria-label="Pesan lewat WhatsApp">
                 <MessageCircle size={18} /> Pesan lewat WA
               </button>
