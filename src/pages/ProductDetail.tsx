@@ -153,7 +153,7 @@ export default function ProductDetail() {
     }
   };
 
-  const onChatWA = async () => {
+  const onChatWA = () => {
     if (!product) return;
 
     const phone = (product.sellerPhone || "").replace(/\D/g, "");
@@ -166,29 +166,32 @@ export default function ProductDetail() {
       `Link produk: ${window.location.href}`
     );
 
-    // 🔹 Log event BEFORE redirect
+    // 🔹 Redirect immediately to prevent popup blockers
+    const waUrl = `https://wa.me/${phone}?text=${text}`;
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+
+    // 🔹 Log event (fire and forget)
     console.log("[EventLog] Attempting insert for product:", product.id);
-    try {
-      const { data, error } = await supabase
-        .from("event_logs")
-        .insert({
-          event_type: "wa_click",
-          product_id: product.id,
-          seller_id: product.seller_id,
-        })
-        .select();
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("event_logs")
+          .insert({
+            event_type: "wa_click",
+            product_id: product.id,
+            seller_id: product.seller_id,
+          })
+          .select();
 
-      if (error) {
-        console.error("[EventLog] Insert error:", error.message, error.details, error.code);
-      } else {
-        console.log("[EventLog] Insert success:", data);
+        if (error) {
+          console.error("[EventLog] Insert error:", error.message, error.details, error.code);
+        } else {
+          console.log("[EventLog] Insert success:", data);
+        }
+      } catch (err) {
+        console.error("[EventLog] Unexpected error:", err);
       }
-    } catch (err) {
-      console.error("[EventLog] Unexpected error:", err);
-    }
-
-    // 🔹 Then redirect
-    window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
+    })();
   };
 
   const onAddToCart = () => {
