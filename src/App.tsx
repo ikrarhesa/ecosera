@@ -51,7 +51,7 @@ export default function App() {
           <Route path="/product/:slug" element={<PublicRoute level={1}><ProductDetail /></PublicRoute>} />
           <Route path="/cart" element={<PublicRoute level={1}><Cart /></PublicRoute>} />
           <Route path="/wishlist" element={<PublicRoute level={0}><Wishlist /></PublicRoute>} />
-          <Route path="/search" element={<PublicRoute level={1}><Search /></PublicRoute>} />
+          <Route path="/search" element={<PublicRoute level={0}><Search /></PublicRoute>} />
           <Route path="/shop/:seller_id" element={<PublicRoute level={1}><SellerShop /></PublicRoute>} />
           <Route path="/e-learning" element={<PublicRoute level={0}><ELearning /></PublicRoute>} />
           <Route path="/e-learning/:moduleId" element={<PublicRoute level={1}><ModuleDetail /></PublicRoute>} />

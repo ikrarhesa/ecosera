@@ -284,7 +284,7 @@ export default function ProductDetail() {
           </div>
 
           {/* Bottom Bar Skeleton */}
-          <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-30 w-full max-w-md md:max-w-lg lg:max-w-xl bg-white border-t px-3 py-3">
+          <div className="sticky bottom-0 z-30 w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto bg-white border-t px-3 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3">
             <div className="flex gap-2">
               <div className="flex-1 h-11 bg-slate-200 rounded-xl animate-pulse" />
               <div className="flex-[2] h-11 bg-slate-200 rounded-xl animate-pulse" />
@@ -642,8 +642,8 @@ export default function ProductDetail() {
         </div>
 
         {/* Sticky Actions */}
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-30 w-full max-w-md md:max-w-lg lg:max-w-xl">
-          <div className="w-full border-t bg-white px-3 py-3">
+        <div className="sticky bottom-0 z-30 w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+          <div className="w-full border-t bg-white px-3 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3">
             <div className="flex items-center gap-2">
               <button onClick={onAddToCart} disabled={outOfStock}
                 className={`flex-1 h-11 rounded-xl border border-slate-300 inline-flex items-center justify-center gap-2 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors ${outOfStock ? "opacity-50" : ""}`}

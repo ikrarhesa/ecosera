@@ -1,5 +1,10 @@
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
+import { useLocation } from "react-router-dom";
+
+// Track paths globally to determine how pages should animate
+let previousPath = "";
+let currentPath = typeof window !== "undefined" ? window.location.pathname : "";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -7,6 +12,12 @@ interface PageTransitionProps {
 }
 
 export default function PageTransition({ children, level = 0 }: PageTransitionProps) {
+  const location = useLocation();
+  if (location.pathname !== currentPath) {
+    previousPath = currentPath;
+    currentPath = location.pathname;
+  }
+
   // Baseline transition config
   const transitionConfig = {
     type: "tween" as const,
@@ -30,7 +41,27 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
     );
   }
 
-  // Pushed pages (Cart, ProductDetail) slide in from right and out to right relative to the container (100%)
+  // Pushed pages (Cart, ProductDetail)
+  const slideVariants = {
+    initial: () => {
+      // If coming FROM the search page to a pushed page (ProductDetail)
+      // fade in rather than slide in from the right edge.
+      if (previousPath.startsWith('/search')) {
+        return { opacity: 0, x: 0 };
+      }
+      return { opacity: 1, x: "100%" };
+    },
+    animate: { x: 0, opacity: 1 },
+    exit: () => {
+      // If navigating TO the search page from a pushed page
+      // fade out rather than slide out to the right edge.
+      if (window.location.pathname.startsWith('/search')) {
+        return { opacity: 0, transition: { duration: 0.2 } };
+      }
+      return { opacity: 1, x: "100%" };
+    }
+  };
+
   return (
     <motion.div
       className="absolute inset-x-0 top-0 bottom-0 w-full h-full bg-[#F6F8FC] overflow-y-auto overflow-x-hidden"
@@ -39,9 +70,11 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
         boxShadow: "-10px 0 30px rgba(0,0,0,0.15)",
         willChange: "transform"
       }}
-      initial={{ x: "100%" }}
-      animate={{ x: 0 }}
-      exit={{ x: "100%" }}
+      variants={slideVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      custom={window.location.pathname}
       transition={transitionConfig}
     >
       {children}

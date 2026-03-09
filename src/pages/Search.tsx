@@ -174,7 +174,7 @@ export default function Search() {
                                     setIsFocused(true);
                                 }}
                                 autoFocus
-                                className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border-none rounded-xl text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 relative z-0"
+                                className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border-none rounded-xl text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 relative z-0"
                             />
 
                             {/* Suggestions Dropdown */}
