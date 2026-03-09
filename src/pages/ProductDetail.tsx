@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft, Heart, Star, MapPin, ChevronLeft, ChevronRight, ChevronDown,
-  MessageCircle, ShieldCheck, Truck, PackageOpen, Check, Plus, Search, ShoppingCart
+  MessageCircle, ShieldCheck, Truck, PackageOpen, Check, Plus, Search, ShoppingCart, Info
 } from "lucide-react";
 import type { Product, ProductVariant } from "../types/product";
 import { getProductBySlug, getCachedProductBySlug, getRelatedProducts, allImagesOf, getProductReviews, submitProductReview, type ProductReview } from "../services/products";
@@ -43,6 +43,7 @@ export default function ProductDetail() {
   const [reviewComment, setReviewComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const goBack = useCallback(() => navigate(-1), [navigate]);
 
@@ -588,15 +589,35 @@ export default function ProductDetail() {
 
                 {/* Write Review Form */}
                 <div className="bg-gray-50 p-4 rounded-xl border">
-                  <h3 className="text-sm font-medium mb-3">Tulis Ulasan Baru</h3>
+                  <div className="flex items-center gap-2 mb-3">
+                    <h3 className="text-sm font-medium">Tulis Ulasan Baru</h3>
+                    <div className="relative">
+                      <button 
+                        type="button" 
+                        onClick={() => setShowTooltip(!showTooltip)}
+                        onBlur={() => setShowTooltip(false)}
+                        className="text-gray-400 hover:text-blue-500 transition-colors"
+                        aria-label="Info Privasi"
+                      >
+                        <Info size={16} />
+                      </button>
+                      {showTooltip && (
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 bg-gray-800 text-white text-[11px] p-2 rounded shadow-lg z-10 text-center">
+                          Email / Nomor HP tidak akan ditampilkan secara publik
+                          {/* Triangle pointer */}
+                          <div className="absolute left-1/2 -translate-x-1/2 top-full border-4 border-transparent border-t-gray-800" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                   <form onSubmit={onSubmitReview} className="space-y-3">
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">Nama (Tampil Publik)</label>
+                      <label className="block text-xs text-gray-600 mb-1">Nama</label>
                       <input required type="text" value={reviewerName} onChange={(e) => setReviewerName(e.target.value)} placeholder="Nama Anda" className="w-full text-sm rounded-lg border p-2 focus:ring-1 focus:ring-blue-500" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">No HP / Email (Privasi Terjamin)</label>
-                      <input required type="text" value={contactInfo} onChange={(e) => setContactInfo(e.target.value)} placeholder="Untuk mencegah spam" className="w-full text-sm rounded-lg border p-2 focus:ring-1 focus:ring-blue-500" />
+                      <label className="block text-xs text-gray-600 mb-1">No HP / Email</label>
+                      <input required type="text" value={contactInfo} onChange={(e) => setContactInfo(e.target.value)} placeholder="emailkamu@ecosera.com" className="w-full text-sm rounded-lg border p-2 focus:ring-1 focus:ring-blue-500" />
                     </div>
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">Penilaian</label>

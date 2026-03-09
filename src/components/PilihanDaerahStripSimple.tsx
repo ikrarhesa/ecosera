@@ -105,16 +105,16 @@ export default function PilihanDaerahStripSimple() {
   const getTabLabel = (tab: TabType) => {
     switch (tab) {
       case 'nearby': return 'Dekat Kamu';
-      case 'popular': return 'Terlaris';
-      case 'new': return 'Baru';
+      case 'popular': return 'Paling Laris';
+      case 'new': return 'Paling Baru';
     }
   };
 
   const getTabDescription = (tab: TabType) => {
     switch (tab) {
       case 'nearby': return 'Produk dari penjual terdekat';
-      case 'popular': return 'Produk terlaris minggu ini';
-      case 'new': return 'Produk terbaru dari penjual pilihan';
+      case 'popular': return 'Produk paling laris minggu ini';
+      case 'new': return 'Produk paling baru dari penjual pilihan';
     }
   };
 
@@ -236,12 +236,12 @@ export default function PilihanDaerahStripSimple() {
             )}
             {activeTab === 'popular' && (
               <div className="mt-1 inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                🔥 Terlaris
+                🔥 Paling Laris
               </div>
             )}
             {activeTab === 'new' && (
               <div className="mt-1 inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
-                ✨ Baru
+                ✨ Paling Baru
               </div>
             )}
 
