@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import { compressImage } from "../lib/imageCompression";
 
 export interface SoughtAfterItem {
     id?: string;
@@ -47,12 +48,13 @@ export async function upsertSoughtAfterItem(item: Omit<SoughtAfterItem, "id" | "
 }
 
 export async function uploadSoughtAfterImage(file: File): Promise<string> {
-    const ext = file.name.split('.').pop() || 'jpg';
+    const compressedFile = await compressImage(file);
+    const ext = compressedFile.name.split('.').pop() || 'webp';
     const fileName = `sought-after-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
 
     const { data, error } = await supabase.storage
         .from("banners")
-        .upload(fileName, file, { upsert: true });
+        .upload(fileName, compressedFile, { upsert: true });
 
     if (error) throw error;
 

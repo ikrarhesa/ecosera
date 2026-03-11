@@ -4,6 +4,7 @@ import { Plus, Trash2, Upload, Check, X, ArrowLeft } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { generateSlug } from "../../lib/utils";
 import ImageCropperModal from "../../components/ImageCropperModal";
+import { compressImage } from "../../lib/imageCompression";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 const MAX_IMAGES = 3;
@@ -98,7 +99,8 @@ export default function AdminProductNew() {
         try {
             const uploadedUrls: string[] = [];
             for (let i = 0; i < imageFiles.length; i++) {
-                const file = imageFiles[i];
+                const originalFile = imageFiles[i];
+                const file = await compressImage(originalFile);
                 const ext = file.name.split(".").pop() || "webp";
                 const filePath = `products/${slug}-${Date.now()}-${i}.${ext}`;
                 const { error: uploadErr } = await supabase.storage

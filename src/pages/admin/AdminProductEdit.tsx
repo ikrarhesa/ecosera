@@ -4,6 +4,7 @@ import { Plus, Trash2, Upload, Check, Save, X, ArrowLeft } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { generateSlug } from "../../lib/utils";
 import ImageCropperModal from "../../components/ImageCropperModal";
+import { compressImage } from "../../lib/imageCompression";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 const MAX_IMAGES = 3;
@@ -126,7 +127,9 @@ export default function AdminProductEdit() {
         try {
             const newUploadedUrls: string[] = [];
             for (let i = 0; i < newImageFiles.length; i++) {
-                const file = newImageFiles[i]; const ext = file.name.split(".").pop() || "webp";
+                const originalFile = newImageFiles[i];
+                const file = await compressImage(originalFile);
+                const ext = file.name.split(".").pop() || "webp";
                 const filePath = `products/${slug}-${Date.now()}-${i}.${ext}`;
                 const { error: uploadErr } = await supabase.storage.from("product-images").upload(filePath, file, { cacheControl: "3600", contentType: file.type, upsert: true });
                 if (uploadErr) { setFormError(`Gagal upload gambar ${i + 1}: ${uploadErr.message}`); setSubmitting(false); return; }

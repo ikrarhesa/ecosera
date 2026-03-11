@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import ImageCropperModal from "../../components/ImageCropperModal";
+import { compressImage } from "../../lib/imageCompression";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 
@@ -155,13 +156,14 @@ export default function AdminShopEdit() {
         try {
             let logoUrl = currentLogo;
             if (logoFile) {
-                const ext = logoFile.name.split(".").pop() || "webp";
+                const compressedLogo = await compressImage(logoFile);
+                const ext = compressedLogo.name.split(".").pop() || "webp";
                 const filePath = `logos/${seller_id}-${Date.now()}.${ext}`;
                 const { error: uploadErr } = await supabase.storage
                     .from("shop-logos")
-                    .upload(filePath, logoFile, {
+                    .upload(filePath, compressedLogo, {
                         cacheControl: "3600",
-                        contentType: logoFile.type,
+                        contentType: compressedLogo.type,
                         upsert: true,
                     });
                 if (uploadErr) {
@@ -177,13 +179,14 @@ export default function AdminShopEdit() {
 
             let bannerUrl = currentBanner;
             if (bannerFile) {
-                const ext = bannerFile.name.split(".").pop() || "webp";
+                const compressedBanner = await compressImage(bannerFile);
+                const ext = compressedBanner.name.split(".").pop() || "webp";
                 const filePath = `banners/${seller_id}-${Date.now()}.${ext}`;
                 const { error: uploadErr } = await supabase.storage
                     .from("shop-logos")
-                    .upload(filePath, bannerFile, {
+                    .upload(filePath, compressedBanner, {
                         cacheControl: "3600",
-                        contentType: bannerFile.type,
+                        contentType: compressedBanner.type,
                         upsert: true,
                     });
                 if (uploadErr) {

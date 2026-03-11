@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import { compressImage } from "../lib/imageCompression";
 
 export interface Banner {
     id: string;
@@ -98,13 +99,14 @@ export async function deleteBanner(id: string): Promise<void> {
 }
 
 export async function uploadBannerImage(file: File): Promise<string> {
+    const compressedFile = await compressImage(file);
     // Generate a unique filename using timestamp and original extension
-    const ext = file.name.split('.').pop() || 'jpg';
+    const ext = compressedFile.name.split('.').pop() || 'webp';
     const fileName = `banner-${Date.now()}.${ext}`;
 
     const { data, error } = await supabase.storage
         .from("banners")
-        .upload(fileName, file, { upsert: true });
+        .upload(fileName, compressedFile, { upsert: true });
 
     if (error) throw error;
 

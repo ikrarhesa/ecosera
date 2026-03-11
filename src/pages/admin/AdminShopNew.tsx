@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Upload, Save, Store, Phone, Mail, MapPin, Navigation, ArrowLeft } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { compressImage } from "../../lib/imageCompression";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 
@@ -57,11 +58,12 @@ export default function AdminShopNew() {
             }
 
             if (logoFile && seller) {
-                const ext = logoFile.name.split(".").pop() || "png";
+                const compressedLogo = await compressImage(logoFile);
+                const ext = compressedLogo.name.split(".").pop() || "webp";
                 const filePath = `logos/${seller.id}-${Date.now()}.${ext}`;
                 const { error: uploadErr } = await supabase.storage
                     .from("shop-logos")
-                    .upload(filePath, logoFile, { cacheControl: "3600", contentType: logoFile.type, upsert: true });
+                    .upload(filePath, compressedLogo, { cacheControl: "3600", contentType: compressedLogo.type, upsert: true });
                 if (!uploadErr) {
                     const { data: urlData } = supabase.storage.from("shop-logos").getPublicUrl(filePath);
                     await supabase.from("sellers").update({ logo_url: urlData.publicUrl }).eq("id", seller.id);
