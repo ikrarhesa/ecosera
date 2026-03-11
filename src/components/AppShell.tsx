@@ -20,7 +20,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
             {/* The main phone layout wrapper - using min-h-screen for body scroll */}
             <div 
                 id="main-scroll-container"
-                className="w-full max-w-md md:max-w-lg lg:max-w-xl min-h-screen bg-white shadow-xl relative overflow-x-hidden"
+                className="w-full max-w-md md:max-w-lg lg:max-w-xl min-h-screen bg-white shadow-xl relative"
             >
                 {children}
             </div>

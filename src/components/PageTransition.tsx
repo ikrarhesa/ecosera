@@ -29,14 +29,14 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
   if (level === 0) {
     return (
       <motion.div
-        className="w-full min-h-screen bg-[#F6F8FC] overflow-x-hidden"
+        className="w-full min-h-screen bg-[#F6F8FC]"
         style={{ 
           position: "relative",
           zIndex: 0 
         }}
-        initial={{ opacity: 1, x: 0 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0.99, x: 0 }}
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0.99 }}
         transition={{ duration: 0.5 }}
       >
         {children}
@@ -47,14 +47,16 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
   // Pushed pages (Cart, ProductDetail)
   const slideVariants = {
     initial: () => {
-      // If coming FROM the search page to a pushed page (ProductDetail)
-      // fade in rather than slide in from the right edge.
       if (previousPath.startsWith('/search')) {
         return { opacity: 0, x: 0 };
       }
       return { opacity: 1, x: "100%" };
     },
-    animate: { x: 0, opacity: 1 },
+    animate: { 
+      x: 0, 
+      opacity: 1,
+      transitionEnd: { display: "block", clear: "both", WebkitTransform: "none", transform: "none" }
+    },
     exit: () => {
       // If navigating TO the search page from a pushed page
       // fade out rather than slide out to the right edge.
@@ -67,12 +69,11 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
 
   return (
     <motion.div
-      className="w-full min-h-screen bg-[#F6F8FC] overflow-x-hidden"
+      className="w-full min-h-screen bg-[#F6F8FC]"
       style={{ 
         position: "relative",
         zIndex: 50,
-        boxShadow: "-10px 0 30px rgba(0,0,0,0.15)",
-        willChange: "transform"
+        boxShadow: "-10px 0 30px rgba(0,0,0,0.15)"
       }}
       variants={slideVariants}
       initial="initial"
