@@ -14,6 +14,7 @@ export type Product = {
   sold: number;
   thumb?: string;
   category?: string;
+  categories?: string[];
   tags?: string[];
   featured?: boolean;
   available?: boolean;

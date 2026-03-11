@@ -49,6 +49,13 @@ export default function ProductDetail() {
 
   useEffect(() => {
     setProduct(cachedProduct);
+    // Initialize variant from cache if available
+    if (cachedProduct?.variants?.length) {
+      setSelectedVariant(cachedProduct.variants[0]);
+    } else {
+      setSelectedVariant(null);
+    }
+
     setLoading(!cachedProduct);
     setQty(0);
     setIdx(0);
@@ -57,9 +64,16 @@ export default function ProductDetail() {
     (async () => {
       const p = await getProductBySlug(String(slug));
       if (!mounted) return;
+
       setProduct(p);
+
+      // Robust variant sync
       if (p?.variants?.length) {
-        setSelectedVariant(p.variants[0]);
+        setSelectedVariant(current => {
+          // If we already have a selection that exists in the new data, keep it
+          const stillExists = current && p.variants!.find(v => v.id === current.id);
+          return stillExists || p.variants![0];
+        });
       } else {
         setSelectedVariant(null);
       }
@@ -318,26 +332,26 @@ export default function ProductDetail() {
       <div className="w-full min-h-screen bg-white text-gray-900">
         {/* Header */}
         <div
-          className="sticky top-0 z-20 flex items-center justify-between px-3 pb-[14px] pt-[calc(14px+env(safe-area-inset-top))] border-b border-white/10"
-          style={{
-            backgroundColor: 'rgba(34, 84, 197, 1)'
-          }}
+          className="sticky top-0 z-20 pt-[env(safe-area-inset-top)] border-b border-white/10"
+          style={{ backgroundColor: 'rgba(34, 84, 197, 1)' }}
         >
-          <button onClick={goBack} className="p-1.5 rounded-full text-white" aria-label="Back">
-            <ArrowLeft size={22} strokeWidth={2} />
-          </button>
-          <div className="flex items-center gap-2">
-            <button onClick={() => navigate('/search')} className="p-1.5 rounded-full bg-white/20 text-white" aria-label="Search">
-              <Search size={20} strokeWidth={2} />
+          <div className="flex items-center justify-between px-5 pb-5 pt-[18px]">
+            <button onClick={goBack} className="p-1.5 rounded-full text-white" aria-label="Back">
+              <ArrowLeft size={22} strokeWidth={2} />
             </button>
-            <button onClick={onShare} className="p-1.5 rounded-full bg-white/20 text-white" aria-label="Share">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v6c-6.5 0-10 4.5-10 12 2.5-4 6-6 10-6v6l10-9-10-9z" />
-              </svg>
-            </button>
-            <button onClick={() => navigate('/cart')} className="p-1.5 rounded-full bg-white/20 text-white" aria-label="Cart">
-              <ShoppingCart size={20} strokeWidth={2} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => navigate('/search')} className="p-1.5 rounded-full bg-white/20 text-white" aria-label="Search">
+                <Search size={20} strokeWidth={2} />
+              </button>
+              <button onClick={onShare} className="p-1.5 rounded-full bg-white/20 text-white" aria-label="Share">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2v6c-6.5 0-10 4.5-10 12 2.5-4 6-6 10-6v6l10-9-10-9z" />
+                </svg>
+              </button>
+              <button onClick={() => navigate('/cart')} className="p-1.5 rounded-full bg-white/20 text-white" aria-label="Cart">
+                <ShoppingCart size={20} strokeWidth={2} />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -592,8 +606,8 @@ export default function ProductDetail() {
                   <div className="flex items-center gap-2 mb-3">
                     <h3 className="text-sm font-medium">Tulis Ulasan Baru</h3>
                     <div className="relative">
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={() => setShowTooltip(!showTooltip)}
                         onBlur={() => setShowTooltip(false)}
                         className="text-gray-400 hover:text-blue-500 transition-colors"

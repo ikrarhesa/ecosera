@@ -128,7 +128,8 @@ function normalize(raw: any): Product {
     image: primary,
     images: imgs,
     description: raw.description ?? "No description available",  // Default description if missing
-    category: String(raw.category ?? "general"),  // Default category if missing
+    category: String(raw.category ?? "general"),  // Primary category ID
+    categories: Array.isArray(raw.categories) ? raw.categories : [String(raw.category ?? "general")], // All category IDs
     sellerName: raw._sellerName ?? raw.sellerName ?? "UMKM Lokal",
     sellerPhone: raw._sellerPhone ?? raw.sellerPhone ?? "",
     location: raw._sellerAddress ?? raw.location ?? "",
@@ -145,13 +146,14 @@ function normalize(raw: any): Product {
   base.available = raw.is_active !== false;
 
   // Variants
-  if (Array.isArray(raw.product_variants)) {
-    base.variants = raw.product_variants.map((v: any) => ({
+  const variantsData = raw.product_variants || raw.variants;
+  if (Array.isArray(variantsData)) {
+    base.variants = variantsData.map((v: any) => ({
       id: v.id,
-      variant_name: v.variant_name,
-      price_override: v.price_override,
-      stock: v.stock
-    }));
+      variant_name: v.variant_name || v.name || "Pilihan",
+      price_override: v.price_override != null ? Number(v.price_override) : null,
+      stock: v.stock != null ? Number(v.stock) : null
+    })).filter((v: any) => v.variant_name); // Only include variants with names
   }
 
   return base;
@@ -181,14 +183,26 @@ export async function getAllProducts(): Promise<Product[]> {
 
     const result = products.map((raw: any) => {
       const info = sellerCache[raw.seller_id];
-      const category = raw.product_categories?.[0]?.category_id || "general";
+      const categories = raw.product_categories?.map((pc: any) => pc.category_id) || [];
+      const primaryCategory = categories[0] || "general";
 
       let calculatedRating = raw.rating ?? 0;
       if (reviews[raw.id]) {
         calculatedRating = Number((reviews[raw.id].totalRating / reviews[raw.id].count).toFixed(1));
       }
 
-      const normalized = normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[raw.id] ?? 0, rating: calculatedRating });
+      const normalized = normalize({
+        ...raw,
+        category: primaryCategory,
+        categories,
+        _sellerName: info?.name,
+        _sellerPhone: info?.phone,
+        _sellerAddress: info?.address,
+        _sellerLat: info?.lat,
+        _sellerLng: info?.lng,
+        _waClicks: waClicks[raw.id] ?? 0,
+        rating: calculatedRating
+      });
       if (normalized.slug) {
         productCache[normalized.slug] = normalized;
       }
@@ -202,16 +216,25 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 // Function to get a product by its Slug
-export async function getProductBySlug(slug: string): Promise<Product | null> {
+export async function getProductBySlug(slugOrId: string): Promise<Product | null> {
   try {
-    const { data, error } = await supabase
+    // Check if input is a UUID
+    const isId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+
+    let query = supabase
       .from("products")
-      .select("*, product_categories(category_id), product_variants(*)")
-      .eq("slug", slug)
-      .single();
+      .select("*, product_categories(category_id), product_variants(*)");
+
+    if (isId) {
+      query = query.eq("id", slugOrId);
+    } else {
+      query = query.eq("slug", slugOrId);
+    }
+
+    const { data, error } = await query.single();
 
     if (error) {
-      console.error(`Error fetching product with slug ${slug}:`, error);
+      console.error(`Error fetching product ${slugOrId}:`, error);
       return null;
     }
     if (!data) return null;
@@ -222,14 +245,26 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       fetchWaClickCounts(),
       fetchAllReviews(),
     ]);
-    const category = data.product_categories?.[0]?.category_id || "general";
+    const categories = data.product_categories?.map((pc: any) => pc.category_id) || [];
+    const primaryCategory = categories[0] || "general";
 
     let calculatedRating = data.rating ?? 0;
     if (reviews[data.id]) {
       calculatedRating = Number((reviews[data.id].totalRating / reviews[data.id].count).toFixed(1));
     }
 
-    const normalized = normalize({ ...data, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[data.id] ?? 0, rating: calculatedRating });
+    const normalized = normalize({
+      ...data,
+      category: primaryCategory,
+      categories,
+      _sellerName: info?.name,
+      _sellerPhone: info?.phone,
+      _sellerAddress: info?.address,
+      _sellerLat: info?.lat,
+      _sellerLng: info?.lng,
+      _waClicks: waClicks[data.id] ?? 0,
+      rating: calculatedRating
+    });
 
     if (normalized.slug) {
       productCache[normalized.slug] = normalized;
@@ -314,14 +349,26 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 
     return products.map((raw: any) => {
       const info = sellerCache[raw.seller_id];
-      const category = raw.product_categories?.[0]?.category_id || "general";
+      const categories = raw.product_categories?.map((pc: any) => pc.category_id) || [];
+      const primaryCategory = categories[0] || "general";
 
       let calculatedRating = raw.rating ?? 0;
       if (reviews[raw.id]) {
         calculatedRating = Number((reviews[raw.id].totalRating / reviews[raw.id].count).toFixed(1));
       }
 
-      return normalize({ ...raw, category, _sellerName: info?.name, _sellerPhone: info?.phone, _sellerAddress: info?.address, _sellerLat: info?.lat, _sellerLng: info?.lng, _waClicks: waClicks[raw.id] ?? 0, rating: calculatedRating });
+      return normalize({
+        ...raw,
+        category: primaryCategory,
+        categories,
+        _sellerName: info?.name,
+        _sellerPhone: info?.phone,
+        _sellerAddress: info?.address,
+        _sellerLat: info?.lat,
+        _sellerLng: info?.lng,
+        _waClicks: waClicks[raw.id] ?? 0,
+        rating: calculatedRating
+      });
     });
   } catch (err) {
     console.error("Unexpected error fetching featured products:", err);

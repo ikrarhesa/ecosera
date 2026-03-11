@@ -1,10 +1,13 @@
 import { motion } from "framer-motion";
-import { ReactNode } from "react";
-import { useLocation } from "react-router-dom";
+import { ReactNode, useEffect, useRef } from "react";
+import { useLocation, useNavigationType } from "react-router-dom";
 
 // Track paths globally to determine how pages should animate
 let previousPath = "";
 let currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+
+// Track scroll positions for each route instance independently
+const scrollMap = new Map<string, number>();
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -13,10 +16,53 @@ interface PageTransitionProps {
 
 export default function PageTransition({ children, level = 0 }: PageTransitionProps) {
   const location = useLocation();
+  const navType = useNavigationType();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   if (location.pathname !== currentPath) {
     previousPath = currentPath;
     currentPath = location.pathname;
   }
+
+  // Handle precise scroll restoration for THIS specific page container
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    if (navType === "POP") {
+      const saved = scrollMap.get(location.key) || 0;
+
+      // Cascade scroll restoration to account for React taking a moment to fully paint DOM heights
+      const attemptScroll = () => {
+        if (el && el.scrollHeight > saved) {
+          el.scrollTop = saved;
+        } else if (el) {
+          // Forcible set even if it doesn't match yet, just in case
+          el.scrollTop = saved;
+        }
+      };
+
+      attemptScroll();
+      requestAnimationFrame(() => {
+        attemptScroll();
+        setTimeout(attemptScroll, 10);
+        setTimeout(attemptScroll, 50);
+        setTimeout(attemptScroll, 100);
+      });
+    } else {
+      requestAnimationFrame(() => {
+        if (el) el.scrollTop = 0;
+      });
+    }
+
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement;
+      scrollMap.set(location.key, target.scrollTop);
+    };
+
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, [location.key, navType]);
 
   // Baseline transition config
   const transitionConfig = {
@@ -25,55 +71,44 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
     ease: [0.25, 1, 0.5, 1] as [number, number, number, number] // Smooth deceleration
   };
 
-  // Base pages (Home, Etalase) should stay completely static while the pushed pages slide over them.
+  // Base pages wrapper
   if (level === 0) {
     return (
       <motion.div
-        className="w-full min-h-screen bg-[#F6F8FC]"
-        style={{ 
-          position: "relative",
-          zIndex: 0 
-        }}
+        ref={scrollRef}
+        className="absolute inset-0 w-full h-full bg-[#F6F8FC] overflow-y-auto overflow-x-hidden z-0 pointer-events-auto"
         initial={{ opacity: 1 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0.99 }}
         transition={{ duration: 0.5 }}
+        style={{ WebkitOverflowScrolling: "touch" }}
       >
         {children}
       </motion.div>
     );
   }
 
-  // Pushed pages (Cart, ProductDetail)
+  // Pushed pages wrapper
   const slideVariants = {
     initial: () => {
-      if (previousPath.startsWith('/search')) {
-        return { opacity: 0, x: 0 };
-      }
+      if (previousPath.startsWith('/search')) return { opacity: 0, x: 0 };
       return { opacity: 1, x: "100%" };
     },
-    animate: { 
-      x: 0, 
-      opacity: 1,
-      transitionEnd: { display: "block", clear: "both", WebkitTransform: "none", transform: "none" }
-    },
+    animate: { x: 0, opacity: 1 },
     exit: () => {
-      // If navigating TO the search page from a pushed page
-      // fade out rather than slide out to the right edge.
-      if (window.location.pathname.startsWith('/search')) {
-        return { opacity: 0, transition: { duration: 0.2 } };
-      }
+      if (window.location.pathname.startsWith('/search')) return { opacity: 0, transition: { duration: 0.2 } };
       return { opacity: 1, x: "100%" };
     }
   };
 
   return (
     <motion.div
-      className="w-full min-h-screen bg-[#F6F8FC]"
-      style={{ 
-        position: "relative",
-        zIndex: 50,
-        boxShadow: "-10px 0 30px rgba(0,0,0,0.15)"
+      ref={scrollRef}
+      className="absolute inset-0 w-full h-full bg-white overflow-y-auto overflow-x-hidden z-50 pointer-events-auto"
+      style={{
+        boxShadow: "-10px 0 30px rgba(0,0,0,0.15)",
+        willChange: "transform",
+        WebkitOverflowScrolling: "touch"
       }}
       variants={slideVariants}
       initial="initial"

@@ -4,7 +4,6 @@ import {
   ChevronRight as ArrowRight
 } from "lucide-react";
 import { getActiveBanners, getCachedActiveBanners, type Banner } from "../services/banners";
-import Navbar from "../components/Navbar";
 import ProductCard from "../components/ProductCard";
 import { useProducts } from "../context/ProductsContext";
 import PilihanDaerahStripSimple from '../components/PilihanDaerahStripSimple';
@@ -146,7 +145,7 @@ export default function Home() {
       if (category.id === "all") {
         return { ...category, count: products.length };
       }
-      const count = products.filter(product => product.category === category.id).length;
+      const count = products.filter(product => product.categories?.includes(category.id)).length;
       return { ...category, count };
     });
   }, [products, categories]);
@@ -156,7 +155,7 @@ export default function Home() {
 
     // Filter by category
     if (selectedCategory !== "all") {
-      filtered = filtered.filter(product => product.category === selectedCategory);
+      filtered = filtered.filter(product => product.categories?.includes(selectedCategory));
     }
 
     // Filter by distance
@@ -207,7 +206,7 @@ export default function Home() {
   return (
     <>
       <div className="min-h-screen bg-[#F6F8FC] pb-28">
-        <main className="px-4 pt-1">
+        <main className="px-5 pt-1">
           {/* Banner carousel */}
           <BannerCarousel />
 

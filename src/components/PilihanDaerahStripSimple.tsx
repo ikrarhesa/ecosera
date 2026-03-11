@@ -25,32 +25,59 @@ export default function PilihanDaerahStripSimple() {
   const { products: allProducts, loading: contextLoading } = useProducts();
   const [products, setProducts] = useState<Product[]>([]);
   const [activeTab, setActiveTab] = useState<TabType>('nearby');
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(() => {
+    try {
+      const cached = localStorage.getItem('ecosera_user_location');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'prompt'>(() => {
+    try {
+      return (localStorage.getItem('ecosera_location_permission') as 'granted' | 'denied' | 'prompt') || 'prompt';
+    } catch {
+      return 'prompt';
+    }
+  });
 
   // Request location permission
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-          setLocationPermission('granted');
-        },
-        (error) => {
-          console.log('Location permission denied:', error);
-          setLocationPermission('denied');
-          // Set default location (Muara Enim area)
-          setUserLocation({ lat: -3.8, lng: 103.8 });
-        }
-      );
-    } else {
-      setLocationPermission('denied');
-      setUserLocation({ lat: -3.8, lng: 103.8 }); // Default to Muara Enim
+    if (locationPermission === 'prompt') {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const loc = { lat: position.coords.latitude, lng: position.coords.longitude };
+            setUserLocation(loc);
+            setLocationPermission('granted');
+            try {
+              localStorage.setItem('ecosera_user_location', JSON.stringify(loc));
+              localStorage.setItem('ecosera_location_permission', 'granted');
+            } catch { }
+          },
+          (error) => {
+            console.log('Location permission denied:', error);
+            setLocationPermission('denied');
+            const defaultLoc = { lat: -3.8, lng: 103.8 };
+            setUserLocation(defaultLoc);
+            try {
+              localStorage.setItem('ecosera_user_location', JSON.stringify(defaultLoc));
+              localStorage.setItem('ecosera_location_permission', 'denied');
+            } catch { }
+          }
+        );
+      } else {
+        setLocationPermission('denied');
+        const defaultLoc = { lat: -3.8, lng: 103.8 };
+        setUserLocation(defaultLoc);
+        try {
+          localStorage.setItem('ecosera_user_location', JSON.stringify(defaultLoc));
+          localStorage.setItem('ecosera_location_permission', 'denied');
+        } catch { }
+      }
     }
-  }, []);
+  }, [locationPermission]);
 
   useEffect(() => {
     if (contextLoading) return;
@@ -162,13 +189,20 @@ export default function PilihanDaerahStripSimple() {
                 if (navigator.geolocation) {
                   navigator.geolocation.getCurrentPosition(
                     (position) => {
-                      setUserLocation({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                      });
+                      const loc = { lat: position.coords.latitude, lng: position.coords.longitude };
+                      setUserLocation(loc);
                       setLocationPermission('granted');
+                      try {
+                        localStorage.setItem('ecosera_user_location', JSON.stringify(loc));
+                        localStorage.setItem('ecosera_location_permission', 'granted');
+                      } catch { }
                     },
-                    () => setLocationPermission('denied')
+                    () => {
+                      setLocationPermission('denied');
+                      try {
+                        localStorage.setItem('ecosera_location_permission', 'denied');
+                      } catch { }
+                    }
                   );
                 }
               }}

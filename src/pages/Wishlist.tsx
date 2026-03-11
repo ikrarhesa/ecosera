@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useWishlist } from "../context/WishlistContext";
-import Navbar from "../components/Navbar";
 import { Heart, Trash2 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "../context/ToastContext";
@@ -51,37 +50,38 @@ export default function Wishlist() {
     };
 
     return (
-        <>
-            <div className="px-4 pb-2 flex items-center justify-between sticky top-0 bg-white z-10 border-b border-white pt-[calc(24px+env(safe-area-inset-top))]">
+        <div className="min-h-screen bg-[#F6F8FC] pb-28">
+            {/* Title Strip - Matches Etalase Category Strip profile */}
+            <div className="bg-white px-5 py-3 flex items-center justify-between border-b border-slate-200 mb-3">
                 <div>
-                    <h1 className="font-bold text-slate-900 text-2xl">Tersimpan</h1>
-                    <p className="text-sm text-slate-500 mt-0.5">{wishlist.length} items</p>
+                    <h1 className="font-semibold text-slate-900 text-lg">Tersimpan</h1>
+                    <p className="text-xs text-slate-500 mt-0.5">{wishlist.length} produk</p>
                 </div>
                 {selectedItems.size > 0 && !isLoading && (
                     <button
                         onClick={handleBatchDelete}
-                        className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium border border-red-100 hover:bg-red-100 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium border border-red-100 hover:bg-red-100 transition-colors"
                     >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3.5 w-3.5" />
                         <span>Hapus ({selectedItems.size})</span>
                     </button>
                 )}
             </div>
 
-            <main className="px-4 mt-2">
+            <main className="px-5">
                 {isLoading ? (
-                    <div className="flex flex-col border-t border-slate-100 mt-2">
+                    <div className="flex flex-col bg-white rounded-xl border border-slate-100 overflow-hidden shadow-sm">
                         {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="flex items-center py-5 border-b border-slate-100 last:border-b-0 animate-pulse">
-                                <div className="pr-4 py-2">
+                            <div key={i} className="flex items-center p-4 border-b border-slate-100 last:border-b-0 animate-pulse">
+                                <div className="pr-3">
                                     <div className="w-5 h-5 rounded border-[1.5px] border-slate-200 bg-slate-200"></div>
                                 </div>
-                                <div className="w-20 h-20 flex-shrink-0 bg-slate-200 rounded-xl mr-4"></div>
+                                <div className="w-20 h-20 flex-shrink-0 bg-slate-200 rounded-xl mr-3"></div>
                                 <div className="flex-1 pr-3 flex flex-col justify-center gap-3">
                                     <div className="h-4 bg-slate-200 rounded w-full"></div>
                                     <div className="h-4 bg-slate-200 rounded w-2/3"></div>
                                 </div>
-                                <div className="pl-1">
+                                <div>
                                     <div className="h-5 bg-slate-200 rounded w-20"></div>
                                 </div>
                             </div>
@@ -91,26 +91,26 @@ export default function Wishlist() {
                     <div className="text-center mt-20">
                         <Heart className="h-16 w-16 text-slate-200 mx-auto mb-4" />
                         <p className="text-slate-800 font-semibold text-lg">Belum ada yang disimpan</p>
-                        <p className="text-slate-500 mt-1 max-w-[250px] mx-auto leading-relaxed">Cari produk yang kamu suka dan simpan untuk nanti!</p>
+                        <p className="text-slate-500 mt-1 max-w-[250px] mx-auto text-sm leading-relaxed">Cari produk yang kamu suka dan simpan untuk nanti!</p>
                         <button
                             onClick={() => navigate("/")}
-                            className="mt-6 px-8 py-3 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                            className="mt-6 px-6 py-2.5 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-sm text-sm"
                         >
                             Mulai Belanja
                         </button>
                     </div>
                 ) : (
-                    <div className="flex flex-col border-t border-slate-100 mt-2">
+                    <div className="flex flex-col bg-white rounded-xl border border-slate-100 overflow-hidden shadow-sm">
                         {wishlist.map((p) => {
                             const isSelected = selectedItems.has(p.id);
                             return (
-                                <Link to={`/product/${p.slug || p.id}`} key={p.id} className="flex items-center py-5 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors">
+                                <Link to={`/product/${p.slug || p.id}`} key={p.id} className="flex items-center p-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors">
                                     <div
-                                        className="pr-4 py-2 cursor-pointer"
+                                        className="pr-3 cursor-pointer"
                                         onClick={(e) => toggleSelect(p.id, e)}
                                     >
                                         {isSelected ? (
-                                            <div className="w-5 h-5 rounded flex items-center justify-center bg-slate-900 text-white border border-slate-900 shadow-sm">
+                                            <div className="w-5 h-5 rounded flex items-center justify-center bg-blue-600 text-white border border-blue-600 shadow-sm">
                                                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                                 </svg>
@@ -119,7 +119,7 @@ export default function Wishlist() {
                                             <div className="w-5 h-5 rounded border-[1.5px] border-slate-300 bg-white hover:border-slate-400 transition-colors"></div>
                                         )}
                                     </div>
-                                    <div className="w-20 h-20 flex-shrink-0 bg-white rounded-xl overflow-hidden mr-4 border border-slate-100">
+                                    <div className="w-20 h-20 flex-shrink-0 bg-slate-50 rounded-lg overflow-hidden mr-3 border border-slate-100">
                                         <img
                                             src={primaryImageOf(p)}
                                             alt={p.name}
@@ -128,11 +128,12 @@ export default function Wishlist() {
                                             onError={(e) => { (e.currentTarget as HTMLImageElement).src = "https://placehold.co/800x800/png?text=Ecosera"; }}
                                         />
                                     </div>
-                                    <div className="flex-1 min-w-0 pr-3 flex flex-col justify-center">
-                                        <h4 className="text-[15px] font-medium text-slate-800 leading-snug line-clamp-3">{p.name}</h4>
+                                    <div className="flex-1 min-w-0 pr-2 flex flex-col justify-center">
+                                        <h4 className="text-sm font-medium text-slate-800 leading-snug line-clamp-2 mb-1">{p.name}</h4>
+                                        <div className="text-[13px] text-slate-500 truncate">{p.sellerName || 'Toko Ecosera'}</div>
                                     </div>
-                                    <div className="text-right whitespace-nowrap pl-1 pointer-events-none">
-                                        <div className="text-[15px] font-bold text-green-700 tracking-tight">Rp {money(p.price)}</div>
+                                    <div className="text-right whitespace-nowrap pointer-events-none">
+                                        <div className="text-sm font-bold text-slate-900 tracking-tight">Rp {money(p.price)}</div>
                                     </div>
                                 </Link>
                             );
@@ -140,6 +141,6 @@ export default function Wishlist() {
                     </div>
                 )}
             </main>
-        </>
+        </div>
     );
 }
