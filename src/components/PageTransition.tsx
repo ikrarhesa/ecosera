@@ -29,8 +29,11 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
   if (level === 0) {
     return (
       <motion.div
-        className="absolute inset-x-0 top-0 bottom-0 w-full h-full bg-[#F6F8FC] overflow-y-auto overflow-x-hidden"
-        style={{ zIndex: 0 }}
+        className="w-full min-h-screen bg-[#F6F8FC] overflow-x-hidden"
+        style={{ 
+          position: "relative",
+          zIndex: 0 
+        }}
         initial={{ opacity: 1, x: 0 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0.99, x: 0 }}
@@ -64,8 +67,9 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
 
   return (
     <motion.div
-      className="absolute inset-x-0 top-0 bottom-0 w-full h-full bg-[#F6F8FC] overflow-y-auto overflow-x-hidden"
+      className="w-full min-h-screen bg-[#F6F8FC] overflow-x-hidden"
       style={{ 
+        position: "relative",
         zIndex: 50,
         boxShadow: "-10px 0 30px rgba(0,0,0,0.15)",
         willChange: "transform"

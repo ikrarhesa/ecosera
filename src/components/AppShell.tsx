@@ -16,11 +16,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
     }
 
     return (
-        <div className="fixed inset-0 bg-slate-100 flex justify-center z-0" style={{ zIndex: 0 }}>
-            {/* The main phone layout wrapper - strict overflow hidden so sliders are perfectly clipped */}
+        <div className="min-h-screen bg-slate-100 flex justify-center z-0" style={{ zIndex: 0 }}>
+            {/* The main phone layout wrapper - using min-h-screen for body scroll */}
             <div 
                 id="main-scroll-container"
-                className="w-full max-w-md md:max-w-lg lg:max-w-xl h-full bg-white shadow-xl relative overflow-hidden"
+                className="w-full max-w-md md:max-w-lg lg:max-w-xl min-h-screen bg-white shadow-xl relative overflow-x-hidden"
             >
                 {children}
             </div>
