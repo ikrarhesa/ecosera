@@ -24,45 +24,65 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
     currentPath = location.pathname;
   }
 
-  // Handle precise scroll restoration for THIS specific page container
+  // Handle scroll restoration — branches on level to choose native vs inner-div scroll
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
+    if (level === 0) {
+      // Native window scroll (level-0 pages)
+      if (navType === "POP") {
+        const saved = scrollMap.get(location.key) || 0;
+        const attemptScroll = () => window.scrollTo({ top: saved, behavior: "instant" as ScrollBehavior });
+        attemptScroll();
+        requestAnimationFrame(() => {
+          attemptScroll();
+          setTimeout(attemptScroll, 50);
+          setTimeout(attemptScroll, 150);
+        });
+      } else {
+        requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }));
+      }
 
-    if (navType === "POP") {
-      const saved = scrollMap.get(location.key) || 0;
+      const handleScroll = () => scrollMap.set(location.key, window.scrollY);
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      return () => window.removeEventListener("scroll", handleScroll);
+    } else {
+      // Inner-div scroll (level-1 pages)
+      const el = scrollRef.current;
+      if (!el) return;
 
-      // Cascade scroll restoration to account for React taking a moment to fully paint DOM heights
-      const attemptScroll = () => {
-        if (el && el.scrollHeight > saved) {
-          el.scrollTop = saved;
-        } else if (el) {
-          // Forcible set even if it doesn't match yet, just in case
-          el.scrollTop = saved;
-        }
+      if (navType === "POP") {
+        const saved = scrollMap.get(location.key) || 0;
+
+        // Cascade scroll restoration to account for React taking a moment to fully paint DOM heights
+        const attemptScroll = () => {
+          if (el && el.scrollHeight > saved) {
+            el.scrollTop = saved;
+          } else if (el) {
+            el.scrollTop = saved;
+          }
+        };
+
+        attemptScroll();
+        requestAnimationFrame(() => {
+          attemptScroll();
+          setTimeout(attemptScroll, 10);
+          setTimeout(attemptScroll, 50);
+          setTimeout(attemptScroll, 100);
+        });
+      } else {
+        requestAnimationFrame(() => {
+          if (el) el.scrollTop = 0;
+        });
+      }
+
+      const handleScroll = (e: Event) => {
+        const target = e.target as HTMLElement;
+        scrollMap.set(location.key, target.scrollTop);
       };
 
-      attemptScroll();
-      requestAnimationFrame(() => {
-        attemptScroll();
-        setTimeout(attemptScroll, 10);
-        setTimeout(attemptScroll, 50);
-        setTimeout(attemptScroll, 100);
-      });
-    } else {
-      requestAnimationFrame(() => {
-        if (el) el.scrollTop = 0;
-      });
+      el.addEventListener("scroll", handleScroll, { passive: true });
+      return () => el.removeEventListener("scroll", handleScroll);
     }
-
-    const handleScroll = (e: Event) => {
-      const target = e.target as HTMLElement;
-      scrollMap.set(location.key, target.scrollTop);
-    };
-
-    el.addEventListener("scroll", handleScroll, { passive: true });
-    return () => el.removeEventListener("scroll", handleScroll);
-  }, [location.key, navType]);
+  }, [level, location.key, navType]);
 
   // Baseline transition config
   const transitionConfig = {
@@ -71,17 +91,14 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
     ease: [0.25, 1, 0.5, 1] as [number, number, number, number] // Smooth deceleration
   };
 
-  // Base pages wrapper
+  // Base pages — use native window scroll so the browser address bar can shrink
   if (level === 0) {
     return (
       <motion.div
-        ref={scrollRef}
-        className="absolute inset-0 w-full h-full bg-[#F6F8FC] overflow-y-auto overflow-x-hidden z-0 pointer-events-auto"
         initial={{ opacity: 1 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0.99 }}
         transition={{ duration: 0.5 }}
-        style={{ WebkitOverflowScrolling: "touch" }}
       >
         {children}
       </motion.div>

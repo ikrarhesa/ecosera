@@ -12,7 +12,7 @@ export default function Header() {
 
   return (
     <div
-      className="sticky top-0 z-50 w-full pt-[env(safe-area-inset-top)] bg-[rgba(34,84,197,1)]"
+      className="fixed top-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-md md:max-w-lg lg:max-w-xl pt-[env(safe-area-inset-top)] bg-[rgba(34,84,197,1)]"
     >
       <header className="w-full relative z-10">
         {/* Content Layer */}

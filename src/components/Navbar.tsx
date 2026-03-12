@@ -32,6 +32,15 @@ export default function Navbar({
   return (
     <>
       {showHeader && <Header />}
+      {/* Spacer to push content below the fixed header */}
+      {showHeader && (
+        <div
+          className="w-full flex-shrink-0"
+          style={{
+            height: "calc(78px + env(safe-area-inset-top))",
+          }}
+        />
+      )}
 
       {/* Optional Additional Content */}
       {showSearchBar && children && (
