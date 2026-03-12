@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, usePresence } from "framer-motion";
 import { ReactNode, useEffect, useRef } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
 
@@ -18,6 +18,7 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
   const location = useLocation();
   const navType = useNavigationType();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isPresent] = usePresence();
 
   if (location.pathname !== currentPath) {
     previousPath = currentPath;
@@ -41,7 +42,11 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
         requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }));
       }
 
-      const handleScroll = () => scrollMap.set(location.key, window.scrollY);
+      const handleScroll = () => {
+        if (isPresent) {
+          scrollMap.set(location.key, window.scrollY);
+        }
+      };
       window.addEventListener("scroll", handleScroll, { passive: true });
       return () => window.removeEventListener("scroll", handleScroll);
     } else {
@@ -75,8 +80,10 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
       }
 
       const handleScroll = (e: Event) => {
-        const target = e.target as HTMLElement;
-        scrollMap.set(location.key, target.scrollTop);
+        if (isPresent) {
+          const target = e.target as HTMLElement;
+          scrollMap.set(location.key, target.scrollTop);
+        }
       };
 
       el.addEventListener("scroll", handleScroll, { passive: true });
