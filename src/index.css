@@ -4,10 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* iOS Safari overscroll / safe-area background.
-   Must match the app's main page colour so the bottom pill area looks seamless. */
-html, body {
+/* Match the app's main page color exactly to make overscroll seamless like Walmart */
+html,
+body,
+#root {
   background-color: #F6F8FC;
+  margin: 0;
+  padding: 0;
 }
 
 

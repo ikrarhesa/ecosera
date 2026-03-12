@@ -18,10 +18,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
     }
 
     return (
-        <div className="min-h-screen bg-[#F6F8FC] flex justify-center">
+        <div className="min-h-screen flex justify-center">
             <div
                 id="main-app-container"
-                className="w-full max-w-md md:max-w-lg lg:max-w-xl min-h-screen bg-[#F6F8FC] shadow-xl relative"
+                className="w-full max-w-md md:max-w-lg lg:max-w-xl min-h-screen relative"
             >
                 {children}
             </div>
