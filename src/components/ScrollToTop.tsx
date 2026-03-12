@@ -6,7 +6,7 @@ export default function ScrollToTop() {
   const navType = useNavigationType();
 
   useEffect(() => {
-    if (navType !== "POP") {
+    if (navType !== "POP" && pathname !== "/") {
       const scrollContainer = document.getElementById('main-scroll-container');
       if (scrollContainer) {
         scrollContainer.scrollTo(0, 0);
