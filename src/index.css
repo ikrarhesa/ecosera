@@ -4,6 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* iOS Safari overscroll background — must match the app container background */
+html, body {
+  background-color: #ffffff;
+  overscroll-behavior-y: none;
+}
+
+
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 

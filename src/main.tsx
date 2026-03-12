@@ -10,8 +10,8 @@ import { ToastProvider } from './context/ToastContext'
 import { ProductsProvider } from './context/ProductsContext'
 import { WishlistProvider } from './context/WishlistContext'
 
-// Let the browser natively save and restore window scroll on back/forward.
-// This is the browser default but we set it explicitly to be safe.
+// We use the browser's native 'auto' scroll restoration for POP (back/forward).
+// ScrollToTop.tsx only handles PUSH (new page) navigations.
 if (typeof window !== 'undefined') {
   window.history.scrollRestoration = 'auto'
 }
