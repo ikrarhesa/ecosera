@@ -252,14 +252,22 @@ export default function ProductDetail() {
     return (
       <>
         <div className="w-full min-h-screen bg-white">
-          {/* Header Skeleton */}
-          <div className="sticky top-0 z-20 flex items-center justify-between bg-white px-3 pb-3 pt-[calc(12px+env(safe-area-inset-top))] border-b">
-            <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse" />
-            <div className="flex gap-2">
-              <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse" />
-              <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse" />
+          {/* Header Skeleton — fixed like the Home Header to avoid blink during route transition */}
+          <div
+            className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg lg:max-w-xl z-50 pt-[env(safe-area-inset-top)]"
+            style={{ backgroundColor: 'rgba(34, 84, 197, 1)' }}
+          >
+            <div className="flex items-center justify-between px-5 pb-5 pt-[18px]">
+              <div className="w-9 h-9 rounded-full bg-white/20 animate-pulse" />
+              <div className="flex gap-2">
+                <div className="w-9 h-9 rounded-full bg-white/20 animate-pulse" />
+                <div className="w-9 h-9 rounded-full bg-white/20 animate-pulse" />
+                <div className="w-9 h-9 rounded-full bg-white/20 animate-pulse" />
+              </div>
             </div>
           </div>
+          {/* Spacer to compensate for fixed header */}
+          <div style={{ height: 'calc(78px + env(safe-area-inset-top))' }} />
 
           {/* Gallery Image Skeleton */}
           <div className="w-full aspect-square bg-slate-200 animate-pulse" />
@@ -330,9 +338,9 @@ export default function ProductDetail() {
   return (
     <>
       <div className="w-full min-h-screen bg-white text-gray-900">
-        {/* Header */}
+        {/* Header — fixed like the Home Header so there's no blink during route transitions */}
         <div
-          className="sticky top-0 z-20 pt-[env(safe-area-inset-top)] border-b border-white/10"
+          className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg lg:max-w-xl z-50 pt-[env(safe-area-inset-top)] border-b border-white/10"
           style={{ backgroundColor: 'rgba(34, 84, 197, 1)' }}
         >
           <div className="flex items-center justify-between px-5 pb-5 pt-[18px]">
@@ -354,6 +362,8 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
+        {/* Spacer to compensate for fixed header */}
+        <div style={{ height: 'calc(78px + env(safe-area-inset-top))' }} />
 
         {/* Gallery Slider */}
         <div className="relative w-full bg-gray-50">

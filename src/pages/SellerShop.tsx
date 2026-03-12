@@ -169,8 +169,8 @@ export default function SellerShop() {
 
     return (
         <div className="min-h-screen pb-24" style={{ background: C.bg }}>
-            {/* ── Header / Search ── */}
-            <div className="sticky top-0 z-40 bg-white shadow-sm border-b border-slate-200 w-full">
+            {/* ── Header / Search — fixed to avoid blink ── */}
+            <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg lg:max-w-xl z-50 bg-white shadow-sm border-b border-slate-200">
                 <div className="max-w-3xl mx-auto px-4 pb-3 flex items-center gap-3 pt-[calc(12px+env(safe-area-inset-top))]">
                     <button
                         onClick={() => navigate(-1)}
@@ -221,6 +221,8 @@ export default function SellerShop() {
                     </div>
                 </div>
             </div>
+            {/* Spacer to compensate for fixed header */}
+            <div style={{ height: 'calc(62px + env(safe-area-inset-top))' }} />
 
             {/* ── Banner ── */}
             <div className="relative h-44 sm:h-56 md:h-64 overflow-hidden">
