@@ -89,7 +89,14 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
       el.addEventListener("scroll", handleScroll, { passive: true });
       return () => el.removeEventListener("scroll", handleScroll);
     }
-  }, [level, location.key, navType]);
+  }, [level, location.key, navType, isPresent]);
+
+  // Reset window scroll when pushed pages (level 1) mount to ensure correct positioning of absolute container
+  useEffect(() => {
+    if (level === 1) {
+      window.scrollTo(0, 0);
+    }
+  }, [level, location.pathname]);
 
   // Baseline transition config
   const transitionConfig = {
