@@ -19,15 +19,6 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
   const navType = useNavigationType();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Captured at mount — identifies which history entry THIS component instance owns.
-  // Never changes for the lifetime of this component, even while it's exiting.
-  const ownKeyRef = useRef(location.key);
-
-  // True only on the very first effect run (= component just entered the DOM).
-  // The exiting component's effect re-fires when location changes, but isEnteringRef
-  // is already false by then, so it won't accidentally reset scroll.
-  const isEnteringRef = useRef(true);
-
   if (location.pathname !== currentPath) {
     previousPath = currentPath;
     currentPath = location.pathname;
@@ -36,34 +27,21 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
   // Handle scroll restoration — branches on level to choose native vs inner-div scroll
   useEffect(() => {
     if (level === 0) {
-      // Native window scroll (level-0 pages).
-      // Only act on scroll position when this is the ENTERING page (first effect run).
-      // The EXITING page's effect re-fires here too (because location.key changed),
-      // but isEnteringRef is already false so we don't touch the scroll position.
-      if (isEnteringRef.current) {
-        if (navType === "POP") {
-          // Back navigation: restore this page's saved scroll position
-          const saved = scrollMap.get(ownKeyRef.current) || 0;
-          const attemptScroll = () => window.scrollTo({ top: saved, behavior: "instant" as ScrollBehavior });
+      // Native window scroll (level-0 pages)
+      if (navType === "POP") {
+        const saved = scrollMap.get(location.key) || 0;
+        const attemptScroll = () => window.scrollTo({ top: saved, behavior: "instant" as ScrollBehavior });
+        attemptScroll();
+        requestAnimationFrame(() => {
           attemptScroll();
-          requestAnimationFrame(() => {
-            attemptScroll();
-            setTimeout(attemptScroll, 50);
-            setTimeout(attemptScroll, 150);
-            setTimeout(attemptScroll, 400);
-            setTimeout(attemptScroll, 800);
-          });
-        } else {
-          // Forward navigation: scroll new page to top
-          requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }));
-        }
+          setTimeout(attemptScroll, 50);
+          setTimeout(attemptScroll, 150);
+        });
+      } else {
+        requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }));
       }
-      isEnteringRef.current = false;
 
-      // Always track scroll under this page's OWN history key,
-      // regardless of what location.key says now (it may have changed while exiting).
-      const myKey = ownKeyRef.current;
-      const handleScroll = () => scrollMap.set(myKey, window.scrollY);
+      const handleScroll = () => scrollMap.set(location.key, window.scrollY);
       window.addEventListener("scroll", handleScroll, { passive: true });
       return () => window.removeEventListener("scroll", handleScroll);
     } else {
