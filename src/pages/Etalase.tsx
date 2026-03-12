@@ -54,7 +54,7 @@ export default function Etalase() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#F6F8FC] pb-28">
+      <div className="min-h-screen bg-[white] pb-28">
 
         {/* Top Category Strip - Uses internal spacers instead of px-5 to prevent snap-positioning bugs */}
         <div className="bg-white border-b border-slate-200 sticky z-10" style={{ top: 'calc(70px + env(safe-area-inset-top))' }}>

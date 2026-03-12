@@ -266,8 +266,8 @@ export default function ProductDetail() {
               </div>
             </div>
           </div>
-          {/* Spacer to compensate for fixed header */}
-          <div style={{ height: 'calc(78px + env(safe-area-inset-top))' }} />
+          {/* Spacer to compensate for fixed header — matched to actual header height to avoid white gap */}
+          <div style={{ height: 'calc(67px + env(safe-area-inset-top))' }} />
 
           {/* Gallery Image Skeleton */}
           <div className="w-full aspect-square bg-slate-200 animate-pulse" />
@@ -362,8 +362,8 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
-        {/* Spacer to compensate for fixed header */}
-        <div style={{ height: 'calc(78px + env(safe-area-inset-top))' }} />
+        {/* Spacer to compensate for fixed header — matched to actual header height to avoid white gap */}
+        <div style={{ height: 'calc(67px + env(safe-area-inset-top))' }} />
 
         {/* Gallery Slider */}
         <div className="relative w-full bg-gray-50">

@@ -284,7 +284,7 @@ export default function Cart() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#F6F8FC]">
+      <div className="min-h-screen bg-[white]">
         {/* Header — fixed to avoid blink during route transitions */}
         <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg lg:max-w-xl z-50 bg-white border-b border-slate-200">
           <div className="px-4 pb-3 flex items-center justify-between pt-[calc(12px+env(safe-area-inset-top))]">
@@ -320,7 +320,7 @@ export default function Cart() {
           </div>
         </div>
         {/* Spacer to compensate for fixed header */}
-        <div style={{ height: 'calc(65px + env(safe-area-inset-top))' }} />
+        <div style={{ height: 'calc(72px + env(safe-area-inset-top))' }} />
 
         {/* Content */}
         <main className="px-4 pt-4 pb-8">

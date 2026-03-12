@@ -151,7 +151,7 @@ export default function Search() {
         : [];
 
     return (
-        <div className="min-h-screen bg-[#F6F8FC] pb-28">
+        <div className="min-h-screen bg-[white] pb-28">
             {/* Search Header — fixed to avoid blink during route transitions */}
             <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg lg:max-w-xl z-50 bg-white border-b border-slate-200 shadow-sm">
                 <div className="px-4 pb-2 flex items-center gap-3 pt-[calc(12px+env(safe-area-inset-top))]">
@@ -223,7 +223,7 @@ export default function Search() {
             </div>
 
             {/* Spacer to compensate for fixed header */}
-            <div style={{ height: 'calc(60px + env(safe-area-inset-top))' }} />
+            <div style={{ height: 'calc(72px + env(safe-area-inset-top))' }} />
 
             <main className="px-4 pt-4">
                 {/* Results Info */}

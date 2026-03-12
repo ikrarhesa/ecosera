@@ -61,7 +61,7 @@ export default function ELearning() {
   return (
     <>
       <BottomNavbar />
-      <div className="min-h-screen bg-[#F6F8FC] pb-28">
+      <div className="min-h-screen bg-[white] pb-28">
         <div className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">
           {/* Header */}
           <div className="flex items-center gap-3 pb-6 pt-[calc(16px+env(safe-area-inset-top))]">

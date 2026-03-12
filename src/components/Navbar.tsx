@@ -37,7 +37,7 @@ export default function Navbar({
         <div
           className="w-full flex-shrink-0"
           style={{
-            height: "calc(78px + env(safe-area-inset-top))",
+            height: "calc(82px + env(safe-area-inset-top))",
           }}
         />
       )}

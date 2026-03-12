@@ -50,7 +50,7 @@ export default function Wishlist() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F6F8FC] pb-28">
+        <div className="min-h-screen bg-[white] pb-28">
             {/* Title Strip - Matches Etalase Category Strip profile */}
             <div className="bg-white px-5 py-3 flex items-center justify-between border-b border-slate-200 mb-3">
                 <div>

@@ -165,7 +165,7 @@ export default function ModuleDetail() {
 
   if (!module) {
     return (
-      <div className="min-h-screen bg-[#F6F8FC] pb-28">
+      <div className="min-h-screen bg-[white] pb-28">
         <Navbar />
         <div className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto text-center">
           <h1 className="text-xl font-bold text-slate-900 mb-4">Modul tidak ditemukan</h1>
@@ -178,7 +178,7 @@ export default function ModuleDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F6F8FC] pb-28">
+    <div className="min-h-screen bg-[white] pb-28">
       <Navbar />
 
       <div className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto">

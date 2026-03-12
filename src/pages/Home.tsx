@@ -205,7 +205,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#F6F8FC] pb-28">
+      <div className="min-h-screen bg-[white] pb-28">
         <main className="px-5 pt-1">
           {/* Banner carousel */}
           <BannerCarousel />
