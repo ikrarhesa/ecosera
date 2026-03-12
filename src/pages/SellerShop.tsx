@@ -222,7 +222,7 @@ export default function SellerShop() {
                 </div>
             </div>
             {/* Spacer to compensate for fixed header */}
-            <div style={{ height: 'calc(62px + env(safe-area-inset-top))' }} />
+            <div style={{ height: 'calc(72px + env(safe-area-inset-top))' }} />
 
             {/* ── Banner ── */}
             <div className="relative h-44 sm:h-56 md:h-64 overflow-hidden">
