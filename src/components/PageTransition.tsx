@@ -1,4 +1,4 @@
-import { motion, usePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ReactNode, useEffect, useRef } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
 
@@ -18,7 +18,6 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
   const location = useLocation();
   const navType = useNavigationType();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [isPresent] = usePresence();
 
   if (location.pathname !== currentPath) {
     previousPath = currentPath;
@@ -42,11 +41,7 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
         requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }));
       }
 
-      const handleScroll = () => {
-        if (isPresent) {
-          scrollMap.set(location.key, window.scrollY);
-        }
-      };
+      const handleScroll = () => scrollMap.set(location.key, window.scrollY);
       window.addEventListener("scroll", handleScroll, { passive: true });
       return () => window.removeEventListener("scroll", handleScroll);
     } else {
@@ -80,23 +75,14 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
       }
 
       const handleScroll = (e: Event) => {
-        if (isPresent) {
-          const target = e.target as HTMLElement;
-          scrollMap.set(location.key, target.scrollTop);
-        }
+        const target = e.target as HTMLElement;
+        scrollMap.set(location.key, target.scrollTop);
       };
 
       el.addEventListener("scroll", handleScroll, { passive: true });
       return () => el.removeEventListener("scroll", handleScroll);
     }
-  }, [level, location.key, navType, isPresent]);
-
-  // Reset window scroll when pushed pages (level 1) mount to ensure correct positioning of absolute container
-  useEffect(() => {
-    if (level === 1) {
-      window.scrollTo(0, 0);
-    }
-  }, [level, location.pathname]);
+  }, [level, location.key, navType]);
 
   // Baseline transition config
   const transitionConfig = {
