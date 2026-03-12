@@ -37,7 +37,7 @@ export default function PageTransition({ children, level = 0 }: PageTransitionPr
           setTimeout(attemptScroll, 50);
           setTimeout(attemptScroll, 150);
         });
-      } else if (location.pathname !== "/") {
+      } else {
         requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }));
       }
 
