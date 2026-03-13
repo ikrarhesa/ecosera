@@ -153,15 +153,15 @@ export default function PilihanDaerahStripSimple() {
         <h3 className="font-bold text-blue-900 text-lg">Pilihan Daerah</h3>
       </div>
 
-      {/* Tab buttons */}
-      <div className="flex gap-2 mb-2">
+      {/* Tab buttons - Horizontal scrollable to prevent wrapping on mobile */}
+      <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide -mx-1 px-1">
         {(['nearby', 'popular', 'new'] as TabType[]).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`h-8 px-3 rounded-full border text-sm font-medium transition-colors ${activeTab === tab
-              ? 'bg-blue-600 text-white border-transparent'
-              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            className={`h-9 px-4 shrink-0 rounded-full border text-sm font-semibold transition-all whitespace-nowrap ${activeTab === tab
+              ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-200'
+              : 'bg-white/80 text-blue-800 border-blue-100 hover:bg-white hover:border-blue-200'
               }`}
           >
             {getTabLabel(tab)}
