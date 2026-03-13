@@ -154,14 +154,14 @@ export default function PilihanDaerahStripSimple() {
       </div>
 
       {/* Tab buttons - Horizontal scrollable to prevent wrapping on mobile */}
-      <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide -mx-1 px-1">
+      <div className="flex gap-2 mb-2.5 overflow-x-auto scrollbar-hide -mx-1 px-1">
         {(['nearby', 'popular', 'new'] as TabType[]).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`h-9 px-4 shrink-0 rounded-full border text-sm font-semibold transition-all whitespace-nowrap ${activeTab === tab
-              ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-200'
-              : 'bg-white/80 text-blue-800 border-blue-100 hover:bg-white hover:border-blue-200'
+            className={`h-[30px] px-3 shrink-0 rounded-full border text-xs font-bold transition-all whitespace-nowrap ${activeTab === tab
+              ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-200/50'
+              : 'bg-white/80 text-blue-800 border-blue-100/50 hover:bg-white hover:border-blue-200'
               }`}
           >
             {getTabLabel(tab)}
