@@ -148,9 +148,9 @@ export default function PilihanDaerahStripSimple() {
   if (contextLoading) return null; // Return nothing while waiting, the parent Home page has its own skeleton loader anyway
 
   return (
-    <div className="mb-3 mt-3">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-semibold">Pilihan Daerah</h3>
+    <div className="mb-6 mt-2 p-4 rounded-2xl bg-gradient-to-br from-blue-50/80 to-blue-100/50 border border-blue-100/50 shadow-sm">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-bold text-blue-900 text-lg">Pilihan Daerah</h3>
       </div>
 
       {/* Tab buttons */}
@@ -169,7 +169,7 @@ export default function PilihanDaerahStripSimple() {
         ))}
       </div>
 
-      <div className="text-xs text-slate-600 mb-2">
+      <div className="text-xs text-blue-800/80 mb-3 font-medium">
         {getTabDescription(activeTab)}
         {activeTab === 'nearby' && locationPermission === 'denied' && (
           <span className="text-orange-600 ml-2">• Lokasi tidak tersedia</span>
