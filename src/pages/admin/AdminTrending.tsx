@@ -49,6 +49,7 @@ export default function AdminTrending() {
                         existingItem || {
                             position,
                             title: "",
+                            show_title: true,
                             image_url: "",
                             link_url: "",
                         }
@@ -117,6 +118,7 @@ export default function AdminTrending() {
             await upsertSoughtAfterItem({
                 position: item.position,
                 title: item.title,
+                show_title: item.show_title,
                 image_url: item.image_url,
                 link_url: item.link_url,
             });
@@ -263,6 +265,28 @@ export default function AdminTrending() {
                                                 saving === item.position
                                             }
                                         />
+                                    </div>
+
+                                    <div className="flex items-center justify-between py-1">
+                                        <span className="text-xs font-medium text-slate-600">Tampilkan Judul</span>
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                className="sr-only peer"
+                                                checked={item.show_title}
+                                                onChange={(e) =>
+                                                    setItems((prev) =>
+                                                        prev.map((i) =>
+                                                            i.position === item.position
+                                                                ? { ...i, show_title: e.target.checked }
+                                                                : i
+                                                        )
+                                                    )
+                                                }
+                                                disabled={saving === item.position}
+                                            />
+                                            <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                        </label>
                                     </div>
 
                                     <div>

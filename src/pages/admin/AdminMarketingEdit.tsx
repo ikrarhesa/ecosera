@@ -23,6 +23,7 @@ export default function AdminMarketingEdit() {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [isActive, setIsActive] = useState(true);
+    const [showTitle, setShowTitle] = useState(true);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [existingImageUrl, setExistingImageUrl] = useState("");
@@ -41,6 +42,7 @@ export default function AdminMarketingEdit() {
                 setOverlayColor(banner.overlay_color || (banner.text_color === "navy" ? "#ffffff" : "#000000"));
                 setOverlayOpacity(banner.overlay_opacity !== undefined ? banner.overlay_opacity : 60);
                 setExistingImageUrl(banner.image_url); setPreviewUrl(banner.image_url); setIsActive(banner.is_active);
+                setShowTitle(banner.show_title !== undefined ? banner.show_title : true);
                 if (banner.start_date) { const sd = new Date(banner.start_date); setStartDate(new Date(sd.getTime() - sd.getTimezoneOffset() * 60000).toISOString().slice(0, 16)); }
                 if (banner.end_date) { const ed = new Date(banner.end_date); setEndDate(new Date(ed.getTime() - ed.getTimezoneOffset() * 60000).toISOString().slice(0, 16)); }
             } catch (err: any) { show("Gagal memanggil data banner."); } finally { setLoading(false); }
@@ -80,12 +82,17 @@ export default function AdminMarketingEdit() {
             if (imageFile) { show("Mengunggah gambar baru..."); finalImageUrl = await uploadBannerImage(imageFile); }
             show("Menyimpan perubahan...");
             await updateBanner(id, {
-                title: title.trim(), link_url: linkUrl.trim() || null, cta_text: ctaText.trim() || null,
+                title: title.trim(), 
+                show_title: showTitle,
+                link_url: linkUrl.trim() || null, 
+                cta_text: ctaText.trim() || null,
                 text_color: textColor,
                 overlay_color: overlayColor,
                 overlay_opacity: overlayOpacity,
-                image_url: finalImageUrl, start_date: startDate ? new Date(startDate).toISOString() : null,
-                end_date: endDate ? new Date(endDate).toISOString() : null, is_active: isActive,
+                image_url: finalImageUrl, 
+                start_date: startDate ? new Date(startDate).toISOString() : null,
+                end_date: endDate ? new Date(endDate).toISOString() : null, 
+                is_active: isActive,
             } as Partial<Banner>);
             show("Banner berhasil diperbarui! 🎉");
             navigate("/admin/marketing");
@@ -123,6 +130,18 @@ export default function AdminMarketingEdit() {
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" className="sr-only peer" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+
+                    {/* Show Title Toggle */}
+                    <div className="flex items-center justify-between bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <div>
+                            <p className="font-medium text-sm" style={{ color: C.navy }}>Tampilkan Judul</p>
+                            <p className="text-xs text-slate-500">Munculkan judul di atas banner?</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" className="sr-only peer" checked={showTitle} onChange={(e) => setShowTitle(e.target.checked)} />
                             <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                         </label>
                     </div>

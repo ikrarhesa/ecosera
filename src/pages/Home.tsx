@@ -72,7 +72,9 @@ function BannerCarousel() {
                 }}
               />
               <div className={`absolute left-4 right-4 bottom-4 ${b.text_color === 'navy' ? 'text-[#041E42]' : 'text-white'}`}>
-                <h3 className="text-lg font-bold leading-tight">{b.title}</h3>
+                {(b.show_title !== false) && (
+                  <h3 className="text-lg font-bold leading-tight">{b.title}</h3>
+                )}
                 {b.link_url && (
                   <a
                     href={b.link_url}

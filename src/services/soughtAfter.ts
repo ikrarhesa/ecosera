@@ -5,6 +5,7 @@ export interface SoughtAfterItem {
     id?: string;
     position: number;
     title: string;
+    show_title: boolean;
     image_url: string;
     link_url?: string;
     created_at?: string;
@@ -38,6 +39,7 @@ export async function upsertSoughtAfterItem(item: Omit<SoughtAfterItem, "id" | "
             {
                 position: item.position,
                 title: item.title,
+                show_title: item.show_title,
                 image_url: item.image_url,
                 link_url: item.link_url
             },

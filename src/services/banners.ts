@@ -11,6 +11,7 @@ export interface Banner {
     overlay_color?: string;
     overlay_opacity?: number;
     is_active: boolean;
+    show_title: boolean;
     sort_order: number;
     start_date?: string | null;
     end_date?: string | null;

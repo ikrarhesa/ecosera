@@ -20,6 +20,7 @@ export default function AdminMarketingNew() {
     const [textColor, setTextColor] = useState<'white' | 'navy'>('white');
     const [overlayColor, setOverlayColor] = useState("#000000");
     const [overlayOpacity, setOverlayOpacity] = useState(60);
+    const [showTitle, setShowTitle] = useState(true);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -58,6 +59,7 @@ export default function AdminMarketingNew() {
             show("Menyimpan banner...");
             await createBanner({
                 title: title.trim(),
+                show_title: showTitle,
                 link_url: linkUrl.trim() || undefined,
                 cta_text: ctaText.trim() || undefined,
                 text_color: textColor,
@@ -146,6 +148,17 @@ export default function AdminMarketingNew() {
                                 <option value="navy">Navy (Untuk Background Terang)</option>
                             </select>
                             <p className="text-[11px] text-slate-500 mt-1.5">Pilih warna teks dan tombol agar kontras dengan gambar banner.</p>
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <div>
+                                <p className="font-medium text-sm" style={{ color: C.navy }}>Tampilkan Judul</p>
+                                <p className="text-xs text-slate-500">Munculkan judul di atas banner?</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" className="sr-only peer" checked={showTitle} onChange={(e) => setShowTitle(e.target.checked)} disabled={loading} />
+                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

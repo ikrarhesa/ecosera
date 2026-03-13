@@ -116,9 +116,11 @@ export default function Etalase() {
                           }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent flex items-end">
-                          <span className="text-white font-medium text-[10px] sm:text-xs p-2 truncate w-full tracking-wide">
-                            {item.title}
-                          </span>
+                          {(item.show_title !== false) && (
+                            <span className="text-white font-medium text-[10px] sm:text-xs p-2 truncate w-full tracking-wide">
+                              {item.title}
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
