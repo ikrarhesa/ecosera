@@ -216,7 +216,7 @@ export default function PilihanDaerahStripSimple() {
 
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-1 -mx-1">
         {products.map((product) => (
-          <Link key={product.id} to={`/product/${product.slug || product.id}`} className="block w-[156px] shrink-0 rounded-xl bg-white border border-slate-200 p-2 hover:border-blue-300 transition-colors">
+          <Link key={product.id} to={`/product/${product.slug || product.id}`} className="block w-[110px] shrink-0 rounded-xl bg-white border border-slate-200 p-1.5 hover:border-blue-300 transition-colors shadow-sm">
             {/* Image */}
             <div className="w-full aspect-square rounded-lg overflow-hidden bg-slate-100">
               <img
@@ -231,51 +231,51 @@ export default function PilihanDaerahStripSimple() {
             </div>
 
             {/* Name */}
-            <div className="mt-2 text-sm font-medium truncate text-slate-900">
+            <div className="mt-1.5 text-xs font-semibold truncate text-slate-900">
               {product.name}
             </div>
 
             {/* Price */}
-            <div className="mt-1 flex items-baseline">
-              <span className="text-sm font-bold text-blue-600">
+            <div className="mt-0.5 flex items-baseline truncate">
+              <span className="text-[11px] font-bold text-blue-600">
                 Rp {money(product.price)}
               </span>
-              <span className="text-[10px] text-slate-500 ml-1 truncate">
-                / {product.unit}
+              <span className="text-[9px] text-slate-500 ml-0.5 truncate">
+                /{product.unit}
               </span>
             </div>
 
             {/* Rating and Sold */}
-            <div className="flex items-center gap-1 mt-1">
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <span className="text-xs text-slate-600">{product.rating}</span>
-              <span className="text-xs text-slate-400">•</span>
-              <span className="text-xs text-slate-600">{product.sold} tertarik</span>
+            <div className="flex items-center gap-0.5 mt-0.5">
+              <Star className="h-2.5 w-2.5 fill-yellow-400 text-yellow-400" />
+              <span className="text-[10px] text-slate-600">{product.rating}</span>
+              <span className="text-[9px] text-slate-400">•</span>
+              <span className="text-[10px] text-slate-600 truncate">{product.sold}</span>
             </div>
 
             {/* Location */}
             {product.location && (
-              <div className="flex items-center gap-1 mt-1 w-full">
-                <MapPin className="h-3 w-3 text-slate-500 flex-shrink-0" />
-                <span className="text-xs text-slate-500 truncate min-w-0 flex-1">{product.location}</span>
+              <div className="flex items-center gap-0.5 mt-0.5 w-full">
+                <MapPin className="h-2.5 w-2.5 text-slate-500 flex-shrink-0" />
+                <span className="text-[10px] text-slate-500 truncate min-w-0 flex-1">{product.location}</span>
               </div>
             )}
 
             {/* Tab-specific badges */}
             {activeTab === 'nearby' && (product as any).distance && (
-              <div className="mt-1 inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                <Navigation className="h-3 w-3 mr-1" />
+              <div className="mt-1 inline-flex items-center text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">
+                <Navigation className="h-2.5 w-2.5 mr-0.5" />
                 {(product as any).distance.toFixed(1)} km
               </div>
             )}
             {activeTab === 'popular' && (
-              <div className="mt-1 inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                🔥 Paling Laris
+              <div className="mt-1 inline-flex items-center text-[9px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 font-medium whitespace-nowrap">
+                🔥 Laris
               </div>
             )}
             {activeTab === 'new' && (
-              <div className="mt-1 inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
-                ✨ Paling Baru
+              <div className="mt-1 inline-flex items-center text-[9px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 font-medium whitespace-nowrap">
+                ✨ Baru
               </div>
             )}
 
