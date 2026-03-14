@@ -2,7 +2,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AdminLayout from "./components/AdminLayout";
+import AdminLayout from "./layouts/AdminLayout";
 import Home from "./pages/Home";
 import Etalase from "./pages/Etalase";
 import ProductDetail from "./pages/ProductDetail";
@@ -24,7 +24,7 @@ import AdminMarketing from "./pages/admin/AdminMarketing";
 import AdminMarketingNew from "./pages/admin/AdminMarketingNew";
 import AdminMarketingEdit from "./pages/admin/AdminMarketingEdit";
 import AdminTrending from "./pages/admin/AdminTrending";
-import PublicLayout from "./components/PublicLayout";
+import PublicLayout from "./layouts/PublicLayout";
 
 export default function App() {
   return (

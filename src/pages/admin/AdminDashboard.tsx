@@ -7,7 +7,7 @@ import {
   Calendar,
   RefreshCw,
 } from "lucide-react";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../lib/supabase";
 
 /* ── Walmart palette ──────────────────────────────────────────────── */
 const C = {
