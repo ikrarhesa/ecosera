@@ -13,7 +13,7 @@ import ModuleDetail from "./pages/ModuleDetail";
 import Wishlist from "./pages/Wishlist";
 import Search from "./pages/Search";
 import AdminLogin from "./pages/admin/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminShops from "./pages/admin/AdminShops";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminProductNew from "./pages/admin/AdminProductNew";
