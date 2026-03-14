@@ -24,32 +24,22 @@ import AdminMarketing from "./pages/admin/AdminMarketing";
 import AdminMarketingNew from "./pages/admin/AdminMarketingNew";
 import AdminMarketingEdit from "./pages/admin/AdminMarketingEdit";
 import AdminTrending from "./pages/admin/AdminTrending";
-import Navbar from "./components/Navbar";
-
-// Wrap a page with the shared Navbar (header + bottom nav)
-function WithNav({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <Navbar />
-      {children}
-    </>
-  );
-}
+import PublicLayout from "./components/PublicLayout";
 
 export default function App() {
   return (
     <AuthProvider>
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={<WithNav><Home /></WithNav>} />
-        <Route path="/etalase" element={<WithNav><Etalase /></WithNav>} />
-        <Route path="/product/:slug" element={<WithNav><ProductDetail /></WithNav>} />
-        <Route path="/cart" element={<WithNav><Cart /></WithNav>} />
-        <Route path="/wishlist" element={<WithNav><Wishlist /></WithNav>} />
-        <Route path="/search" element={<WithNav><Search /></WithNav>} />
-        <Route path="/shop/:seller_id" element={<WithNav><SellerShop /></WithNav>} />
-        <Route path="/e-learning" element={<WithNav><ELearning /></WithNav>} />
-        <Route path="/e-learning/:moduleId" element={<WithNav><ModuleDetail /></WithNav>} />
+        <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
+        <Route path="/etalase" element={<PublicLayout><Etalase /></PublicLayout>} />
+        <Route path="/product/:slug" element={<PublicLayout><ProductDetail /></PublicLayout>} />
+        <Route path="/cart" element={<PublicLayout><Cart /></PublicLayout>} />
+        <Route path="/wishlist" element={<PublicLayout><Wishlist /></PublicLayout>} />
+        <Route path="/search" element={<PublicLayout><Search /></PublicLayout>} />
+        <Route path="/shop/:seller_id" element={<PublicLayout><SellerShop /></PublicLayout>} />
+        <Route path="/e-learning" element={<PublicLayout><ELearning /></PublicLayout>} />
+        <Route path="/e-learning/:moduleId" element={<PublicLayout><ModuleDetail /></PublicLayout>} />
 
         {/* Admin login (public) */}
         <Route path="/admin/login" element={<AdminLogin />} />
