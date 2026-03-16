@@ -7,11 +7,13 @@
  * Future step: add debounce for rapid tab presses and error toast.
  */
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { fetchPilihanDaerah } from '../services/pilihanDaerah';
-import { formatCurrencyIDR, km } from '../utils/format';
+import { formatCurrencyIDR } from '../utils/format';
 import { haversineKm } from '../utils/geo';
-import { isOnline, onOnlineOnce } from '../utils/net';
+import { buildSafeWaHref } from '../utils/contact';
+import { analytics } from '../services/analytics';
+import { PilihanProductCard } from './PilihanProductCard';
 import { isBrowser } from '../utils/dom';
 import { FEATURE_PILIHAN_TITLE_VARIANT } from '../config/featureFlags';
 import { getStarterBundles } from '../services/starterBundles';
@@ -27,55 +29,19 @@ export interface PilihanDaerahStripProps {
   onAdd?: (itemId: string) => void; // parent can handle add-to-cart
 }
 
-const TabToReason: Record<string, 'order_again' | 'staple' | 'nearby'> = {
-  'Beli Lagi': 'order_again',
-  'Kebutuhan Pokok': 'staple',
-  'Dekat Kamu': 'nearby',
-};
 
-const ReasonToLabel: Record<'order_again' | 'staple' | 'nearby', string> = {
+const ReasonToLabel: Record<PilihanTab, string> = {
   order_again: 'Beli Lagi',
   staple: 'Kebutuhan Pokok',
   nearby: 'Dekat',
 };
 
-const FALLBACK_IMG =
-  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="100%" height="100%" fill="%23e5e7eb"/></svg>';
 
-// WhatsApp link security helpers
-function sanitizePhoneE164ish(raw?: string): string {
-  if (!raw) return '';
-  // keep digits only
-  const digits = raw.replace(/\D+/g, '');
-  // optionally normalize leading 0 to 62 for IDN, but KEEP SIMPLE: just return digits
-  return digits;
-}
-
-function sanitizePrefill(raw?: string, region?: string): string {
-  const base = (raw && typeof raw === 'string' ? raw : '').replace(/[\u0000-\u001F\u007F]/g, ' ').trim();
-  const withRegion = region ? (base.length ? base + '\n(Area: ' + region + ')' : '(Area: ' + region + ')') : base;
-  // cap to 500 chars to avoid absurd URLs
-  return withRegion.slice(0, 500);
-}
-
-function buildSafeWaHref(phoneRaw?: string, textRaw?: string) {
-  const phone = sanitizePhoneE164ish(phoneRaw);
-  const text = sanitizePrefill(textRaw);
-  if (!phone) return null; // invalid, avoid rendering broken link
-  const url = 'https://wa.me/' + phone + (text ? ('?text=' + encodeURIComponent(text)) : '');
-  try {
-    const u = new URL(url);
-    if (u.protocol !== 'https:' || u.hostname !== 'wa.me') return null;
-    return u.toString();
-  } catch {
-    return null;
-  }
-}
 
 export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.Element {
   const [data, setData] = useState<PilihanResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'order_again' | 'staple' | 'nearby'>('order_again');
+  const [activeTab, setActiveTab] = useState<PilihanTab>('order_again');
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const [refetchNonce, setRefetchNonce] = useState(0);
@@ -85,7 +51,7 @@ export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.
   // Impression tracking refs
   const seenImpressionsRef = useRef<Set<string>>(new Set()); // keys: `${activeTab}:${item.id}`
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const pendingImpressionsRef = useRef<Array<{ id: string; tab: 'order_again'|'staple'|'nearby'; region: string }>>([]);
+  const pendingImpressionsRef = useRef<Array<{ id: string; tab: PilihanTab; region: string }>>([]);
   const throttleTimerRef = useRef<number | null>(null);
 
   // Throttled impression dispatch - impressions are per-tab and fire once per item when ≥50% visible
@@ -96,11 +62,7 @@ export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.
       throttleTimerRef.current = null;
       if (batch.length) {
         for (const it of batch) {
-          window.dispatchEvent(
-            new CustomEvent('pilihan_impression', {
-              detail: { item_id: it.id, tab: it.tab, region_label: it.region },
-            })
-          );
+          analytics.pilihan.impression({ item_id: it.id, tab: it.tab, region_label: it.region });
         }
       }
     }, 200);
@@ -157,7 +119,6 @@ export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.
           ? props.regionLabelOverride
           : resolveRegionLabel(props.lat, props.lng);
 
-        // Detect significant location change
         const last = readLastLoc();
         const hasCoords = typeof props.lat === 'number' && typeof props.lng === 'number';
         if (hasCoords) {
@@ -189,15 +150,11 @@ export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.
           setData(response);
           
           // Dispatch view event
-          if (isBrowser()) {
-            window.dispatchEvent(new CustomEvent('pilihan_view', {
-              detail: {
-                region_label: response.region_label,
-                items_shown: response.items.length,
-                tab: response.tab
-              }
-            }));
-          }
+          analytics.pilihan.view({
+            region_label: response.region_label,
+            items_shown: response.items.length,
+            tab: response.tab
+          });
 
 
           // Persist activeTab to localStorage
@@ -331,16 +288,12 @@ export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.
   }, [activeTab, data]);
 
   // Handle tab switch
-  const handleTabSwitch = (newTab: 'order_again' | 'staple' | 'nearby') => {
+  const handleTabSwitch = (newTab: PilihanTab) => {
     const oldTab = activeTab;
     setActiveTab(newTab);
     
     // Dispatch tab switch event
-    if (isBrowser()) {
-      window.dispatchEvent(new CustomEvent('pilihan_tab_switch', {
-        detail: { from: oldTab, to: newTab }
-      }));
-    }
+    analytics.pilihan.tabSwitch({ from: oldTab, to: newTab });
   };
 
   // Handle add to cart
@@ -348,15 +301,11 @@ export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.
     props.onAdd?.(item.id);
     
     // Dispatch add event
-    if (isBrowser()) {
-      window.dispatchEvent(new CustomEvent('pilihan_click_add', {
-        detail: {
-          item_id: item.id,
-          tab: activeTab,
-          region_label: data?.region_label || 'Unknown'
-        }
-      }));
-    }
+    analytics.pilihan.clickAdd({
+      item_id: item.id,
+      tab: activeTab,
+      region_label: data?.region_label || 'Unknown'
+    });
   };
 
   // Handle chat
@@ -369,9 +318,7 @@ export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.
 
     if (href) {
       if (isBrowser()) {
-        window.dispatchEvent(new CustomEvent('pilihan_click_chat', { 
-          detail: { item_id: item.id, tab: activeTab, region_label: regionLabel } 
-        }));
+      analytics.pilihan.clickChat({ item_id: item.id, tab: activeTab, region_label: regionLabel });
         // open in new tab safely
         window.open(href, '_blank', 'noopener,noreferrer');
       }
@@ -451,11 +398,7 @@ export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.
               setRefetchNonce((n) => n + 1);
               
               // Dispatch retry event
-              if (isBrowser()) {
-                window.dispatchEvent(new CustomEvent('pilihan_retry', {
-                  detail: { tab: activeTab }
-                }));
-              }
+              analytics.pilihan.retry({ tab: activeTab });
             }}
           >
             Coba lagi
@@ -490,11 +433,7 @@ export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.
             
             // Dispatch bundles view event once
             React.useEffect(() => {
-              if (isBrowser()) {
-                window.dispatchEvent(new CustomEvent('pilihan_bundles_view', { 
-                  detail: { region_label: region } 
-                }));
-              }
+              analytics.pilihan.bundlesView({ region_label: region });
             }, []);
 
             return bundles.map(bundle => (
@@ -518,21 +457,15 @@ export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.
                     });
                     
                     // Dispatch analytics event
-                    if (isBrowser()) {
-                      window.dispatchEvent(new CustomEvent('pilihan_bundle_add_all', {
-                        detail: {
-                          bundle_id: bundle.id,
-                          region_label: region,
-                          item_ids: bundle.items.map(i => i.id)
-                        }
-                      }));
-                    }
+                    analytics.pilihan.bundleAddAll({
+                      bundle_id: bundle.id,
+                      region_label: region,
+                      item_ids: bundle.items.map(i => i.id)
+                    });
                     
                     // Optional toast
                     if (isBrowser() && (window as any).toast) {
                       (window as any).toast(`Ditambahkan ${bundle.items.length} item ke keranjang`);
-                    } else if (isBrowser()) {
-                      console.log('[pilihan] bundle ditambahkan:', bundle.id);
                     }
                   }}
                 >
@@ -544,90 +477,17 @@ export default function PilihanDaerahStrip(props: PilihanDaerahStripProps): JSX.
         </div>
       ) : (
         <div className="flex gap-3 overflow-x-auto no-scrollbar">
-          {items.slice(0, 6).map(item => {
-            const [imgLoading, setImgLoading] = useState(true);
-            
-            return (
-              <div
-                key={item.id}
-                className="w-[156px] shrink-0 rounded-xl border border-slate-200 bg-white p-2"
-                ref={setCardRef(`${activeTab}:${item.id}`)}
-              >
-                {/* Image */}
-                <div className="w-full aspect-square rounded-lg bg-slate-100 overflow-hidden">
-                  <img
-                    src={item.image?.trim() || FALLBACK_IMG}
-                    srcSet={
-                      item.image
-                        ? `${item.image.trim()} 1x, ${item.image.trim()} 2x`
-                        : undefined
-                    }
-                    alt={item.name || 'Produk'}
-                    width={300}
-                    height={300}
-                    loading="lazy"
-                    decoding="async"
-                    onLoad={() => setImgLoading(false)}
-                    onError={(e) => {
-                      const el = e.currentTarget;
-                      el.src = FALLBACK_IMG;
-                      el.removeAttribute('srcset');
-                      setImgLoading(false);
-                    }}
-                    className={[
-                      'h-full w-full object-cover',
-                      'transition duration-300',
-                      imgLoading ? 'blur-[6px] scale-[1.02]' : 'blur-0 scale-100',
-                    ].join(' ')}
-                  />
-                </div>
-
-              {/* Name */}
-              <div className="mt-2 text-sm line-clamp-2 text-slate-900">
-                {item.name}
-              </div>
-
-              {/* Price and Unit */}
-              <div className="mt-1 flex items-baseline">
-                <span className="text-sm font-semibold">
-                  {formatCurrencyIDR(item.price)}
-                </span>
-                <span className="text-xs text-slate-600 ml-1">
-                  {item.unit}
-                </span>
-              </div>
-
-              {/* Stock */}
-              <div className="text-[11px] text-slate-600">
-                {item.stock === null ? 'Preorder' : `Stok: ${item.stock}`}
-              </div>
-
-              {/* Reason Badge */}
-              <div className="mt-1 inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
-                {ReasonToLabel[item.reason]}
-                {item.reason === 'nearby' && item.distance_km && ` ${km(item.distance_km)}`}
-              </div>
-
-              {/* Actions */}
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => handleAdd(item)}
-                  aria-label={`Tambah ${item.name || 'Produk'}`}
-                  className="h-8 rounded-lg text-sm font-medium border bg-[#2254C5] text-white border-transparent"
-                >
-                  Tambah
-                </button>
-                <button
-                  onClick={() => handleChat(item)}
-                  aria-label={`Chat ${item.seller?.name || 'penjual'}`}
-                  className="h-8 rounded-lg text-sm font-medium border bg-white text-slate-900 border-slate-200"
-                >
-                  Chat
-                </button>
-              </div>
-              </div>
-            );
-          })}
+          {items.slice(0, 6).map(item => (
+            <PilihanProductCard
+              key={item.id}
+              item={item}
+              tab={activeTab}
+              onAdd={handleAdd}
+              onChat={handleChat}
+              cardRef={setCardRef(`${activeTab}:${item.id}`)}
+              reasonLabel={ReasonToLabel[item.reason]}
+            />
+          ))}
         </div>
       )}
 

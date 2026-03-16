@@ -3,7 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { Plus, Package, Pencil, Trash2, ToggleLeft, ToggleRight, ArrowLeft } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
-const C = { blue: "#0071DC", navy: "#041E42" };
+import { UI } from "../../config/ui";
+import { formatCurrencyIDR } from "../../utils/format";
 const BUCKET = "product-images";
 
 /** Extract the storage path from a Supabase public URL */
@@ -22,8 +23,6 @@ interface ProductRow {
     is_active: boolean;
 }
 
-const fmtIDR = (n: number) =>
-    new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
 
 export default function AdminProducts() {
     const { seller_id } = useParams<{ seller_id: string }>();
@@ -104,13 +103,13 @@ export default function AdminProducts() {
                 </Link>
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold" style={{ color: C.navy }}>Produk</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold" style={{ color: UI.BRAND.NAVY }}>Produk</h1>
                         {shopName && <p className="text-sm text-slate-500 mt-1">{shopName} · {products.length} produk</p>}
                     </div>
                     <Link
                         to={`/admin/shops/${seller_id}/products/new`}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-white text-sm font-medium transition-colors hover:opacity-90"
-                        style={{ backgroundColor: C.blue }}
+                        style={{ backgroundColor: UI.BRAND.PRIMARY }}
                     >
                         <Plus className="h-4 w-4" />
                         Tambah Produk
@@ -120,7 +119,7 @@ export default function AdminProducts() {
 
             {loading && (
                 <div className="flex items-center justify-center py-24">
-                    <div className="w-8 h-8 border-[3px] border-t-transparent rounded-full animate-spin" style={{ borderColor: C.blue, borderTopColor: "transparent" }} />
+                    <div className="w-8 h-8 border-[3px] border-t-transparent rounded-full animate-spin" style={{ borderColor: UI.BRAND.PRIMARY, borderTopColor: "transparent" }} />
                 </div>
             )}
 
@@ -140,7 +139,7 @@ export default function AdminProducts() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wider text-slate-500" style={{ backgroundColor: C.blue + "06" }}>
+                                    <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wider text-slate-500" style={{ backgroundColor: UI.BRAND.PRIMARY + "06" }}>
                                         <th className="px-4 py-3 font-medium">Nama</th>
                                         <th className="px-4 py-3 font-medium hidden md:table-cell">Slug</th>
                                         <th className="px-4 py-3 font-medium text-right">Harga</th>
@@ -151,9 +150,9 @@ export default function AdminProducts() {
                                 <tbody>
                                     {products.map((p) => (
                                         <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
-                                            <td className="px-4 py-3 font-medium" style={{ color: C.navy }}>{p.name}</td>
+                                            <td className="px-4 py-3 font-medium" style={{ color: UI.BRAND.NAVY }}>{p.name}</td>
                                             <td className="px-4 py-3 font-mono text-xs text-slate-500 hidden md:table-cell">{p.slug}</td>
-                                            <td className="px-4 py-3 text-right tabular-nums">{fmtIDR(p.price)}</td>
+                                            <td className="px-4 py-3 text-right tabular-nums">{formatCurrencyIDR(p.price)}</td>
                                             <td className="px-4 py-3 text-center">
                                                 <button onClick={() => toggleActive(p)} className="inline-flex items-center gap-1 group" title={p.is_active ? "Nonaktifkan" : "Aktifkan"}>
                                                     {p.is_active ? (
@@ -168,7 +167,7 @@ export default function AdminProducts() {
                                             </td>
                                             <td className="px-4 py-3 text-center">
                                                 <div className="flex items-center justify-center gap-1">
-                                                    <Link to={`/admin/shops/${seller_id}/products/${p.id}/edit`} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors" style={{ color: C.blue }} title="Edit">
+                                                    <Link to={`/admin/shops/${seller_id}/products/${p.id}/edit`} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors" style={{ color: UI.BRAND.PRIMARY }} title="Edit">
                                                         <Pencil className="h-4 w-4" />
                                                     </Link>
                                                     <button onClick={() => deleteProduct(p)} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Hapus">

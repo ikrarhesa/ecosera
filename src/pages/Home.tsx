@@ -1,14 +1,14 @@
 // src/pages/Home.tsx
-import React, { useState, useRef, useMemo, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
-  ChevronRight as ArrowRight
+  ChevronRight as ArrowRight,
+  Search
 } from "lucide-react";
 import { getActiveBanners, getCachedActiveBanners, type Banner } from "../services/banners";
 import ProductCard from "../components/ProductCard";
-import { useProducts } from "../context/ProductsContext";
 import PilihanDaerahStripSimple from '../components/PilihanDaerahStripSimple';
-import { calculateDistance, requestUserLocation } from "../utils/distance";
-import { getCategories, getCachedCategories } from "../services/categories";
+import { useHomeProducts } from "../hooks/useHomeProducts";
+import { UI } from "../config/ui";
 
 /* ===== Helpers ===== */
 
@@ -21,11 +21,21 @@ import { getCategories, getCachedCategories } from "../services/categories";
 /* ===== Carousel Banner ===== */
 function BannerCarousel() {
   const [banners, setBanners] = useState<Banner[]>(() => getCachedActiveBanners() || []);
+  const [loading, setLoading] = useState(!banners.length);
+  const [minLoading, setMinLoading] = useState(!banners.length);
   const [i, setI] = useState(0);
   const touchX = useRef<number | null>(null);
 
   useEffect(() => {
-    getActiveBanners().then(setBanners).catch(console.error);
+    let timer: any;
+    if (minLoading) {
+      timer = setTimeout(() => setMinLoading(false), 800);
+    }
+    getActiveBanners()
+      .then(setBanners)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+    return () => timer && clearTimeout(timer);
   }, []);
 
   // Autoplay
@@ -50,6 +60,14 @@ function BannerCarousel() {
     if (Math.abs(dx) > 40) (dx > 0 ? prev() : next());
     touchX.current = null;
   };
+
+  if (loading || minLoading) {
+    return (
+      <section className="mt-1">
+        <div className="rounded-lg h-48 bg-slate-200 animate-pulse border border-slate-100" />
+      </section>
+    );
+  }
 
   if (banners.length === 0) return null;
 
@@ -110,100 +128,27 @@ function BannerCarousel() {
 
 /* ===== Page ===== */
 export default function Home() {
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [distance, setDistance] = useState("all");
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const cachedCats = useMemo(() => getCachedCategories(), []);
-  const [categories, setCategories] = useState<{ id: string, name: string }[]>(() => {
-    if (cachedCats) return [{ id: "all", name: "Semua" }, ...cachedCats];
-    return [{ id: "all", name: "Semua" }];
-  });
-  const { products, loading } = useProducts();
+  const {
+    products: filteredProducts,
+    loading,
+    categories: categoriesWithCounts,
+    selectedCategory,
+    setSelectedCategory
+  } = useHomeProducts();
+
+  const [minLoading, setMinLoading] = useState(loading);
 
   useEffect(() => {
-    getCategories().then(data => {
-      setCategories([{ id: "all", name: "Semua" }, ...data]);
-    });
-  }, []);
-
-  React.useEffect(() => {
-    if (distance !== "all" && !userLocation) {
-      requestUserLocation().then(loc => {
-        if (loc) setUserLocation(loc);
-        else {
-          alert("Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin diberikan.");
-          setDistance("all");
-        }
-      });
+    let timer: any;
+    if (loading) {
+      timer = setTimeout(() => setMinLoading(false), 800);
+    } else {
+      setMinLoading(false);
     }
-  }, [distance, userLocation]);
+    return () => timer && clearTimeout(timer);
+  }, [loading]);
 
-  // Cart integration
-  // (Removed since we don't have handleAddToCart here anymore)
-
-  // Calculate category counts
-  const categoriesWithCounts = useMemo(() => {
-    return categories.map(category => {
-      if (category.id === "all") {
-        return { ...category, count: products.length };
-      }
-      const count = products.filter(product => product.categories?.includes(category.id)).length;
-      return { ...category, count };
-    });
-  }, [products, categories]);
-  // Filter and sort products
-  const filteredProducts = useMemo(() => {
-    let filtered = [...products];
-
-    // Filter by category
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter(product => product.categories?.includes(selectedCategory));
-    }
-
-    // Filter by distance
-    if (distance !== "all" && userLocation) {
-      let maxDist = Infinity;
-      let minDist = 0;
-      if (distance === "0-5") { maxDist = 5; }
-      else if (distance === "5-10") { minDist = 5; maxDist = 10; }
-      else if (distance === "10-20") { minDist = 10; maxDist = 20; }
-      else if (distance === "20+") { minDist = 20; }
-
-      filtered = filtered.filter(product => {
-        if (product.sellerLat == null || product.sellerLng == null) return false;
-        const dist = calculateDistance(userLocation.lat, userLocation.lng, product.sellerLat, product.sellerLng);
-        return dist >= minDist && dist <= maxDist;
-      });
-    }
-
-    return filtered;
-  }, [products, selectedCategory, distance, userLocation]);
-
-  // Analytics event logging
-  useEffect(() => {
-    const log = (name: string) => (e: any) => {
-      console.log(`[analytics] ${name}`, e?.detail ?? {});
-    };
-    const onView = log('pilihan_view');
-    const onTab = log('pilihan_tab_switch');
-    const onImp = log('pilihan_impression');
-    const onAdd = log('pilihan_click_add');
-    const onChat = log('pilihan_click_chat');
-
-    window.addEventListener('pilihan_view', onView as EventListener);
-    window.addEventListener('pilihan_tab_switch', onTab as EventListener);
-    window.addEventListener('pilihan_impression', onImp as EventListener);
-    window.addEventListener('pilihan_click_add', onAdd as EventListener);
-    window.addEventListener('pilihan_click_chat', onChat as EventListener);
-
-    return () => {
-      window.removeEventListener('pilihan_view', onView as EventListener);
-      window.removeEventListener('pilihan_tab_switch', onTab as EventListener);
-      window.removeEventListener('pilihan_impression', onImp as EventListener);
-      window.removeEventListener('pilihan_click_add', onAdd as EventListener);
-      window.removeEventListener('pilihan_click_chat', onChat as EventListener);
-    };
-  }, []);
+  const showSkeleton = loading || minLoading;
 
   return (
     <>
@@ -223,33 +168,42 @@ export default function Home() {
 
             {/* Horizontal scrollable categories */}
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {categoriesWithCounts.map((category) => (
+              {showSkeleton ? (
+                <>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="flex-shrink-0 px-8 py-4 rounded-full bg-slate-200 animate-pulse border border-slate-100" />
+                  ))}
+                </>
+              ) : (
+                categoriesWithCounts.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
                   className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${selectedCategory === category.id
-                    ? "bg-blue-600 text-white"
+                   ? "bg-blue-600 text-white"
                     : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
-                    }`}
-                >
-                  {category.name}
-                  {category.count > 0 && !loading && (
-                    <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${selectedCategory === category.id
-                      ? "bg-blue-500 text-white"
-                      : "bg-slate-100 text-slate-600"
-                      }`}>
-                      {category.count}
-                    </span>
-                  )}
+                  }`}
+                style={selectedCategory === category.id ? { backgroundColor: UI.BRAND.PRIMARY } : undefined}
+              >
+                    {category.name}
+                    {category.count > 0 && (
+                      <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${selectedCategory === category.id
+                        ? "bg-white/20 text-white"
+                        : "bg-slate-100 text-slate-600"
+                        }`}>
+                        {category.count}
+                      </span>
+                    )}
                 </button>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
           {/* Produk */}
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold">
-              {loading ? (
+              {showSkeleton ? (
                 <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
               ) : (
                 selectedCategory === "all"
@@ -259,7 +213,7 @@ export default function Home() {
             </h3>
           </div>
 
-          {loading ? (
+          {showSkeleton ? (
             <div className="grid grid-cols-2 gap-3">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 animate-pulse">
@@ -281,8 +235,18 @@ export default function Home() {
               </div>
 
               {filteredProducts.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-slate-600">Tidak ada produk dalam kategori ini</p>
+                <div className="text-center py-20 px-10">
+                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="text-slate-300" size={32} />
+                  </div>
+                  <p className="text-slate-500 font-medium">Tidak ada produk dalam kategori ini</p>
+                  <button 
+                    onClick={() => setSelectedCategory("all")}
+                    className="mt-4 text-sm font-semibold"
+                    style={{ color: UI.BRAND.PRIMARY }}
+                  >
+                    Lihat Semua Produk
+                  </button>
                 </div>
               )}
             </>

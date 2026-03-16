@@ -15,13 +15,8 @@ import {
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
-/* ── Walmart brand tokens ── */
-const C = {
-    blue: "#0071DC",
-    navy: "#041E42",
-    yellow: "#FFC220",
-    bg: "#F5F6F8",
-};
+import { UI } from "../config/ui";
+import { formatCurrencyIDR } from "../utils/format";
 
 interface Seller {
     id: string;
@@ -50,14 +45,6 @@ interface ProductRow {
     thumb: string | null;
 }
 
-const PLACEHOLDER = "https://placehold.co/400x400/png?text=Ecosera";
-
-const fmtIDR = (n: number) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        maximumFractionDigits: 0,
-    }).format(n);
 
 export default function SellerShop() {
     const { seller_id } = useParams<{ seller_id: string }>();
@@ -110,7 +97,7 @@ export default function SellerShop() {
         if (p.images && p.images.length > 0) return p.images[0];
         if (p.image_url) return p.image_url;
         if (p.thumb) return p.thumb;
-        return PLACEHOLDER;
+        return UI.PLACEHOLDER;
     };
 
     const filteredProducts = products.filter(p =>
@@ -124,13 +111,13 @@ export default function SellerShop() {
         return (
             <div
                 className="min-h-screen flex items-center justify-center"
-                style={{ background: C.bg }}
+                style={{ background: UI.BRAND.BG }}
             >
                 <div className="flex flex-col items-center gap-3">
                     <div
                         className="h-8 w-8 border-[3px] border-t-transparent rounded-full animate-spin"
                         style={{
-                            borderColor: C.blue,
+                            borderColor: UI.BRAND.PRIMARY,
                             borderTopColor: "transparent",
                         }}
                     />
@@ -145,20 +132,20 @@ export default function SellerShop() {
         return (
             <div
                 className="min-h-screen flex items-center justify-center"
-                style={{ background: C.bg }}
+                style={{ background: UI.BRAND.BG }}
             >
                 <div className="text-center">
                     <Store className="h-12 w-12 text-slate-300 mx-auto mb-3" />
                     <p
                         className="text-lg font-semibold"
-                        style={{ color: C.navy }}
+                        style={{ color: UI.BRAND.NAVY }}
                     >
                         Toko tidak ditemukan
                     </p>
                     <button
                         onClick={() => navigate("/")}
                         className="mt-3 text-sm font-medium hover:underline"
-                        style={{ color: C.blue }}
+                        style={{ color: UI.BRAND.PRIMARY }}
                     >
                         Kembali ke beranda
                     </button>
@@ -168,7 +155,7 @@ export default function SellerShop() {
     }
 
     return (
-        <div className="min-h-screen pb-24" style={{ background: C.bg }}>
+        <div className="min-h-screen pb-24" style={{ background: UI.BRAND.BG }}>
             {/* ── Header / Search — fixed to avoid blink ── */}
             <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg lg:max-w-xl z-50 bg-white shadow-sm border-b border-slate-200">
                 <div className="max-w-3xl mx-auto px-4 pb-3 flex items-center gap-3 pt-[calc(12px+env(safe-area-inset-top))]">
@@ -176,7 +163,7 @@ export default function SellerShop() {
                         onClick={() => navigate(-1)}
                         className="p-2 sm:p-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all active:scale-95 shrink-0"
                     >
-                        <ArrowLeft className="h-5 w-5" style={{ color: C.navy }} />
+                        <ArrowLeft className="h-5 w-5" style={{ color: UI.BRAND.NAVY }} />
                     </button>
 
                     <div className="flex-1 relative" ref={searchContainerRef}>
@@ -236,7 +223,7 @@ export default function SellerShop() {
                     <div
                         className="absolute inset-0"
                         style={{
-                            background: `linear-gradient(135deg, ${C.navy} 0%, ${C.blue} 100%)`,
+                            background: `linear-gradient(135deg, ${UI.BRAND.NAVY} 0%, ${UI.BRAND.PRIMARY} 100%)`,
                         }}
                     >
                         {/* Subtle pattern overlay */}
@@ -270,7 +257,7 @@ export default function SellerShop() {
                                 ) : (
                                     <Store
                                         className="h-8 w-8"
-                                        style={{ color: C.blue }}
+                                        style={{ color: UI.BRAND.PRIMARY }}
                                     />
                                 )}
                             </div>
@@ -278,7 +265,7 @@ export default function SellerShop() {
                             <div className="flex-1 min-w-0 pt-1">
                                 <h1
                                     className="text-xl sm:text-2xl font-bold truncate"
-                                    style={{ color: C.navy }}
+                                    style={{ color: UI.BRAND.NAVY }}
                                 >
                                     {seller.name}
                                 </h1>
@@ -333,8 +320,8 @@ export default function SellerShop() {
                                             href={`mailto:${seller.email}`}
                                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
                                             style={{
-                                                backgroundColor: C.blue + "10",
-                                                color: C.blue,
+                                                backgroundColor: UI.BRAND.PRIMARY + "10",
+                                                color: UI.BRAND.PRIMARY,
                                             }}
                                         >
                                             <Mail className="h-3.5 w-3.5" />{" "}
@@ -363,8 +350,8 @@ export default function SellerShop() {
                                             rel="noopener noreferrer"
                                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
                                             style={{
-                                                backgroundColor: C.blue + "10",
-                                                color: C.blue,
+                                                backgroundColor: UI.BRAND.PRIMARY + "10",
+                                                color: UI.BRAND.PRIMARY,
                                             }}
                                         >
                                             <Facebook className="h-3.5 w-3.5" />{" "}
@@ -393,11 +380,11 @@ export default function SellerShop() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                     <h2
                         className="text-lg font-bold flex items-center gap-2"
-                        style={{ color: C.navy }}
+                        style={{ color: UI.BRAND.NAVY }}
                     >
                         <Package
                             className="h-5 w-5"
-                            style={{ color: C.blue }}
+                            style={{ color: UI.BRAND.PRIMARY }}
                         />
                         Produk{" "}
                         <span className="text-sm font-normal text-slate-500">
@@ -438,15 +425,15 @@ export default function SellerShop() {
                                 <div className="p-3 md:p-4 flex flex-col flex-1">
                                     <p
                                         className="text-sm md:text-base font-medium line-clamp-2 leading-snug mb-2"
-                                        style={{ color: C.navy }}
+                                        style={{ color: UI.BRAND.NAVY }}
                                     >
                                         {p.name}
                                     </p>
                                     <p
                                         className="text-sm md:text-base font-bold mt-auto"
-                                        style={{ color: C.blue }}
+                                        style={{ color: UI.BRAND.PRIMARY }}
                                     >
-                                        {fmtIDR(p.price)}
+                                        {formatCurrencyIDR(p.price)}
                                     </p>
                                 </div>
                             </Link>

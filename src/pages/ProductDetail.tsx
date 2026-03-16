@@ -1,21 +1,23 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import {
-  ArrowLeft, Heart, Star, MapPin, ChevronLeft, ChevronRight, ChevronDown,
-  MessageCircle, ShieldCheck, Truck, PackageOpen, Check, Plus, Search, ShoppingCart, Info
-} from "lucide-react";
+import { ArrowLeft, MessageCircle, Plus, Search, ShoppingCart, PackageOpen } from "lucide-react";
 import type { Product, ProductVariant } from "../types/product";
 import { getProductBySlug, getCachedProductBySlug, getRelatedProducts, allImagesOf, getProductReviews, submitProductReview, type ProductReview } from "../services/products";
 import { useToast } from "../context/ToastContext";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
-import { supabase } from "../lib/supabase";
+import { analytics } from "../services/analytics";
 
-const ACCENT = "#2254c5";
-const PLACEHOLDER = "https://placehold.co/800x800/png?text=Ecosera";
+import { ProductGallery } from "./product-detail/ProductGallery";
+import { SellerInfo } from "./product-detail/SellerInfo";
+import { ProductMainInfo } from "./product-detail/ProductMainInfo";
+import { ReviewSection } from "./product-detail/ReviewSection";
 
-const fmtIDR = (n: number) =>
-  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
+import { formatCurrencyIDR } from "../utils/format";
+import { UI } from "../config/ui";
+
+const ACCENT = UI.BRAND.PRIMARY;
+const PLACEHOLDER = UI.PLACEHOLDER;
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -32,9 +34,6 @@ export default function ProductDetail() {
   const [related, setRelated] = useState<Product[]>([]);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
 
-  const galleryRef = useRef<HTMLDivElement>(null);
-  const [idx, setIdx] = useState(0);
-
   // Reviews State
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [reviewerName, setReviewerName] = useState("");
@@ -42,8 +41,6 @@ export default function ProductDetail() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
-  const [showReviews, setShowReviews] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
 
   const goBack = useCallback(() => navigate(-1), [navigate]);
 
@@ -58,7 +55,6 @@ export default function ProductDetail() {
 
     setLoading(!cachedProduct);
     setQty(0);
-    setIdx(0);
 
     let mounted = true;
     (async () => {
@@ -78,20 +74,9 @@ export default function ProductDetail() {
         setSelectedVariant(null);
       }
 
-      // Fire and forget 'product_view' analytics log
+      // Log product view
       if (p) {
-        (async () => {
-          try {
-            const { error } = await supabase.from("event_logs").insert({
-              event_type: "product_view",
-              product_id: p.id,
-              seller_id: p.seller_id
-            });
-            if (error) console.error("[EventLog] product_view insert error:", error);
-          } catch (err) {
-            console.error("[EventLog] Unexpected product_view error:", err);
-          }
-        })();
+        analytics.product.view(p.id, p.seller_id);
       }
 
       const revs = p ? await getProductReviews(p.id) : [];
@@ -99,7 +84,6 @@ export default function ProductDetail() {
       setReviews(revs);
 
       setQty(0);
-      setIdx(0);
       if (p) setRelated(await getRelatedProducts(p.category || "default", p.id, 10));
       else setRelated([]);
       setLoading(false);
@@ -129,7 +113,7 @@ export default function ProductDetail() {
   const onShare = async () => {
     if (!product) return;
     const url = window.location.href;
-    const text = `Cek ${product.name} di Ecosera (${fmtIDR(product.price)}/${product.unit})`;
+    const text = `Cek ${product.name} di Ecosera (${formatCurrencyIDR(product.price)}/${product.unit})`;
     if (navigator.share) {
       try { await navigator.share({ title: product.name, text, url }); } catch { }
     } else {
@@ -146,7 +130,7 @@ export default function ProductDetail() {
       `Halo ${product.sellerName ?? "Seller"}, saya ingin pesan:\n` +
       `• Produk: ${product.name}${variantText}\n` +
       `• Jumlah: ${qty} ${product.unit}\n` +
-      `• Total: ${fmtIDR(total)}\n\n` +
+      `• Total: ${formatCurrencyIDR(total)}\n\n` +
       `Link produk: ${window.location.href}`
     );
 
@@ -154,28 +138,8 @@ export default function ProductDetail() {
     const waUrl = `https://wa.me/${phone}?text=${text}`;
     window.open(waUrl, "_blank", "noopener,noreferrer");
 
-    // 🔹 Log event (fire and forget)
-    console.log("[EventLog] Attempting insert for product:", product.id);
-    (async () => {
-      try {
-        const { data, error } = await supabase
-          .from("event_logs")
-          .insert({
-            event_type: "wa_click",
-            product_id: product.id,
-            seller_id: product.seller_id,
-          })
-          .select();
-
-        if (error) {
-          console.error("[EventLog] Insert error:", error.message, error.details, error.code);
-        } else {
-          console.log("[EventLog] Insert success:", data);
-        }
-      } catch (err) {
-        console.error("[EventLog] Unexpected error:", err);
-      }
-    })();
+    // Log WhatsApp click
+    analytics.product.waClick(product.id, product.seller_id);
   };
 
   const onAddToCart = () => {
@@ -232,21 +196,6 @@ export default function ProductDetail() {
 
   const images = useMemo(() => allImagesOf(product), [product]);
 
-  const goTo = (i: number) => {
-    const el = galleryRef.current;
-    if (!el) return;
-    const clamped = Math.max(0, Math.min(i, images.length - 1));
-    el.scrollTo({ left: clamped * el.clientWidth, behavior: "smooth" });
-    setIdx(clamped);
-  };
-  const prev = () => goTo(idx - 1);
-  const next = () => goTo(idx + 1);
-  const onScroll = () => {
-    const el = galleryRef.current;
-    if (!el) return;
-    const current = Math.round(el.scrollLeft / el.clientWidth);
-    if (current !== idx) setIdx(current);
-  };
 
   if (loading) {
     return (
@@ -255,7 +204,7 @@ export default function ProductDetail() {
           {/* Header Skeleton — fixed like the Home Header to avoid blink during route transition */}
           <div
             className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg lg:max-w-xl z-50 pt-[env(safe-area-inset-top)]"
-            style={{ backgroundColor: 'rgba(34, 84, 197, 1)' }}
+            style={{ backgroundColor: UI.BRAND.PRIMARY }}
           >
             <div className="flex items-center justify-between px-5 pb-5 pt-[18px]">
               <div className="w-9 h-9 rounded-full bg-white/20 animate-pulse" />
@@ -341,7 +290,7 @@ export default function ProductDetail() {
         {/* Header — fixed like the Home Header so there's no blink during route transitions */}
         <div
           className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-lg lg:max-w-xl z-50 pt-[env(safe-area-inset-top)]"
-          style={{ backgroundColor: 'rgba(34, 84, 197, 1)' }}
+          style={{ backgroundColor: UI.BRAND.PRIMARY }}
         >
           <div className="flex items-center justify-between px-5 pb-5 pt-[18px]">
             <button onClick={goBack} className="p-1.5 rounded-full text-white" aria-label="Back">
@@ -365,306 +314,49 @@ export default function ProductDetail() {
         {/* Spacer to compensate for fixed header — matched to actual header height to avoid white gap */}
         <div style={{ height: 'calc(67px + env(safe-area-inset-top))' }} />
 
-        {/* Gallery Slider */}
-        <div className="relative w-full bg-gray-50">
-          <div
-            ref={galleryRef}
-            onScroll={onScroll}
-            className="w-full overflow-x-auto snap-x snap-mandatory scroll-smooth"
-            style={{ scrollbarWidth: "none" }}
-          >
-            <div className="flex w-full">
-              {images.map((src, i) => (
-                <div key={i} className="snap-center shrink-0 w-full aspect-square overflow-hidden bg-gray-100">
-                  <img
-                    src={src}
-                    alt={`${product.name} - gambar ${i + 1}`}
-                    className="h-full w-full object-cover"
-                    loading={i === 0 ? "eager" : "lazy"}
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = PLACEHOLDER; }}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={prev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 border grid place-items-center"
-                aria-label="Sebelumnya"
-              >
-                <ChevronLeft />
-              </button>
-              <button
-                onClick={next}
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 border grid place-items-center"
-                aria-label="Selanjutnya"
-              >
-                <ChevronRight />
-              </button>
-            </>
-          )}
-
-          {images.length > 1 && (
-            <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center gap-1.5">
-              {images.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => goTo(i)}
-                  className={`h-1.5 rounded-full ${i === idx ? "w-5" : "w-2.5"} transition-all`}
-                  style={{ backgroundColor: i === idx ? ACCENT : "rgba(255,255,255,0.9)" }}
-                  aria-label={`Ke gambar ${i + 1}`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Thumbnails */}
-        {images.length > 1 && (
-          <div className="mt-2 px-3">
-            <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-              {images.map((src, i) => (
-                <button
-                  key={i}
-                  onClick={() => goTo(i)}
-                  className={`h-16 w-16 rounded-lg overflow-hidden border ${i === idx ? "" : ""}`}
-                  style={i === idx ? { outline: `2px solid ${ACCENT}`, outlineOffset: 0 } : undefined}
-                  aria-label={`Pilih gambar ${i + 1}`}
-                >
-                  <img src={src} alt={`thumb ${i + 1}`} className="h-full w-full object-cover" loading="lazy"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = PLACEHOLDER; }}
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        <ProductGallery
+          images={images}
+          productName={product.name}
+          accentColor={ACCENT}
+          placeholder={PLACEHOLDER}
+        />
 
         {/* Content */}
         <div className="px-4 pb-32">
-          <h1 className="mt-4 text-lg font-semibold">{product.name}</h1>
+          <ProductMainInfo
+            product={product}
+            liked={liked}
+            toggleWishlist={toggleWishlist}
+            showToast={show}
+            accentColor={ACCENT}
+            displayRating={displayRating}
+            reviewsCount={reviews.length}
+            selectedVariant={selectedVariant}
+            setSelectedVariant={setSelectedVariant}
+            qty={qty}
+            setQty={setQty}
+            clampQty={clampQty}
+            currentPrice={currentPrice}
+            total={total}
+            outOfStock={outOfStock}
+          />
 
-          <div className="flex items-end justify-between">
-            <div>
-              <div className="mt-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold" style={{ color: ACCENT }}>{fmtIDR(currentPrice)}</span>
-                  <span className="text-sm text-gray-500">/ {product.unit}</span>
-                </div>
-              </div>
+          <SellerInfo product={product} />
 
-              <div className="mt-1 flex items-center gap-1 text-sm text-gray-700">
-                {displayRating ? (
-                  <>
-                    <Star className="fill-amber-400 stroke-amber-400" size={16} />
-                    <span>{displayRating}</span>
-                    <span className="text-gray-400">•</span>
-                    <span>{reviews.length > 0 ? `${reviews.length} ulasan` : ((selectedVariant?.stock ?? product.stock) == null ? "Stok tersedia" : `Stok ${selectedVariant?.stock ?? product.stock}`)}</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white bg-blue-600 rounded-full">Produk Baru</span>
-                    <span className="text-gray-400">•</span>
-                    <span>{(selectedVariant?.stock ?? product.stock) == null ? "Stok tersedia" : `Stok ${selectedVariant?.stock ?? product.stock}`}</span>
-                  </>
-                )}
-              </div>
-            </div>
+          <ReviewSection
+            reviews={reviews}
+            reviewerName={reviewerName}
+            setReviewerName={setReviewerName}
+            contactInfo={contactInfo}
+            setContactInfo={setContactInfo}
+            reviewRating={reviewRating}
+            setReviewRating={setReviewRating}
+            reviewComment={reviewComment}
+            setReviewComment={setReviewComment}
+            submittingReview={submittingReview}
+            onSubmitReview={onSubmitReview}
+          />
 
-            <button
-              onClick={() => {
-                if (product) {
-                  toggleWishlist(product);
-                  show(liked ? "Dihapus dari wishlist" : "Disimpan ke wishlist 💖");
-                }
-              }}
-              className="p-2 mb-1"
-              aria-label="Like"
-            >
-              <Heart
-                size={20}
-                strokeWidth={1.5}
-                className={liked ? "fill-red-500 stroke-red-500" : "text-slate-400 hover:text-red-500 hover:scale-110 active:scale-95 transition-all"}
-              />
-            </button>
-          </div>
-
-          {/* Seller / Lokasi */}
-          <div className="mt-3 flex items-center justify-between rounded-2xl border p-3 gap-2">
-            <Link to={product.seller_id ? `/shop/${product.seller_id}` : "#"} className="flex items-center gap-2 hover:opacity-80 transition-opacity min-w-0">
-              <div className="h-9 w-9 rounded-full bg-gray-100 grid place-items-center font-medium shrink-0">
-                {(product.sellerName ?? "UMKM")[0]}
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold truncate">{product.sellerName ?? "UMKM Lokal"}</p>
-                <p className="text-xs text-gray-500 flex items-center gap-1 truncate">
-                  <MapPin size={14} className="shrink-0" /> <span className="truncate">{product.location || "Lokasi belum diatur"}</span>
-                </p>
-              </div>
-            </Link>
-            <div className="flex flex-col items-end gap-1 text-[11px] text-gray-600 shrink-0">
-              <span className="inline-flex items-center gap-1"><ShieldCheck size={14} /> Terverifikasi</span>
-              <span className="inline-flex items-center gap-1"><Truck size={14} /> COD/Antar</span>
-            </div>
-          </div>
-
-          {/* Deskripsi */}
-          <div className="mt-4">
-            <h2 className="text-sm font-semibold mb-1">Deskripsi</h2>
-            <p className="text-sm text-gray-700 leading-relaxed">
-              {product.description || "Produk lokal berkualitas dari UMKM Ecosera."}
-            </p>
-          </div>
-
-          {/* Variants */}
-          {product.variants && product.variants.length > 0 && (
-            <div className="mt-5">
-              <h2 className="text-sm font-semibold mb-2">Pilih Varian</h2>
-              <div className="flex flex-wrap gap-2">
-                {product.variants.map((v: ProductVariant) => (
-                  <button
-                    key={v.id}
-                    onClick={() => setSelectedVariant(v)}
-                    className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors ${selectedVariant?.id === v.id ? 'border-blue-600 bg-blue-50 text-blue-700' : 'bg-white border-slate-300 text-slate-700 hover:border-slate-400'}`}
-                  >
-                    {v.variant_name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Quantity */}
-          <div className="mt-5 rounded-2xl border p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold">Jumlah</span>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setQty(q => clampQty(q - 1))} className="h-9 w-9 rounded-full border grid place-items-center text-lg" aria-label="Kurangi">-</button>
-                <input
-                  type="number" inputMode="numeric" value={qty === 0 ? "" : qty}
-                  onChange={(e) => setQty(clampQty(parseInt(e.target.value || "0", 10)))}
-                  className="w-14 text-center border rounded-lg py-1"
-                  min={0} max={(selectedVariant?.stock ?? product.stock) == null ? undefined : Number(selectedVariant?.stock ?? product.stock)}
-                />
-                <button onClick={() => setQty(q => clampQty(q + 1))} className="h-9 w-9 rounded-full border grid place-items-center text-lg" aria-label="Tambah">+</button>
-              </div>
-            </div>
-
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-sm text-gray-600">Total</span>
-              <span className="text-xl font-bold" style={{ color: ACCENT }}>{fmtIDR(total)}</span>
-            </div>
-
-            {outOfStock && (
-              <div className="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-2 text-amber-700 text-sm">
-                Stok habis untuk saat ini.
-              </div>
-            )}
-          </div>
-
-          {/* Keunggulan */}
-          <ul className="mt-4 grid grid-cols-2 gap-3 text-xs text-gray-700">
-            <li className="flex items-center gap-2"><Check size={16} style={{ color: ACCENT }} /> UMKM lokal</li>
-            <li className="flex items-center gap-2"><Check size={16} style={{ color: ACCENT }} /> Kualitas terjamin</li>
-            <li className="flex items-center gap-2"><Check size={16} style={{ color: ACCENT }} /> Harga bersaing</li>
-            <li className="flex items-center gap-2"><Check size={16} style={{ color: ACCENT }} /> Dukungan Ecosera</li>
-          </ul>
-
-          {/* Reviews Section */}
-          <div className="mt-6 border-t pt-5">
-            <button
-              onClick={() => setShowReviews(!showReviews)}
-              className="w-full flex items-center justify-between py-1 group"
-            >
-              <h2 className="text-sm font-semibold">Ulasan Pembeli ({reviews.length})</h2>
-              <div className={`transition-transform duration-300 ease-in-out text-gray-400 group-hover:text-blue-500 ${showReviews ? 'rotate-180' : 'rotate-0'}`}>
-                <ChevronDown size={20} />
-              </div>
-            </button>
-
-            <div
-              className={`grid transition-all duration-300 ease-in-out ${showReviews ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0 pointer-events-none'
-                }`}
-            >
-              <div className="overflow-hidden">
-                {/* Review List */}
-                <div className="space-y-4 mb-6">
-                  {reviews.length === 0 ? (
-                    <p className="text-sm text-gray-500 italic">Belum ada ulasan untuk produk ini. Jadilah yang pertama!</p>
-                  ) : (
-                    reviews.map((rev, i) => (
-                      <div key={rev.id || i} className="border-b pb-3 last:border-b-0 last:pb-0">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">{rev.reviewer_name}</span>
-                          <div className="flex text-amber-400">
-                            {Array.from({ length: 5 }).map((_, idx) => (
-                              <Star key={idx} size={12} className={idx < rev.rating ? "fill-amber-400" : "fill-gray-200 text-gray-200"} />
-                            ))}
-                          </div>
-                        </div>
-                        {rev.comment && <p className="text-sm text-gray-600 mt-1">{rev.comment}</p>}
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                {/* Write Review Form */}
-                <div className="bg-gray-50 p-4 rounded-xl border">
-                  <div className="flex items-center gap-2 mb-3">
-                    <h3 className="text-sm font-medium">Tulis Ulasan Baru</h3>
-                    <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() => setShowTooltip(!showTooltip)}
-                        onBlur={() => setShowTooltip(false)}
-                        className="text-gray-400 hover:text-blue-500 transition-colors"
-                        aria-label="Info Privasi"
-                      >
-                        <Info size={16} />
-                      </button>
-                      {showTooltip && (
-                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 bg-gray-800 text-white text-[11px] p-2 rounded shadow-lg z-10 text-center">
-                          Email / Nomor HP tidak akan ditampilkan secara publik
-                          {/* Triangle pointer */}
-                          <div className="absolute left-1/2 -translate-x-1/2 top-full border-4 border-transparent border-t-gray-800" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <form onSubmit={onSubmitReview} className="space-y-3">
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">Nama</label>
-                      <input required type="text" value={reviewerName} onChange={(e) => setReviewerName(e.target.value)} placeholder="Nama Anda" className="w-full text-sm rounded-lg border p-2 focus:ring-1 focus:ring-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">No HP / Email</label>
-                      <input required type="text" value={contactInfo} onChange={(e) => setContactInfo(e.target.value)} placeholder="emailkamu@ecosera.com" className="w-full text-sm rounded-lg border p-2 focus:ring-1 focus:ring-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">Penilaian</label>
-                      <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button key={star} type="button" onClick={() => setReviewRating(star)} className="p-1">
-                            <Star size={24} className={star <= reviewRating ? "fill-amber-400 stroke-amber-400" : "stroke-gray-300"} />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">Komentar (Opsional)</label>
-                      <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} placeholder="Bagaimana produk ini?" rows={2} className="w-full text-sm rounded-lg border p-2 focus:ring-1 focus:ring-blue-500" />
-                    </div>
-                    <button disabled={submittingReview} type="submit" className="w-full py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
-                      {submittingReview ? "Mengirim..." : "Kirim Ulasan"}
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Related */}
           {related.length > 0 && (
@@ -677,7 +369,7 @@ export default function ProductDetail() {
                       onError={(e) => { (e.currentTarget as HTMLImageElement).src = PLACEHOLDER; }} />
                     <div className="p-2">
                       <p className="text-xs line-clamp-2">{r.name}</p>
-                      <p className="text-sm font-semibold mt-1" style={{ color: ACCENT }}>{fmtIDR(r.price)}</p>
+                      <p className="text-sm font-semibold mt-1" style={{ color: ACCENT }}>{formatCurrencyIDR(r.price)}</p>
                     </div>
                   </Link>
                 ))}

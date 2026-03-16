@@ -4,8 +4,9 @@ import { Heart, Trash2 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "../context/ToastContext";
 import { primaryImageOf } from "../services/products";
+import { formatCurrencyIDR } from "../utils/format";
+import { UI } from "../config/ui";
 
-const money = (n: number) => n.toLocaleString("id-ID");
 
 export default function Wishlist() {
     const { wishlist, toggleWishlist } = useWishlist();
@@ -94,7 +95,8 @@ export default function Wishlist() {
                         <p className="text-slate-500 mt-1 max-w-[250px] mx-auto text-sm leading-relaxed">Cari produk yang kamu suka dan simpan untuk nanti!</p>
                         <button
                             onClick={() => navigate("/")}
-                            className="mt-6 px-6 py-2.5 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-sm text-sm"
+                            className="mt-6 px-6 py-2.5 rounded-full text-white font-medium hover:opacity-90 transition-colors shadow-sm text-sm"
+                            style={{ backgroundColor: UI.BRAND.PRIMARY }}
                         >
                             Mulai Belanja
                         </button>
@@ -110,7 +112,10 @@ export default function Wishlist() {
                                         onClick={(e) => toggleSelect(p.id, e)}
                                     >
                                         {isSelected ? (
-                                            <div className="w-5 h-5 rounded flex items-center justify-center bg-blue-600 text-white border border-blue-600 shadow-sm">
+                                            <div 
+                                                className="w-5 h-5 rounded flex items-center justify-center text-white shadow-sm"
+                                                style={{ backgroundColor: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY }}
+                                            >
                                                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                                 </svg>
@@ -125,7 +130,7 @@ export default function Wishlist() {
                                             alt={p.name}
                                             className="w-full h-full object-cover"
                                             loading="lazy"
-                                            onError={(e) => { (e.currentTarget as HTMLImageElement).src = "https://placehold.co/800x800/png?text=Ecosera"; }}
+                                            onError={(e) => { (e.currentTarget as HTMLImageElement).src = UI.PLACEHOLDER; }}
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0 pr-2 flex flex-col justify-center">
@@ -133,7 +138,7 @@ export default function Wishlist() {
                                         <div className="text-[13px] text-slate-500 truncate">{p.sellerName || 'Toko Ecosera'}</div>
                                     </div>
                                     <div className="text-right whitespace-nowrap pointer-events-none">
-                                        <div className="text-sm font-bold text-slate-900 tracking-tight">Rp {money(p.price)}</div>
+                                        <div className="text-sm font-bold text-slate-900 tracking-tight">{formatCurrencyIDR(p.price)}</div>
                                     </div>
                                 </Link>
                             );

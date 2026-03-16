@@ -1,5 +1,5 @@
 export function formatCurrencyIDR(n: number): string {
-  return `Rp${n.toLocaleString('id-ID')}`;
+  return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
 }
 
 export function km(n?: number): string {

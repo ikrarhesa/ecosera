@@ -2,11 +2,11 @@ import { Link } from "react-router-dom";
 import { Store, Star, MapPin } from "lucide-react";
 import type { Product } from "../types/product";
 import { primaryImageOf } from "../services/products";
-
-const money = (n: number) => n.toLocaleString("id-ID");
+import { formatCurrencyIDR } from "../utils/format";
+import { UI } from "../config/ui";
 
 export default function ProductCard({ product }: { product: Product }) {
-  const img = primaryImageOf(product);
+  const img = primaryImageOf(product) || UI.PLACEHOLDER;
 
   return (
     <Link to={`/product/${product.slug || product.id}`} className="p-3 rounded-xl bg-white/70 border border-black/10 hover:bg-white">
@@ -54,7 +54,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
-        <p className="font-semibold text-blue-600 mt-1">Rp {money(product.price)}</p>
+        <p className="font-semibold text-blue-600 mt-1">{formatCurrencyIDR(product.price)}</p>
 
         {/* Seller location */}
         {product.location && (

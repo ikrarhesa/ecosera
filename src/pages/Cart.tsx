@@ -4,11 +4,11 @@ import { Trash2, Minus, Plus, Store, MessageCircle, ArrowLeft, ShoppingBag } fro
 import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../context/ToastContext";
-import { money } from "../utils/money";
+import { formatCurrencyIDR } from "../utils/format";
 import { SHOP_WA } from "../utils/env";
+import { UI } from "../config/ui";
 
-const fallbackImg =
-  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&h=300&q=70";
+const fallbackImg = UI.PLACEHOLDER;
 
 function buildWaMessage(
   sellerName: string,
@@ -19,12 +19,12 @@ function buildWaMessage(
     `*Pesanan dari ${sellerName}*`,
     "————————————",
     ...items.map(
-      (i, idx) => `${idx + 1}) ${i.name}${i.variantName ? ` (${i.variantName})` : ''} x${i.qty} = Rp ${money(i.price * i.qty)}`
+      (i, idx) => `${idx + 1}) ${i.name}${i.variantName ? ` (${i.variantName})` : ''} x${i.qty} = ${formatCurrencyIDR(i.price * i.qty)}`
     ),
     "————————————",
-    `Subtotal: Rp ${money(subtotal)}`,
+    `Subtotal: ${formatCurrencyIDR(subtotal)}`,
     `Ongkir: (akan dikonfirmasi)`,
-    `Total: Rp ${money(subtotal)} *estimasi tanpa ongkir*`,
+    `Total: ${formatCurrencyIDR(subtotal)} *estimasi tanpa ongkir*`,
     "————————————",
     "Mohon isi data pemesanan:",
     "Nama:",
@@ -116,11 +116,11 @@ function CartItemRow({
               </p>
               {sellerName && (
                 <div className="flex items-center gap-1 mt-1">
-                  <Store className="h-3 w-3 text-blue-600" />
-                  <p className="text-[12px] text-blue-600 font-medium">{sellerName}</p>
+                  <Store className="h-3 w-3" style={{ color: UI.BRAND.PRIMARY }} />
+                  <p className="text-[12px] font-medium" style={{ color: UI.BRAND.PRIMARY }}>{sellerName}</p>
                 </div>
               )}
-              <p className="text-[13px] text-slate-600">Rp {money(price)} / item</p>
+              <p className="text-[13px] text-slate-600">{formatCurrencyIDR(price)} / item</p>
             </div>
 
             {/* Delete button in top-right */}
@@ -156,7 +156,7 @@ function CartItemRow({
             {/* Total per item */}
             <div className="text-right">
               <p className="text-xs text-slate-600">Total</p>
-              <p className="font-semibold">Rp {money(price * qty)}</p>
+              <p className="font-semibold">{formatCurrencyIDR(price * qty)}</p>
             </div>
           </div>
         </div>
@@ -203,8 +203,8 @@ function SellerGroup({
       {/* Seller Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Store className="h-4 w-4 text-blue-600" />
-          <h3 className="font-semibold text-blue-600">{sellerName}</h3>
+          <Store className="h-4 w-4" style={{ color: UI.BRAND.PRIMARY }} />
+          <h3 className="font-semibold" style={{ color: UI.BRAND.PRIMARY }}>{sellerName}</h3>
         </div>
         <div className="text-sm text-slate-600">
           {items.length} item{items.length > 1 ? 's' : ''}
@@ -239,7 +239,7 @@ function SellerGroup({
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-slate-600">Subtotal</p>
-            <p className="text-lg font-bold text-blue-600">Rp {money(subtotal)}</p>
+            <p className="text-lg font-bold" style={{ color: UI.BRAND.PRIMARY }}>{formatCurrencyIDR(subtotal)}</p>
           </div>
           <a
             href={waLink}
@@ -329,9 +329,10 @@ export default function Cart() {
               <ShoppingBag className="h-16 w-16 text-slate-300 mx-auto mb-3" />
               <p className="text-slate-500 font-medium">Keranjang kosong</p>
               <p className="text-slate-400 text-sm mt-1">Yuk mulai belanja!</p>
-              <button
+                <button
                 onClick={() => navigate("/")}
-                className="mt-4 px-6 py-2 rounded-xl bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+                className="mt-4 px-6 py-2 rounded-xl text-white text-sm font-medium hover:opacity-90 transition-colors"
+                style={{ backgroundColor: UI.BRAND.PRIMARY }}
               >
                 Mulai Belanja
               </button>

@@ -5,6 +5,7 @@ import type { Product } from "../types/product";
 import { useProducts } from "../context/ProductsContext";
 import { getSoughtAfterItems, getCachedSoughtAfterItems, SoughtAfterItem } from "../services/soughtAfter";
 import { getCategories, getCachedCategories } from "../services/categories";
+import { UI } from "../config/ui";
 
 export default function Etalase() {
   const { products: all, loading } = useProducts();
@@ -16,6 +17,15 @@ export default function Etalase() {
   const cachedSoughtAfter = useMemo(() => getCachedSoughtAfterItems(), []);
   const [soughtAfterItems, setSoughtAfterItems] = useState<SoughtAfterItem[]>(cachedSoughtAfter || []);
   const [loadingSoughtAfter, setLoadingSoughtAfter] = useState(!cachedSoughtAfter);
+  const [minLoading, setMinLoading] = useState(!cachedSoughtAfter);
+
+  useEffect(() => {
+    let timer: any;
+    if (minLoading) {
+      timer = setTimeout(() => setMinLoading(false), 800);
+    }
+    return () => timer && clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     async function fetchSoughtAfter() {
@@ -65,9 +75,10 @@ export default function Etalase() {
             <button
               onClick={() => setSelectedCategory("all")}
               className={`shrink-0 flex items-center justify-center px-4 py-2 rounded-full text-[13px] font-semibold transition-colors border ${selectedCategory === "all"
-                ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                ? "text-white shadow-sm"
                 : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border-slate-200/50"
                 }`}
+              style={selectedCategory === "all" ? { backgroundColor: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY } : {}}
             >
               Semua
             </button>
@@ -76,9 +87,10 @@ export default function Etalase() {
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`shrink-0 flex items-center justify-center px-4 py-2 rounded-full text-[13px] font-semibold transition-colors border ${selectedCategory === cat.id
-                  ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                  ? "text-white shadow-sm"
                   : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border-slate-200/50"
                   }`}
+                style={selectedCategory === cat.id ? { backgroundColor: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY } : {}}
               >
                 {cat.name}
               </button>
@@ -91,53 +103,63 @@ export default function Etalase() {
 
         <main className="px-5 pt-4">
           {/* Sought After Grid - Always visible */}
-          <div className="mb-6">
-            <h3 className="font-bold text-slate-800 mb-3 text-lg">Lagi Tren di Ecosera</h3>
-            {loadingSoughtAfter ? (
-              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="aspect-[4/3] bg-slate-200 animate-pulse rounded-xl"></div>
-                ))}
-              </div>
-            ) : soughtAfterItems.filter(item => item.image_url && !item.image_url.includes('placeholder.svg')).length > 0 ? (
-              <div className="flex flex-wrap gap-2 sm:gap-3">
-                {soughtAfterItems
-                  .filter(item => item.image_url && !item.image_url.includes('placeholder.svg'))
-                  .slice(0, 6)
-                  .map((item) => {
-                    const content = (
-                      <div className="relative aspect-[4/3] w-20 sm:w-24 rounded-xl overflow-hidden shadow-sm border border-slate-200/60 group shrink-0">
-                        <img
-                          src={item.image_url}
-                          alt={item.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/images/placeholder.svg';
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent flex items-end">
-                          {(item.show_title !== false) && (
-                            <span className="text-white font-medium text-[10px] sm:text-xs p-2 truncate w-full tracking-wide">
-                              {item.title}
-                            </span>
-                          )}
+          {(loadingSoughtAfter || minLoading || soughtAfterItems.filter(item => 
+            item.image_url && 
+            !item.image_url.includes(UI.PLACEHOLDER) && 
+            !item.image_url.includes('placeholder.svg')
+          ).length > 0) && (
+            <div className="mb-6">
+              <h3 className="font-bold text-slate-800 mb-3 text-lg">Lagi Tren di Ecosera</h3>
+              {(loadingSoughtAfter || minLoading) ? (
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="aspect-[4/3] bg-slate-200 animate-pulse rounded-xl"></div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2 sm:gap-3">
+                  {soughtAfterItems
+                    .filter(item => 
+                      item.image_url && 
+                      !item.image_url.includes(UI.PLACEHOLDER) && 
+                      !item.image_url.includes('placeholder.svg')
+                    )
+                    .slice(0, 6)
+                    .map((item) => {
+                      const content = (
+                        <div className="relative aspect-[4/3] w-20 sm:w-24 rounded-xl overflow-hidden shadow-sm border border-slate-200/60 group shrink-0">
+                          <img
+                            src={item.image_url}
+                            alt={item.title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent flex items-end">
+                            {(item.show_title !== false) && (
+                              <span className="text-white font-medium text-[10px] sm:text-xs p-2 truncate w-full tracking-wide">
+                                {item.title}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    );
+                      );
 
-                    return item.link_url ? (
-                      <Link key={item.position} to={item.link_url} className="block">
-                        {content}
-                      </Link>
-                    ) : (
-                      <div key={item.position}>
-                        {content}
-                      </div>
-                    );
-                  })}
-              </div>
-            ) : null}
-          </div>
+                      return item.link_url ? (
+                        <Link key={item.position} to={item.link_url} className="block">
+                          {content}
+                        </Link>
+                      ) : (
+                        <div key={item.position}>
+                          {content}
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
+          )}
 
 
           <div className="flex items-center justify-between mb-4">

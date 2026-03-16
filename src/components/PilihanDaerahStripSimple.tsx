@@ -5,21 +5,11 @@ import type { Product } from '../types/product';
 import { useProducts } from '../context/ProductsContext';
 
 
+import { formatCurrencyIDR, km } from '../utils/format';
+import { haversineKm } from '../utils/geo';
+import { UI } from '../config/ui';
+
 type TabType = 'nearby' | 'popular' | 'new';
-
-const money = (n: number) => n.toLocaleString("id-ID");
-
-// Haversine distance calculation (km)
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
 
 export default function PilihanDaerahStripSimple() {
   const { products: allProducts, loading: contextLoading } = useProducts();
@@ -92,7 +82,7 @@ export default function PilihanDaerahStripSimple() {
             .map(product => {
               const hasCoords = product.sellerLat != null && product.sellerLng != null;
               if (hasCoords) {
-                const distance = calculateDistance(
+                const distance = haversineKm(
                   userLocation.lat, userLocation.lng,
                   product.sellerLat!, product.sellerLng!
                 );
@@ -145,7 +135,34 @@ export default function PilihanDaerahStripSimple() {
     }
   };
 
-  if (contextLoading) return null; // Return nothing while waiting, the parent Home page has its own skeleton loader anyway
+  const [minLoading, setMinLoading] = useState(contextLoading);
+
+  useEffect(() => {
+    let timer: any;
+    if (contextLoading) {
+      timer = setTimeout(() => setMinLoading(false), 800);
+    } else {
+      setMinLoading(false);
+    }
+    return () => timer && clearTimeout(timer);
+  }, [contextLoading]);
+
+  if (contextLoading || minLoading) {
+    return (
+      <div className="mb-6 mt-2 p-[14px] rounded-2xl bg-white border border-slate-100 animate-pulse">
+        <div className="h-6 w-32 bg-slate-200 rounded mb-4" />
+        <div className="flex gap-2.5 mb-4">
+          {[1, 2, 3].map(i => <div key={i} className="h-8 w-24 bg-slate-200 rounded-full" />)}
+        </div>
+        <div className="h-4 w-48 bg-slate-200 rounded mb-4" />
+        <div className="flex gap-3 overflow-x-auto pb-2">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="w-[122px] shrink-0 aspect-[1/1.6] bg-slate-200 rounded-xl" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mb-6 mt-2 p-[14px] rounded-2xl bg-gradient-to-br from-blue-50/80 to-blue-100/50 border border-blue-100/50 shadow-sm">
@@ -160,9 +177,10 @@ export default function PilihanDaerahStripSimple() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`h-[34px] px-4 shrink-0 rounded-full border text-xs font-bold transition-all whitespace-nowrap ${activeTab === tab
-              ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-200/50'
+              ? 'text-white border-blue-600 shadow-sm shadow-blue-200/50'
               : 'bg-white/80 text-blue-800 border-blue-100/50 hover:bg-white hover:border-blue-200'
               }`}
+            style={activeTab === tab ? { backgroundColor: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY } : undefined}
           >
             {getTabLabel(tab)}
           </button>
@@ -220,12 +238,12 @@ export default function PilihanDaerahStripSimple() {
             {/* Image */}
             <div className="w-full aspect-square rounded-lg overflow-hidden bg-slate-100">
               <img
-                src={product.image || "https://placehold.co/800x800/png?text=Ecosera"}
+                src={product.image || UI.PLACEHOLDER}
                 alt={product.name}
                 className="w-full h-full object-cover"
                 loading="lazy"
                 onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = "https://placehold.co/800x800/png?text=Ecosera";
+                  (e.currentTarget as HTMLImageElement).src = UI.PLACEHOLDER;
                 }}
               />
             </div>
@@ -237,8 +255,8 @@ export default function PilihanDaerahStripSimple() {
 
             {/* Price */}
             <div className="mt-0.5 flex items-baseline truncate">
-              <span className="text-[12px] font-bold text-blue-600">
-                Rp {money(product.price)}
+              <span className="text-[12px] font-bold" style={{ color: UI.BRAND.PRIMARY }}>
+                {formatCurrencyIDR(product.price)}
               </span>
               <span className="text-[10px] text-slate-500 ml-0.5 truncate">
                 /{product.unit}
@@ -265,7 +283,7 @@ export default function PilihanDaerahStripSimple() {
             {activeTab === 'nearby' && (product as any).distance && (
               <div className="mt-1.5 inline-flex items-center text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">
                 <Navigation className="h-3 w-3 mr-1" />
-                {(product as any).distance.toFixed(1)} km
+                {km((product as any).distance)}
               </div>
             )}
             {activeTab === 'popular' && (
