@@ -67,8 +67,8 @@ export default function Etalase() {
       <div className="min-h-screen bg-[white] pb-28">
 
         {/* Top Category Strip - Uses internal spacers instead of px-5 to prevent snap-positioning bugs */}
-        <div className="bg-white border-b border-slate-200 sticky z-10" style={{ top: 'calc(70px + env(safe-area-inset-top))' }}>
-          <div className="overflow-x-auto no-scrollbar py-3.5 flex gap-3">
+        <div className="bg-white border-b border-slate-200 sticky z-20" style={{ top: 'calc(82px + env(safe-area-inset-top))' }}>
+          <div className="overflow-x-auto no-scrollbar py-4 flex gap-3">
             {/* Left padding spacer - guarantees 20px offset from edge */}
             <div className="w-5 shrink-0" />
 
