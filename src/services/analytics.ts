@@ -70,4 +70,10 @@ export const analytics = {
     waClick: (productId: string, sellerId?: string | null) =>
       logEvent('wa_click', { product_id: productId, seller_id: sellerId }),
   },
+
+  // Search Events
+  search: {
+    perform: (query: string, resultsCount: number) =>
+      logEvent('search_perform', { search_query: query, results_count: resultsCount }),
+  },
 };

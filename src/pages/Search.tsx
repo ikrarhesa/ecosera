@@ -4,7 +4,7 @@ import ProductCard from "../components/ProductCard";
 import { useProductSearch } from "../hooks/useProductSearch";
 import { SearchHeader } from "./search/SearchHeader";
 import { FilterBottomSheet } from "./search/FilterBottomSheet";
-
+import { analytics } from "../services/analytics";
 
 export default function Search() {
   const {
@@ -30,6 +30,7 @@ export default function Search() {
     if (localQuery.trim()) {
       applyQuery(localQuery);
       setIsFocused(false);
+      analytics.search.perform(localQuery, filteredProducts.length);
     }
   };
 
