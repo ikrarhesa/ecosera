@@ -937,6 +937,8 @@ export default function AdminDashboard() {
                       color = "#7C3AED";
                     }
 
+                    if (!title) return null;
+
                     return (
                       <div key={log.id} className="relative pl-8 group">
                         <div
