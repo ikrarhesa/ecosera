@@ -542,7 +542,7 @@ export default function AdminShopEdit() {
                         <div>
                             <label className={labelCls}>Facebook</label>
                             <div className="relative">
-                                <Facebook className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-600" />
+                                <Facebook className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-primary" />
                                 <input
                                     type="text"
                                     value={social.facebook || ""}

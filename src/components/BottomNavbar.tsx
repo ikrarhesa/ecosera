@@ -17,7 +17,7 @@ export default function BottomNavbar() {
           <div className="flex items-center justify-around text-slate-700 text-xs">
             <Link
               to="/"
-              className={`flex flex-col items-center gap-1 py-2 transition-colors ${isActive("/") ? "text-blue-600" : "text-slate-700"
+              className={`flex flex-col items-center gap-1 py-2 transition-colors ${isActive("/") ? "text-brand-primary" : "text-slate-700"
                 }`}
             >
               <HomeIcon className="h-5 w-5" />
@@ -26,7 +26,7 @@ export default function BottomNavbar() {
 
             <Link
               to="/etalase"
-              className={`flex flex-col items-center gap-1 py-2 transition-colors ${isActive("/etalase") ? "text-blue-600" : "text-slate-700"
+              className={`flex flex-col items-center gap-1 py-2 transition-colors ${isActive("/etalase") ? "text-brand-primary" : "text-slate-700"
                 }`}
             >
               <Package className="h-5 w-5" />
@@ -35,7 +35,7 @@ export default function BottomNavbar() {
 
             <Link
               to="/wishlist"
-              className={`flex flex-col items-center gap-1 py-2 transition-colors ${isActive("/wishlist") ? "text-blue-600" : "text-slate-700"
+              className={`flex flex-col items-center gap-1 py-2 transition-colors ${isActive("/wishlist") ? "text-brand-primary" : "text-slate-700"
                 }`}
             >
               <Heart className="h-5 w-5" />

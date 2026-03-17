@@ -25,8 +25,8 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Shop name with icon */}
         {product.sellerName && (
           <div className="flex items-center gap-1 mt-1 w-full">
-            <Store className="h-3 w-3 text-blue-600 flex-shrink-0" />
-            <span className="text-xs text-blue-600 font-medium truncate min-w-0 flex-1">{product.sellerName}</span>
+            <Store className="h-3 w-3 text-brand-primary flex-shrink-0" />
+            <span className="text-xs text-brand-primary font-medium truncate min-w-0 flex-1">{product.sellerName}</span>
           </div>
         )}
 
@@ -44,7 +44,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         ) : (
           <div className="flex items-center gap-1 mt-1">
-            <span className="inline-block px-1.5 py-px text-[9px] font-semibold tracking-wide text-white bg-blue-600 rounded-[4px]">Produk Baru</span>
+            <span className="inline-block px-1.5 py-px text-[9px] font-semibold tracking-wide text-white bg-brand-primary rounded-[4px]">Produk Baru</span>
             {product.sold != null && (
               <>
                 <span className="text-xs text-slate-400">•</span>
@@ -54,7 +54,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
-        <p className="font-semibold text-blue-600 mt-1">{formatCurrencyIDR(product.price)}</p>
+        <p className="font-semibold text-brand-primary mt-1">{formatCurrencyIDR(product.price)}</p>
 
         {/* Seller location */}
         {product.location && (

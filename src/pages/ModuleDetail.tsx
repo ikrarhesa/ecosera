@@ -169,7 +169,7 @@ export default function ModuleDetail() {
         <Navbar />
         <div className="px-4 pt-4 max-w-md md:max-w-lg lg:max-w-xl mx-auto text-center">
           <h1 className="text-xl font-bold text-slate-900 mb-4">Modul tidak ditemukan</h1>
-          <Link to="/e-learning" className="text-blue-600 hover:underline">
+          <Link to="/e-learning" className="text-brand-primary hover:underline">
             Kembali ke E-Learning
           </Link>
         </div>
@@ -232,7 +232,7 @@ export default function ModuleDetail() {
 
             <button
               onClick={() => setShowTranscription(!showTranscription)}
-              className="text-blue-600 text-sm font-medium hover:underline"
+              className="text-brand-primary text-sm font-medium hover:underline"
             >
               {showTranscription ? 'Sembunyikan' : 'Tampilkan'} Transkrip
             </button>

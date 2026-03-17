@@ -84,7 +84,7 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-medium text-slate-900 truncate">{product.name}</h4>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-xs font-semibold" style={{ color: UI.BRAND.PRIMARY }}>
+                          <span className="text-xs font-semibold text-brand-primary">
                             Rp {product.price.toLocaleString("id-ID")}
                           </span>
                           {product.sellerName && (

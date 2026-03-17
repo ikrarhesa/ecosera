@@ -114,7 +114,7 @@ export default function Etalase() {
                 onClick={() => setSelectedCategory("all")}
                 className={`shrink-0 flex items-center justify-center px-4 py-2 rounded-full text-[13px] font-semibold transition-colors border ${selectedCategory === "all"
                   ? "text-white shadow-sm"
-                  : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border-slate-200/50"
+                  : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-brand-primary border-slate-200/50"
                   }`}
                 style={selectedCategory === "all" ? { backgroundColor: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY } : {}}
               >
@@ -126,7 +126,7 @@ export default function Etalase() {
                   onClick={() => setSelectedCategory(cat.id)}
                   className={`shrink-0 flex items-center justify-center px-4 py-2 rounded-full text-[13px] font-semibold transition-colors border ${selectedCategory === cat.id
                     ? "text-white shadow-sm"
-                    : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border-slate-200/50"
+                    : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-brand-primary border-slate-200/50"
                     }`}
                   style={selectedCategory === cat.id ? { backgroundColor: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY } : {}}
                 >

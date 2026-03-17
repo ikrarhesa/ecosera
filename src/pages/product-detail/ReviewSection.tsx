@@ -115,7 +115,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
                 <label className="block text-xs text-gray-600 mb-1">Komentar (Opsional)</label>
                 <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} placeholder="Bagaimana produk ini?" rows={2} className="w-full text-sm rounded-lg border p-2 focus:ring-1 focus:ring-blue-500" />
               </div>
-              <button disabled={submittingReview} type="submit" className="w-full py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+              <button disabled={submittingReview} type="submit" className="w-full py-2 bg-brand-primary text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
                 {submittingReview ? "Mengirim..." : "Kirim Ulasan"}
               </button>
             </form>

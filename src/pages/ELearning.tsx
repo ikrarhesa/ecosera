@@ -79,7 +79,7 @@ export default function ELearning() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="bg-white rounded-xl border border-slate-100 p-3 text-center">
-              <BookOpen className="h-6 w-6 text-blue-600 mx-auto mb-1" />
+              <BookOpen className="h-6 w-6 text-brand-primary mx-auto mb-1" />
               <p className="text-xs text-slate-600">Modul</p>
               <p className="font-semibold text-slate-900">{MODULES.length}</p>
             </div>
@@ -146,7 +146,7 @@ export default function ELearning() {
                       </div>
                       <div className="w-full bg-slate-200 rounded-full h-1.5">
                         <div
-                          className="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
+                          className="bg-brand-primary h-1.5 rounded-full transition-all duration-300"
                           style={{ width: `${module.progress}%` }}
                         />
                       </div>

@@ -144,8 +144,7 @@ export default function SellerShop() {
                     </p>
                     <button
                         onClick={() => navigate("/")}
-                        className="mt-3 text-sm font-medium hover:underline"
-                        style={{ color: UI.BRAND.PRIMARY }}
+                        className="mt-3 text-sm font-medium hover:underline text-brand-primary"
                     >
                         Kembali ke beranda
                     </button>
@@ -199,7 +198,7 @@ export default function SellerShop() {
                                     className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
                                 >
                                     <Search className="h-4 w-4 text-blue-500" />
-                                    <span className="text-sm text-blue-600 line-clamp-1">
+                                    <span className="text-sm text-brand-primary line-clamp-1">
                                         Cari <strong>"{searchQuery}"</strong> di Ecosera
                                     </span>
                                 </button>
@@ -256,8 +255,7 @@ export default function SellerShop() {
                                     />
                                 ) : (
                                     <Store
-                                        className="h-8 w-8"
-                                        style={{ color: UI.BRAND.PRIMARY }}
+                                        className="h-8 w-8 text-brand-primary"
                                     />
                                 )}
                             </div>
@@ -383,8 +381,7 @@ export default function SellerShop() {
                         style={{ color: UI.BRAND.NAVY }}
                     >
                         <Package
-                            className="h-5 w-5"
-                            style={{ color: UI.BRAND.PRIMARY }}
+                            className="h-5 w-5 text-brand-primary"
                         />
                         Produk{" "}
                         <span className="text-sm font-normal text-slate-500">
@@ -430,8 +427,7 @@ export default function SellerShop() {
                                         {p.name}
                                     </p>
                                     <p
-                                        className="text-sm md:text-base font-bold mt-auto"
-                                        style={{ color: UI.BRAND.PRIMARY }}
+                                        className="text-sm md:text-base font-bold mt-auto text-brand-primary"
                                     >
                                         {formatCurrencyIDR(p.price)}
                                     </p>

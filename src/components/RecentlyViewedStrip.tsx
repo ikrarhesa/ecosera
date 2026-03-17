@@ -60,7 +60,7 @@ export const RecentlyViewedStrip: React.FC<RecentlyViewedStripProps> = ({
               {/* Info Area */}
               <div className="p-2.5 flex flex-col flex-grow">
                 {/* Name */}
-                <h3 className="text-xs font-medium text-slate-800 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xs font-medium text-slate-800 line-clamp-2 leading-tight group-hover:text-brand-primary transition-colors">
                   {p.name}
                 </h3>
 
@@ -77,7 +77,7 @@ export const RecentlyViewedStrip: React.FC<RecentlyViewedStripProps> = ({
                 )}
 
                 {/* Price */}
-                <div className="mt-auto pt-1 font-semibold text-blue-600 text-sm">
+                <div className="mt-auto pt-1 font-semibold text-brand-primary text-sm">
                   {p.price ? formatCurrencyIDR(p.price) : "Rp 0"}
                 </div>
               </div>

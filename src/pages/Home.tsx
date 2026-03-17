@@ -104,7 +104,7 @@ function BannerCarousel() {
                   background: `linear-gradient(to top, ${b.overlay_color || (b.text_color === 'navy' ? '#ffffff' : '#000000')}${Math.round((b.overlay_opacity !== undefined ? b.overlay_opacity : 60) * 2.55).toString(16).padStart(2, '0')}, transparent)`
                 }}
               />
-              <div className={`absolute left-4 right-4 bottom-4 ${b.text_color === 'navy' ? 'text-[#041E42]' : 'text-white'}`}>
+              <div className={`absolute left-4 right-4 bottom-4 ${b.text_color === 'navy' ? 'text-brand-navy' : 'text-white'}`}>
                 {(b.show_title !== false) && (
                   <h3 className="text-lg font-bold leading-tight">{b.title}</h3>
                 )}
@@ -116,7 +116,7 @@ function BannerCarousel() {
                     onClick={() => analytics.banner.click(b.id, b.title, b.link_url)}
                     className={`mt-2 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors
                       ${b.text_color === 'navy'
-                        ? 'bg-white text-[#041E42] border border-[#041E42] hover:bg-slate-50'
+                        ? 'bg-white text-brand-navy border border-[#041E42] hover:bg-slate-50'
                         : 'bg-white text-slate-900 border border-transparent hover:bg-slate-100'}`}
                   >
                     {b.cta_text || "Lihat Promo"} <ArrowRight className="h-3.5 w-3.5" />
@@ -198,7 +198,7 @@ export default function Home() {
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
                   className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${selectedCategory === category.id
-                   ? "bg-blue-600 text-white"
+                   ? "bg-brand-primary text-white"
                     : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
                   }`}
                 style={selectedCategory === category.id ? { backgroundColor: UI.BRAND.PRIMARY } : undefined}
@@ -260,8 +260,7 @@ export default function Home() {
                   <p className="text-slate-500 font-medium">Tidak ada produk dalam kategori ini</p>
                   <button 
                     onClick={() => setSelectedCategory("all")}
-                    className="mt-4 text-sm font-semibold"
-                    style={{ color: UI.BRAND.PRIMARY }}
+                    className="mt-4 text-sm font-semibold text-brand-primary"
                   >
                     Lihat Semua Produk
                   </button>

@@ -177,7 +177,7 @@ export default function PilihanDaerahStripSimple() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`h-[34px] px-4 shrink-0 rounded-full border text-xs font-bold transition-all whitespace-nowrap ${activeTab === tab
-              ? 'text-white border-blue-600 shadow-sm shadow-blue-200/50'
+              ? 'text-white border-brand-primary shadow-sm shadow-blue-200/50'
               : 'bg-white/80 text-blue-800 border-blue-100/50 hover:bg-white hover:border-blue-200'
               }`}
             style={activeTab === tab ? { backgroundColor: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY } : undefined}
@@ -255,7 +255,7 @@ export default function PilihanDaerahStripSimple() {
 
             {/* Price */}
             <div className="mt-0.5 flex items-baseline truncate">
-              <span className="text-[12px] font-bold" style={{ color: UI.BRAND.PRIMARY }}>
+              <span className="text-[12px] font-bold text-brand-primary">
                 {formatCurrencyIDR(product.price)}
               </span>
               <span className="text-[10px] text-slate-500 ml-0.5 truncate">

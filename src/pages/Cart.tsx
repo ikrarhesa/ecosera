@@ -116,8 +116,8 @@ function CartItemRow({
               </p>
               {sellerName && (
                 <div className="flex items-center gap-1 mt-1">
-                  <Store className="h-3 w-3" style={{ color: UI.BRAND.PRIMARY }} />
-                  <p className="text-[12px] font-medium" style={{ color: UI.BRAND.PRIMARY }}>{sellerName}</p>
+                  <Store className="h-3 w-3 text-brand-primary" />
+                  <p className="text-[12px] text-brand-primary font-medium">{sellerName}</p>
                 </div>
               )}
               <p className="text-[13px] text-slate-600">{formatCurrencyIDR(price)} / item</p>
@@ -203,8 +203,8 @@ function SellerGroup({
       {/* Seller Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Store className="h-4 w-4" style={{ color: UI.BRAND.PRIMARY }} />
-          <h3 className="font-semibold" style={{ color: UI.BRAND.PRIMARY }}>{sellerName}</h3>
+          <Store className="h-4 w-4 text-brand-primary" />
+          <h3 className="font-semibold text-brand-primary">{sellerName}</h3>
         </div>
         <div className="text-sm text-slate-600">
           {items.length} item{items.length > 1 ? 's' : ''}
@@ -239,7 +239,7 @@ function SellerGroup({
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-slate-600">Subtotal</p>
-            <p className="text-lg font-bold" style={{ color: UI.BRAND.PRIMARY }}>{formatCurrencyIDR(subtotal)}</p>
+            <p className="text-lg font-bold text-brand-primary">{formatCurrencyIDR(subtotal)}</p>
           </div>
           <a
             href={waLink}

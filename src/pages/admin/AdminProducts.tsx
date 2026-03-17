@@ -295,9 +295,9 @@ export default function AdminProducts() {
                                                     title={allSelected ? "Batalkan semua" : "Pilih semua"}
                                                 >
                                                     {allSelected ? (
-                                                        <CheckSquare className="h-4 w-4" style={{ color: UI.BRAND.PRIMARY }} />
+                                                        <CheckSquare className="h-4 w-4 text-brand-primary" />
                                                     ) : someSelected ? (
-                                                        <MinusSquare className="h-4 w-4" style={{ color: UI.BRAND.PRIMARY }} />
+                                                        <MinusSquare className="h-4 w-4 text-brand-primary" />
                                                     ) : (
                                                         <Square className="h-4 w-4" />
                                                     )}
@@ -329,7 +329,7 @@ export default function AdminProducts() {
                                                             className="flex items-center justify-center transition-colors"
                                                         >
                                                             {isSelected ? (
-                                                                <CheckSquare className="h-4 w-4" style={{ color: UI.BRAND.PRIMARY }} />
+                                                                <CheckSquare className="h-4 w-4 text-brand-primary" />
                                                             ) : (
                                                                 <Square className="h-4 w-4 text-slate-300 hover:text-slate-500" />
                                                             )}
@@ -352,7 +352,7 @@ export default function AdminProducts() {
                                                     </td>
                                                     <td className="px-4 py-3 text-center">
                                                         <div className="flex items-center justify-center gap-1">
-                                                            <Link to={`/admin/shops/${seller_id}/products/${p.id}/edit`} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors" style={{ color: UI.BRAND.PRIMARY }} title="Edit">
+                                                            <Link to={`/admin/shops/${seller_id}/products/${p.id}/edit`} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-brand-primary" title="Edit">
                                                                 <Pencil className="h-4 w-4" />
                                                             </Link>
                                                             <button onClick={() => deleteProduct(p)} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Hapus">
@@ -374,7 +374,7 @@ export default function AdminProducts() {
                                         {products.length} produk · {products.filter((p) => p.is_active).length} aktif
                                     </p>
                                     {selectedIds.size > 0 && (
-                                        <p className="text-xs font-medium" style={{ color: UI.BRAND.PRIMARY }}>
+                                        <p className="text-xs font-medium text-brand-primary">
                                             {selectedIds.size} dipilih
                                         </p>
                                     )}

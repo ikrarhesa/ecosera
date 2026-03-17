@@ -61,7 +61,7 @@ export const ProductMainInfo: React.FC<ProductMainInfoProps> = ({
               </>
             ) : (
               <>
-                <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white bg-blue-600 rounded-full">Produk Baru</span>
+                <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white bg-brand-primary rounded-full">Produk Baru</span>
                 <span className="text-gray-400">•</span>
                 <span>{(selectedVariant?.stock ?? product.stock) == null ? "Stok tersedia" : `Stok ${selectedVariant?.stock ?? product.stock}`}</span>
               </>
@@ -102,7 +102,7 @@ export const ProductMainInfo: React.FC<ProductMainInfoProps> = ({
               <button
                 key={v.id}
                 onClick={() => setSelectedVariant(v)}
-                className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors ${selectedVariant?.id === v.id ? 'border-blue-600 bg-blue-50 text-blue-700' : 'bg-white border-slate-300 text-slate-700 hover:border-slate-400'}`}
+                className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors ${selectedVariant?.id === v.id ? 'border-brand-primary bg-blue-50 text-blue-700' : 'bg-white border-slate-300 text-slate-700 hover:border-slate-400'}`}
               >
                 {v.variant_name}
               </button>

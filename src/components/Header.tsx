@@ -38,7 +38,7 @@ export default function Header() {
               readOnly
               className="flex-1 outline-none text-[15px] placeholder-slate-400 text-slate-800 bg-transparent py-1.5 cursor-text pointer-events-none min-w-0"
             />
-            <div className="bg-[#041E42] h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="bg-brand-navy h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0">
               <Search className="h-5 w-5 text-white" />
             </div>
           </div>
@@ -51,7 +51,7 @@ export default function Header() {
           >
             <div className="relative">
               <ShoppingCart size={26} strokeWidth={2} className="text-white" />
-              <span className="absolute -top-2 -right-2.5 bg-[#FFC220] text-[#041E42] text-[11px] font-bold h-5 min-w-[20px] flex items-center justify-center rounded-full px-1 border border-[#FFC220]">
+              <span className="absolute -top-2 -right-2.5 bg-[#FFC220] text-brand-navy text-[11px] font-bold h-5 min-w-[20px] flex items-center justify-center rounded-full px-1 border border-[#FFC220]">
                 {totalItems}
               </span>
             </div>

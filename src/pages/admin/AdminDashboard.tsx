@@ -795,7 +795,7 @@ export default function AdminDashboard() {
               <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
                 <h3 className="font-bold text-slate-800 mb-4 flex items-center justify-between">
                   Pencarian Populer
-                  <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase">
+                  <span className="text-[10px] font-bold text-brand-primary bg-blue-50 px-2 py-0.5 rounded-full uppercase">
                     Top {searchLogs.length}
                   </span>
                 </h3>

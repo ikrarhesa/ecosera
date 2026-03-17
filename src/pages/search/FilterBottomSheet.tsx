@@ -112,8 +112,7 @@ export const FilterBottomSheet: React.FC<FilterBottomSheetProps> = ({
                       value={option.id}
                       checked={priceRange === option.id}
                       onChange={(e) => setPriceRange(e.target.value)}
-                      className="w-4 h-4 focus:ring-blue-500"
-                      style={{ color: UI.BRAND.PRIMARY }}
+                      className="w-4 h-4 focus:ring-blue-500 text-brand-primary"
                     />
                     <span className={`ml-3 text-sm ${priceRange === option.id ? "font-medium" : "text-slate-700"}`} style={priceRange === option.id ? { color: UI.BRAND.PRIMARY } : {}}>
                       {option.name}
