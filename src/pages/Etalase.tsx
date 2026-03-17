@@ -5,11 +5,14 @@ import type { Product } from "../types/product";
 import { useProducts } from "../context/ProductsContext";
 import { getSoughtAfterItems, getCachedSoughtAfterItems, SoughtAfterItem } from "../services/soughtAfter";
 import { getCategories, getCachedCategories } from "../services/categories";
+import { SORT_OPTIONS } from "../hooks/useProductSearch";
 import { UI } from "../config/ui";
+import { ChevronDown } from "lucide-react";
 
 export default function Etalase() {
   const { products: all, loading } = useProducts();
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("default");
 
   const cachedCats = useMemo(() => getCachedCategories(), []);
   const [dbCategories, setDbCategories] = useState<{ id: string, name: string }[]>(cachedCats || []);
@@ -48,7 +51,7 @@ export default function Etalase() {
     });
   }, []);
 
-  // Filter and sort products based on search and filters
+  // Filter and sort products based on selected category and sort algorithm
   const filteredProducts = useMemo(() => {
     let filtered = [...all];
 
@@ -59,45 +62,80 @@ export default function Etalase() {
       );
     }
 
+    // Sort products
+    switch (sortBy) {
+      case "price-low":
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case "price-high":
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+      case "rating":
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      case "newest":
+        filtered.sort((a, b) => b.id.localeCompare(a.id));
+        break;
+      default:
+        break;
+    }
+
     return filtered;
-  }, [all, selectedCategory]);
+  }, [all, selectedCategory, sortBy]);
 
   return (
     <>
       <div className="min-h-screen bg-[white] pb-28">
 
-        {/* Top Category Strip - Uses internal spacers instead of px-5 to prevent snap-positioning bugs */}
+        {/* Top Category Strip - Fixed Sort, Scrolling Categories */}
         <div className="bg-white border-b border-slate-200 sticky z-20" style={{ top: 'calc(82px + env(safe-area-inset-top))' }}>
-          <div className="overflow-x-auto no-scrollbar py-4 flex gap-3">
-            {/* Left padding spacer - guarantees 20px offset from edge */}
-            <div className="w-5 shrink-0" />
+          <div className="flex items-center py-3 pl-5 pr-5 gap-3">
+            
+            {/* Sort Dropdown (Fixed left) */}
+            <div className="shrink-0 relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="appearance-none pl-4 pr-10 py-2 rounded-full text-[13px] font-semibold transition-colors border border-slate-200/50 bg-slate-100/80 text-slate-700 focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                style={sortBy !== "default" ? { backgroundColor: `${UI.BRAND.PRIMARY}15`, color: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY } : {}}
+              >
+                {SORT_OPTIONS.map(opt => (
+                  <option key={opt.id} value={opt.id} className="text-slate-900 bg-white">{opt.name === "Default" ? "Urutkan" : opt.name}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none h-4 w-4 text-slate-500" />
+            </div>
 
-            <button
-              onClick={() => setSelectedCategory("all")}
-              className={`shrink-0 flex items-center justify-center px-4 py-2 rounded-full text-[13px] font-semibold transition-colors border ${selectedCategory === "all"
-                ? "text-white shadow-sm"
-                : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border-slate-200/50"
-                }`}
-              style={selectedCategory === "all" ? { backgroundColor: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY } : {}}
-            >
-              Semua
-            </button>
-            {dbCategories.map((cat) => (
+            <div className="w-[1px] h-6 bg-slate-200 shrink-0" />
+
+            {/* Scrollable Category Buttons */}
+            <div className="flex-1 overflow-x-auto no-scrollbar flex items-center gap-3">
               <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`shrink-0 flex items-center justify-center px-4 py-2 rounded-full text-[13px] font-semibold transition-colors border ${selectedCategory === cat.id
+                onClick={() => setSelectedCategory("all")}
+                className={`shrink-0 flex items-center justify-center px-4 py-2 rounded-full text-[13px] font-semibold transition-colors border ${selectedCategory === "all"
                   ? "text-white shadow-sm"
                   : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border-slate-200/50"
                   }`}
-                style={selectedCategory === cat.id ? { backgroundColor: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY } : {}}
+                style={selectedCategory === "all" ? { backgroundColor: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY } : {}}
               >
-                {cat.name}
+                Semua
               </button>
-            ))}
-
-            {/* Right padding spacer */}
-            <div className="w-5 shrink-0" />
+              {dbCategories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`shrink-0 flex items-center justify-center px-4 py-2 rounded-full text-[13px] font-semibold transition-colors border ${selectedCategory === cat.id
+                    ? "text-white shadow-sm"
+                    : "bg-slate-100/80 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border-slate-200/50"
+                    }`}
+                  style={selectedCategory === cat.id ? { backgroundColor: UI.BRAND.PRIMARY, borderColor: UI.BRAND.PRIMARY } : {}}
+                >
+                  {cat.name}
+                </button>
+              ))}
+              {/* Right padding spacer inside scroll area */}
+              <div className="w-1 shrink-0" />
+            </div>
           </div>
         </div>
 

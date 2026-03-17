@@ -12,6 +12,10 @@ import { ProductGallery } from "./product-detail/ProductGallery";
 import { SellerInfo } from "./product-detail/SellerInfo";
 import { ProductMainInfo } from "./product-detail/ProductMainInfo";
 import { ReviewSection } from "./product-detail/ReviewSection";
+import { RecentlyViewedStrip } from "../components/RecentlyViewedStrip";
+
+import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
+import { useProducts } from "../context/ProductsContext";
 
 import { formatCurrencyIDR } from "../utils/format";
 import { UI } from "../config/ui";
@@ -23,8 +27,11 @@ export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { show } = useToast();
-  const { addToCart } = useCart();
+  const { items, addToCart } = useCart();
+  const cartCount = items.length;
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { addRecentlyViewed, recentlyViewedIds } = useRecentlyViewed();
+  const { products: allProducts } = useProducts();
 
   const cachedProduct = useMemo(() => getCachedProductBySlug(String(slug)), [slug]);
   const [product, setProduct] = useState<Product | null>(cachedProduct);
@@ -77,6 +84,7 @@ export default function ProductDetail() {
       // Log product view
       if (p) {
         analytics.product.view(p.id, p.seller_id);
+        addRecentlyViewed(p.id);
       }
 
       const revs = p ? await getProductReviews(p.id) : [];
@@ -305,8 +313,13 @@ export default function ProductDetail() {
                   <path d="M12 2v6c-6.5 0-10 4.5-10 12 2.5-4 6-6 10-6v6l10-9-10-9z" />
                 </svg>
               </button>
-              <button onClick={() => navigate('/cart')} className="p-1.5 rounded-full bg-white/20 text-white" aria-label="Cart">
+              <button onClick={() => navigate('/cart')} className="relative p-1.5 rounded-full bg-white/20 text-white" aria-label="Cart">
                 <ShoppingCart size={20} strokeWidth={2} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm">
+                    {cartCount}
+                  </span>
+                )}
               </button>
             </div>
           </div>
@@ -359,9 +372,22 @@ export default function ProductDetail() {
 
 
           {/* Related */}
-          {related.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-sm font-semibold mb-2">Produk Terkait</h3>
+          <div className="mt-6">
+            <h3 className="text-sm font-semibold mb-2">Produk Terkait</h3>
+            
+            {loading ? (
+              <div className="flex gap-3 overflow-x-auto pb-1">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="min-w-[160px] rounded-xl border overflow-hidden animate-pulse">
+                    <div className="h-28 w-full bg-slate-200" />
+                    <div className="p-2 space-y-2">
+                      <div className="h-3 bg-slate-200 rounded w-full" />
+                      <div className="h-4 bg-slate-200 rounded w-1/2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : related.length > 0 ? (
               <div className="flex gap-3 overflow-x-auto pb-1">
                 {related.map(r => (
                   <Link key={r.id} to={`/product/${r.slug || r.id}`} className="min-w-[160px] rounded-xl border overflow-hidden">
@@ -374,8 +400,18 @@ export default function ProductDetail() {
                   </Link>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-xs text-slate-400">Tidak ada produk terkait.</p>
+            )}
+          </div>
+          
+          {/* Recently Viewed Strip */}
+          <div className="-mx-4 mt-8">
+            <RecentlyViewedStrip 
+              productIds={recentlyViewedIds.filter(id => id !== product?.id)} 
+              productsData={allProducts} 
+            />
+          </div>
         </div>
 
         {/* Sticky Actions */}
@@ -388,10 +424,10 @@ export default function ProductDetail() {
                 <Plus size={18} /> Keranjang
               </button>
               <button onClick={onChatWA} disabled={outOfStock || qty === 0}
-                className={`flex-[2] h-11 rounded-xl inline-flex items-center justify-center gap-2 text-sm font-semibold text-white transition-colors ${(outOfStock || qty === 0) ? "opacity-50 cursor-not-allowed" : ""}`}
-                style={{ backgroundColor: (outOfStock || qty === 0) ? "#9ca3af" : ACCENT }}
+                className={`flex-[2] h-11 rounded-xl inline-flex items-center justify-center gap-2 text-sm font-semibold text-white transition-colors ${outOfStock ? "opacity-50 cursor-not-allowed" : ""}`}
+                style={{ backgroundColor: outOfStock ? "#9ca3af" : (qty === 0 ? "#cbd5e1" : ACCENT), color: qty === 0 ? "#64748b" : "white" }}
                 aria-label="Pesan lewat WhatsApp">
-                <MessageCircle size={18} /> Pesan lewat WA
+                <MessageCircle size={18} /> {qty === 0 ? "Masukkan Jumlah Produk" : "Pesan lewat WA"}
               </button>
             </div>
           </div>

@@ -1,6 +1,19 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Plus, Package, Pencil, Trash2, ToggleLeft, ToggleRight, ArrowLeft } from "lucide-react";
+import {
+    Plus,
+    Package,
+    Pencil,
+    Trash2,
+    ToggleLeft,
+    ToggleRight,
+    ArrowLeft,
+    CheckSquare,
+    Square,
+    MinusSquare,
+    ToggleRight as ActivateIcon,
+    ToggleLeft as DeactivateIcon,
+} from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
 import { UI } from "../../config/ui";
@@ -23,7 +36,6 @@ interface ProductRow {
     is_active: boolean;
 }
 
-
 export default function AdminProducts() {
     const { seller_id } = useParams<{ seller_id: string }>();
     const [products, setProducts] = useState<ProductRow[]>([]);
@@ -31,9 +43,17 @@ export default function AdminProducts() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    /* ── Bulk selection state ─────────────────────────────────── */
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [bulkLoading, setBulkLoading] = useState(false);
+
+    const allSelected = products.length > 0 && selectedIds.size === products.length;
+    const someSelected = selectedIds.size > 0 && !allSelected;
+
     const fetchProducts = async () => {
         if (!seller_id) return;
         setLoading(true);
+        setSelectedIds(new Set()); // reset selection on reload
 
         const { data: sellerData } = await supabase
             .from("sellers")
@@ -58,6 +78,7 @@ export default function AdminProducts() {
 
     useEffect(() => { fetchProducts(); }, [seller_id]);
 
+    /* ── Single toggle ────────────────────────────────────────── */
     const toggleActive = async (p: ProductRow) => {
         const newVal = !p.is_active;
         setProducts((prev) => prev.map((x) => (x.id === p.id ? { ...x, is_active: newVal } : x)));
@@ -68,10 +89,10 @@ export default function AdminProducts() {
         }
     };
 
+    /* ── Single delete ────────────────────────────────────────── */
     const deleteProduct = async (p: ProductRow) => {
         if (!confirm(`Hapus "${p.name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
 
-        // Fetch product images to clean up storage
         const { data: prodData } = await supabase.from("products").select("images, image_url").eq("id", p.id).single();
         if (prodData) {
             const imageUrls: string[] = Array.isArray(prodData.images) && prodData.images.length > 0
@@ -91,7 +112,80 @@ export default function AdminProducts() {
             alert(`Gagal menghapus: ${err.message}`);
         } else {
             setProducts((prev) => prev.filter((x) => x.id !== p.id));
+            setSelectedIds((prev) => { const s = new Set(prev); s.delete(p.id); return s; });
         }
+    };
+
+    /* ── Checkbox helpers ─────────────────────────────────────── */
+    const toggleOne = (id: string) => {
+        setSelectedIds((prev) => {
+            const s = new Set(prev);
+            s.has(id) ? s.delete(id) : s.add(id);
+            return s;
+        });
+    };
+
+    const toggleAll = () => {
+        setSelectedIds(allSelected ? new Set() : new Set(products.map((p) => p.id)));
+    };
+
+    /* ── Bulk actions ─────────────────────────────────────────── */
+    const bulkSetActive = async (active: boolean) => {
+        const ids = Array.from(selectedIds);
+        setBulkLoading(true);
+        // Optimistic update
+        setProducts((prev) => prev.map((p) => ids.includes(p.id) ? { ...p, is_active: active } : p));
+        const { error: err } = await supabase
+            .from("products")
+            .update({ is_active: active })
+            .in("id", ids);
+        if (err) {
+            console.error("[AdminProducts] bulk toggle error:", err);
+            // Revert on failure
+            setProducts((prev) => prev.map((p) => ids.includes(p.id) ? { ...p, is_active: !active } : p));
+            alert(`Gagal mengubah status: ${err.message}`);
+        } else {
+            setSelectedIds(new Set());
+        }
+        setBulkLoading(false);
+    };
+
+    const bulkDelete = async () => {
+        const ids = Array.from(selectedIds);
+        if (!confirm(`Hapus ${ids.length} produk yang dipilih? Tindakan ini tidak bisa dibatalkan.`)) return;
+        setBulkLoading(true);
+
+        // Clean up images for each selected product in parallel
+        const imageFetches = ids.map((id) =>
+            supabase.from("products").select("images, image_url").eq("id", id).single()
+        );
+        const imageResults = await Promise.all(imageFetches);
+        const allPaths: string[] = [];
+        for (const { data } of imageResults) {
+            if (!data) continue;
+            const urls: string[] = Array.isArray(data.images) && data.images.length > 0
+                ? data.images
+                : data.image_url ? [data.image_url] : [];
+            allPaths.push(...urls.map(extractStoragePath).filter(Boolean) as string[]);
+        }
+        if (allPaths.length > 0) {
+            await supabase.storage.from(BUCKET).remove(allPaths);
+        }
+
+        // Delete related rows and products
+        await Promise.all([
+            supabase.from("product_categories").delete().in("product_id", ids),
+            supabase.from("product_variants").delete().in("product_id", ids),
+        ]);
+        const { error: err } = await supabase.from("products").delete().in("id", ids);
+        if (err) {
+            console.error("[AdminProducts] bulk delete error:", err);
+            alert(`Gagal menghapus: ${err.message}`);
+        } else {
+            setProducts((prev) => prev.filter((p) => !ids.includes(p.id)));
+            setSelectedIds(new Set());
+        }
+        setBulkLoading(false);
     };
 
     return (
@@ -136,50 +230,157 @@ export default function AdminProducts() {
                             <p className="text-sm text-slate-400 mt-1">Klik "Tambah Produk" untuk memulai</p>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wider text-slate-500" style={{ backgroundColor: UI.BRAND.PRIMARY + "06" }}>
-                                        <th className="px-4 py-3 font-medium">Nama</th>
-                                        <th className="px-4 py-3 font-medium hidden md:table-cell">Slug</th>
-                                        <th className="px-4 py-3 font-medium text-right">Harga</th>
-                                        <th className="px-4 py-3 font-medium text-center">Status</th>
-                                        <th className="px-4 py-3 font-medium text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {products.map((p) => (
-                                        <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
-                                            <td className="px-4 py-3 font-medium" style={{ color: UI.BRAND.NAVY }}>{p.name}</td>
-                                            <td className="px-4 py-3 font-mono text-xs text-slate-500 hidden md:table-cell">{p.slug}</td>
-                                            <td className="px-4 py-3 text-right tabular-nums">{formatCurrencyIDR(p.price)}</td>
-                                            <td className="px-4 py-3 text-center">
-                                                <button onClick={() => toggleActive(p)} className="inline-flex items-center gap-1 group" title={p.is_active ? "Nonaktifkan" : "Aktifkan"}>
-                                                    {p.is_active ? (
-                                                        <ToggleRight className="h-5 w-5 text-green-600 group-hover:text-green-700" />
+                        <>
+                            {/* ── Bulk Action Bar (appears when items selected) ── */}
+                            <div
+                                className={`transition-all duration-200 overflow-hidden ${
+                                    selectedIds.size > 0 ? "max-h-20 opacity-100" : "max-h-0 opacity-0"
+                                }`}
+                            >
+                                <div
+                                    className="flex items-center gap-3 px-4 py-3 border-b"
+                                    style={{ backgroundColor: UI.BRAND.PRIMARY + "0C", borderColor: UI.BRAND.PRIMARY + "25" }}
+                                >
+                                    <span className="text-sm font-semibold" style={{ color: UI.BRAND.NAVY }}>
+                                        {selectedIds.size} dipilih
+                                    </span>
+                                    <div className="flex items-center gap-2 ml-auto">
+                                        <button
+                                            onClick={() => bulkSetActive(true)}
+                                            disabled={bulkLoading}
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 transition-colors disabled:opacity-50"
+                                        >
+                                            <ActivateIcon className="h-3.5 w-3.5" />
+                                            Aktifkan
+                                        </button>
+                                        <button
+                                            onClick={() => bulkSetActive(false)}
+                                            disabled={bulkLoading}
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors disabled:opacity-50"
+                                        >
+                                            <DeactivateIcon className="h-3.5 w-3.5" />
+                                            Nonaktifkan
+                                        </button>
+                                        <button
+                                            onClick={bulkDelete}
+                                            disabled={bulkLoading}
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition-colors disabled:opacity-50"
+                                        >
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                            Hapus
+                                        </button>
+                                        <button
+                                            onClick={() => setSelectedIds(new Set())}
+                                            className="text-xs text-slate-400 hover:text-slate-600 px-2 py-1.5 transition-colors"
+                                        >
+                                            Batal
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ── Table ── */}
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm">
+                                    <thead>
+                                        <tr
+                                            className="border-b border-slate-100 text-left text-xs uppercase tracking-wider text-slate-500"
+                                            style={{ backgroundColor: UI.BRAND.PRIMARY + "06" }}
+                                        >
+                                            {/* Select-all checkbox header */}
+                                            <th className="px-4 py-3 w-10">
+                                                <button
+                                                    onClick={toggleAll}
+                                                    className="flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors"
+                                                    title={allSelected ? "Batalkan semua" : "Pilih semua"}
+                                                >
+                                                    {allSelected ? (
+                                                        <CheckSquare className="h-4 w-4" style={{ color: UI.BRAND.PRIMARY }} />
+                                                    ) : someSelected ? (
+                                                        <MinusSquare className="h-4 w-4" style={{ color: UI.BRAND.PRIMARY }} />
                                                     ) : (
-                                                        <ToggleLeft className="h-5 w-5 text-slate-400 group-hover:text-slate-500" />
+                                                        <Square className="h-4 w-4" />
                                                     )}
-                                                    <span className={`text-xs font-medium ${p.is_active ? "text-green-700" : "text-slate-500"}`}>
-                                                        {p.is_active ? "Aktif" : "Off"}
-                                                    </span>
                                                 </button>
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <div className="flex items-center justify-center gap-1">
-                                                    <Link to={`/admin/shops/${seller_id}/products/${p.id}/edit`} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors" style={{ color: UI.BRAND.PRIMARY }} title="Edit">
-                                                        <Pencil className="h-4 w-4" />
-                                                    </Link>
-                                                    <button onClick={() => deleteProduct(p)} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Hapus">
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </button>
-                                                </div>
-                                            </td>
+                                            </th>
+                                            <th className="px-4 py-3 font-medium">Nama</th>
+                                            <th className="px-4 py-3 font-medium hidden md:table-cell">Slug</th>
+                                            <th className="px-4 py-3 font-medium text-right">Harga</th>
+                                            <th className="px-4 py-3 font-medium text-center">Status</th>
+                                            <th className="px-4 py-3 font-medium text-center">Aksi</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        {products.map((p) => {
+                                            const isSelected = selectedIds.has(p.id);
+                                            return (
+                                                <tr
+                                                    key={p.id}
+                                                    className={`border-b border-slate-100 transition-colors ${
+                                                        isSelected
+                                                            ? "bg-blue-50/60"
+                                                            : "hover:bg-slate-50/50"
+                                                    }`}
+                                                >
+                                                    {/* Row checkbox */}
+                                                    <td className="px-4 py-3">
+                                                        <button
+                                                            onClick={() => toggleOne(p.id)}
+                                                            className="flex items-center justify-center transition-colors"
+                                                        >
+                                                            {isSelected ? (
+                                                                <CheckSquare className="h-4 w-4" style={{ color: UI.BRAND.PRIMARY }} />
+                                                            ) : (
+                                                                <Square className="h-4 w-4 text-slate-300 hover:text-slate-500" />
+                                                            )}
+                                                        </button>
+                                                    </td>
+                                                    <td className="px-4 py-3 font-medium" style={{ color: UI.BRAND.NAVY }}>{p.name}</td>
+                                                    <td className="px-4 py-3 font-mono text-xs text-slate-500 hidden md:table-cell">{p.slug}</td>
+                                                    <td className="px-4 py-3 text-right tabular-nums">{formatCurrencyIDR(p.price)}</td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <button onClick={() => toggleActive(p)} className="inline-flex items-center gap-1 group" title={p.is_active ? "Nonaktifkan" : "Aktifkan"}>
+                                                            {p.is_active ? (
+                                                                <ToggleRight className="h-5 w-5 text-green-600 group-hover:text-green-700" />
+                                                            ) : (
+                                                                <ToggleLeft className="h-5 w-5 text-slate-400 group-hover:text-slate-500" />
+                                                            )}
+                                                            <span className={`text-xs font-medium ${p.is_active ? "text-green-700" : "text-slate-500"}`}>
+                                                                {p.is_active ? "Aktif" : "Off"}
+                                                            </span>
+                                                        </button>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <div className="flex items-center justify-center gap-1">
+                                                            <Link to={`/admin/shops/${seller_id}/products/${p.id}/edit`} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors" style={{ color: UI.BRAND.PRIMARY }} title="Edit">
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Link>
+                                                            <button onClick={() => deleteProduct(p)} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Hapus">
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* ── Footer count ── */}
+                            {products.length > 0 && (
+                                <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between">
+                                    <p className="text-xs text-slate-400">
+                                        {products.length} produk · {products.filter((p) => p.is_active).length} aktif
+                                    </p>
+                                    {selectedIds.size > 0 && (
+                                        <p className="text-xs font-medium" style={{ color: UI.BRAND.PRIMARY }}>
+                                            {selectedIds.size} dipilih
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             )}

@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { Play, Clock, BookOpen, ArrowLeft } from "lucide-react";
 import BottomNavbar from "../components/BottomNavbar";
@@ -100,7 +99,7 @@ export default function ELearning() {
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-slate-900">Modul Pembelajaran</h2>
 
-            {MODULES.map((module, index) => (
+            {MODULES.map((module) => (
               <Link
                 key={module.id}
                 to={`/e-learning/${module.id}`}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Play, Pause, ArrowLeft, Clock, BookOpen, CheckCircle, ChevronRight } from "lucide-react";
 import Navbar from "../components/Navbar";

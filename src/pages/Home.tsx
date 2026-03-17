@@ -5,9 +5,12 @@ import {
   Search
 } from "lucide-react";
 import { getActiveBanners, getCachedActiveBanners, type Banner } from "../services/banners";
+import { analytics } from "../services/analytics";
 import ProductCard from "../components/ProductCard";
 import PilihanDaerahStripSimple from '../components/PilihanDaerahStripSimple';
+import { RecentlyViewedStrip } from "../components/RecentlyViewedStrip";
 import { useHomeProducts } from "../hooks/useHomeProducts";
+import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
 import { UI } from "../config/ui";
 
 /* ===== Helpers ===== */
@@ -25,6 +28,8 @@ function BannerCarousel() {
   const [minLoading, setMinLoading] = useState(!banners.length);
   const [i, setI] = useState(0);
   const touchX = useRef<number | null>(null);
+  // Track which banner IDs have already been impressed this session
+  const impressedIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     let timer: any;
@@ -53,6 +58,16 @@ function BannerCarousel() {
   };
   const prev = () => goto(i - 1);
   const next = () => goto(i + 1);
+
+  // Fire banner impression when active slide changes
+  useEffect(() => {
+    if (!banners[i]) return;
+    const b = banners[i];
+    if (!impressedIds.current.has(b.id)) {
+      impressedIds.current.add(b.id);
+      analytics.banner.impression(b.id, b.title);
+    }
+  }, [i, banners]);
   const onTouchStart = (e: React.TouchEvent) => (touchX.current = e.touches[0].clientX);
   const onTouchEnd = (e: React.TouchEvent) => {
     if (touchX.current == null || banners.length <= 1) return;
@@ -98,6 +113,7 @@ function BannerCarousel() {
                     href={b.link_url}
                     target={b.link_url.startsWith('http') ? "_blank" : "_self"}
                     rel="noreferrer"
+                    onClick={() => analytics.banner.click(b.id, b.title, b.link_url)}
                     className={`mt-2 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors
                       ${b.text_color === 'navy'
                         ? 'bg-white text-[#041E42] border border-[#041E42] hover:bg-slate-50'
@@ -135,6 +151,8 @@ export default function Home() {
     selectedCategory,
     setSelectedCategory
   } = useHomeProducts();
+
+  const { recentlyViewedIds } = useRecentlyViewed();
 
   const [minLoading, setMinLoading] = useState(loading);
 
@@ -251,6 +269,14 @@ export default function Home() {
               )}
             </>
           )}
+
+          {/* Recently Viewed Strip */}
+          <div className="-mx-5 mt-6 mb-2">
+            <RecentlyViewedStrip 
+              productIds={recentlyViewedIds} 
+              productsData={filteredProducts} 
+            />
+          </div>
         </main>
       </div>
     </>

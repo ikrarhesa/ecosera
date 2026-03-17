@@ -76,4 +76,12 @@ export const analytics = {
     perform: (query: string, resultsCount: number) =>
       logEvent('search_perform', { search_query: query, results_count: resultsCount }),
   },
+
+  // Banner Events
+  banner: {
+    impression: (bannerId: string, bannerTitle: string) =>
+      logEvent('banner_impression', { banner_id: bannerId, banner_title: bannerTitle }),
+    click: (bannerId: string, bannerTitle: string, linkUrl?: string) =>
+      logEvent('banner_click', { banner_id: bannerId, banner_title: bannerTitle, link_url: linkUrl }),
+  },
 };

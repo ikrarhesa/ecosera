@@ -263,6 +263,8 @@ export default function Cart() {
   const { items, removeFromCart, clearCart, updateQty } = useCart();
   const { show } = useToast();
   const navigate = useNavigate();
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+
   const goBack = useCallback(() => {
     navigate(-1);
   }, [navigate]);
@@ -305,12 +307,7 @@ export default function Cart() {
             </div>
             {totalItems > 0 && (
               <button
-                onClick={() => {
-                  if (confirm("Kosongkan seluruh keranjang?")) {
-                    clearCart();
-                    show("Keranjang dikosongkan 🗑️");
-                  }
-                }}
+                onClick={() => setShowClearConfirm(true)}
                 className="rounded-xl p-2 border border-slate-200 bg-white hover:bg-red-50 transition-colors"
                 title="Hapus semua"
               >
@@ -352,6 +349,18 @@ export default function Cart() {
             </div>
           )}
         </main>
+
+        {/* Modal Konfirmasi Kosongkan Keranjang */}
+        <ConfirmModal
+          open={showClearConfirm}
+          text="Kosongkan seluruh keranjang?"
+          onCancel={() => setShowClearConfirm(false)}
+          onConfirm={() => {
+            clearCart();
+            setShowClearConfirm(false);
+            show("Keranjang dikosongkan 🗑️");
+          }}
+        />
       </div>
     </>
   );

@@ -99,7 +99,7 @@ function sanitizeItem(item: PilihanItem): PilihanItem {
 }
 
 // Create fallback data when server returns empty items
-function createFallbackItems(regionLabel: string): PilihanItem[] {
+function createFallbackItems(): PilihanItem[] {
   const fallbackSeller: PilihanSeller = {
     id: 'fallback-seller',
     name: 'Local Seller',
@@ -228,7 +228,7 @@ export async function fetchPilihanDaerah(params: {
       responseData = {
         region_label: rawData.region_label || 'Unknown Region',
         tab: params.tab || 'nearby',
-        items: createFallbackItems(rawData.region_label || 'Unknown Region')
+        items: createFallbackItems()
       };
     }
 
@@ -254,7 +254,7 @@ export async function fetchPilihanDaerah(params: {
     return {
       region_label: params.region || 'Unknown Region',
       tab: params.tab || 'nearby',
-      items: createFallbackItems(params.region || 'Unknown Region')
+      items: createFallbackItems()
     };
   }
 }
