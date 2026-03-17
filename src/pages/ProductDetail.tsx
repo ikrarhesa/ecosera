@@ -28,7 +28,7 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { show } = useToast();
   const { items, addToCart } = useCart();
-  const cartCount = items.length;
+  const cartCount = items.reduce((sum, item) => sum + item.qty, 0);
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addRecentlyViewed, recentlyViewedIds } = useRecentlyViewed();
   const { products: allProducts } = useProducts();
@@ -316,7 +316,7 @@ export default function ProductDetail() {
               <button onClick={() => navigate('/cart')} className="relative p-1.5 rounded-full bg-white/20 text-white" aria-label="Cart">
                 <ShoppingCart size={20} strokeWidth={2} />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm">
+                  <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#FFC220] px-1 text-[10px] font-bold text-brand-navy shadow-sm border border-[#FFC220]">
                     {cartCount}
                   </span>
                 )}
