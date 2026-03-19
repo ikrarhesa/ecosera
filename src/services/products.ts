@@ -4,9 +4,9 @@ import { supabase } from "../lib/supabase";
 
 const PLACEHOLDER = "https://placehold.co/800x800/png?text=Ecosera";
 
-// Cache seller names to avoid repeated lookups
-const sellerCache: Record<string, { name: string; phone: string; address: string; lat?: number; lng?: number }> = {};
+// Cache normalized products by slug
 const productCache: Record<string, Product> = {};
+
 let waClickCache: Record<string, number> | null = null;
 let waClickCacheTime = 0;
 const WA_CLICK_CACHE_TTL = 60_000; // 1 minute
@@ -17,29 +17,6 @@ const REVIEWS_CACHE_TTL = 60_000; // 1 minute
 
 export function getCachedProductBySlug(slug: string): Product | null {
   return productCache[slug] || null;
-}
-
-async function fetchSellerInfo(sellerId: string) {
-  if (!sellerId) return null;
-  if (sellerCache[sellerId]) return sellerCache[sellerId];
-  const { data } = await supabase
-    .from("sellers")
-    .select("name, phone, address, latitude, longitude, social_media")
-    .eq("id", sellerId)
-    .single();
-  if (data) {
-    // Prefer social_media.whatsapp over the legacy phone column
-    const social = (data.social_media as Record<string, string> | null) ?? {};
-    const waPhone = social.whatsapp?.trim() || data.phone || "";
-    sellerCache[sellerId] = {
-      name: data.name,
-      phone: waPhone,
-      address: data.address || "",
-      lat: data.latitude ?? undefined,
-      lng: data.longitude ?? undefined,
-    };
-  }
-  return sellerCache[sellerId] || null;
 }
 
 /**
@@ -121,23 +98,23 @@ function normalize(raw: any): Product {
   const base: Product = {
     id: String(raw.id),
     slug: raw.slug ?? undefined,
-    name: String(raw.name || "Unknown Product"),  // Ensure product has a name
-    price: Number(raw.price ?? 0),  // Ensure price is a number
-    unit: String(raw.unit ?? "pcs"),  // Ensure unit is provided
-    stock: Number.isFinite(stockParsed) ? stockParsed : 999,  // Ensure stock is a valid number
+    name: String(raw.name || "Unknown Product"),
+    price: Number(raw.price ?? 0),
+    unit: String(raw.unit ?? "pcs"),
+    stock: Number.isFinite(stockParsed) ? stockParsed : 999,
     image: primary,
     images: imgs,
-    description: raw.description ?? "No description available",  // Default description if missing
-    category: String(raw.category ?? "general"),  // Primary category ID
-    categories: Array.isArray(raw.categories) ? raw.categories : [String(raw.category ?? "general")], // All category IDs
-    sellerName: raw._sellerName ?? raw.sellerName ?? "UMKM Lokal",
-    sellerPhone: raw._sellerPhone ?? raw.sellerPhone ?? "",
-    location: raw._sellerAddress ?? raw.location ?? "",
-    sellerLat: raw._sellerLat ?? undefined,
-    sellerLng: raw._sellerLng ?? undefined,
-    rating: Number(raw.rating ?? 0),  // 0 = no real reviews yet
+    description: raw.description ?? "No description available",
+    category: String(raw.category ?? "general"),
+    categories: Array.isArray(raw.categories) ? raw.categories : [String(raw.category ?? "general")],
+    sellerName: raw.seller?.name ?? raw._sellerName ?? raw.sellerName ?? "UMKM Lokal",
+    sellerPhone: raw.seller?.phone ?? raw._sellerPhone ?? raw.sellerPhone ?? "",
+    location: raw.seller?.address ?? raw._sellerAddress ?? raw.location ?? "",
+    sellerLat: raw.seller?.latitude ?? raw._sellerLat ?? undefined,
+    sellerLng: raw.seller?.longitude ?? raw._sellerLng ?? undefined,
+    rating: Number(raw.rating ?? 0),
     sold: raw._waClicks ?? Number(raw.sold ?? 0),
-    tags: Array.isArray(raw.tags) ? raw.tags : [],  // Ensure tags are an array
+    tags: Array.isArray(raw.tags) ? raw.tags : [],
     seller_id: raw.seller_id ?? null,
   };
 
@@ -164,7 +141,7 @@ export async function getAllProducts(): Promise<Product[]> {
   try {
     const { data, error } = await supabase
       .from("products")
-      .select("*, product_categories(category_id), product_variants(*)")
+      .select("*, seller:sellers(*), product_categories(category_id), product_variants(*)")
       .eq("is_active", true);
 
     if (error) {
@@ -172,17 +149,14 @@ export async function getAllProducts(): Promise<Product[]> {
       return [];
     }
 
-    // Enrich with seller names + wa_click counts + reviews
+    // Enrich with wa_click counts + reviews (seller info is now joined)
     const products = data || [];
-    const sellerIds = [...new Set(products.map((p: any) => p.seller_id).filter(Boolean))];
-    const [, waClicks, reviews] = await Promise.all([
-      Promise.all(sellerIds.map(fetchSellerInfo)),
+    const [waClicks, reviews] = await Promise.all([
       fetchWaClickCounts(),
       fetchAllReviews(),
     ]);
 
     const result = products.map((raw: any) => {
-      const info = sellerCache[raw.seller_id];
       const categories = raw.product_categories?.map((pc: any) => pc.category_id) || [];
       const primaryCategory = categories[0] || "general";
 
@@ -195,11 +169,6 @@ export async function getAllProducts(): Promise<Product[]> {
         ...raw,
         category: primaryCategory,
         categories,
-        _sellerName: info?.name,
-        _sellerPhone: info?.phone,
-        _sellerAddress: info?.address,
-        _sellerLat: info?.lat,
-        _sellerLng: info?.lng,
         _waClicks: waClicks[raw.id] ?? 0,
         rating: calculatedRating
       });
@@ -223,7 +192,7 @@ export async function getProductBySlug(slugOrId: string): Promise<Product | null
 
     let query = supabase
       .from("products")
-      .select("*, product_categories(category_id), product_variants(*)");
+      .select("*, seller:sellers(*), product_categories(category_id), product_variants(*)");
 
     if (isId) {
       query = query.eq("id", slugOrId);
@@ -239,9 +208,8 @@ export async function getProductBySlug(slugOrId: string): Promise<Product | null
     }
     if (!data) return null;
 
-    // Enrich with seller name + wa_click count + reviews
-    const [info, waClicks, reviews] = await Promise.all([
-      fetchSellerInfo(data.seller_id),
+    // Enrich with wa_click count + reviews
+    const [waClicks, reviews] = await Promise.all([
       fetchWaClickCounts(),
       fetchAllReviews(),
     ]);
@@ -257,11 +225,6 @@ export async function getProductBySlug(slugOrId: string): Promise<Product | null
       ...data,
       category: primaryCategory,
       categories,
-      _sellerName: info?.name,
-      _sellerPhone: info?.phone,
-      _sellerAddress: info?.address,
-      _sellerLat: info?.lat,
-      _sellerLng: info?.lng,
       _waClicks: waClicks[data.id] ?? 0,
       rating: calculatedRating
     });
@@ -330,7 +293,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
   try {
     const { data, error } = await supabase
       .from("products")
-      .select("*, product_categories(category_id), product_variants(*)")
+      .select("*, seller:sellers(*), product_categories(category_id), product_variants(*)")
       .eq("featured", true)
       .eq("is_active", true);
 
@@ -340,15 +303,12 @@ export async function getFeaturedProducts(): Promise<Product[]> {
     }
 
     const products = data || [];
-    const sellerIds = [...new Set(products.map((p: any) => p.seller_id).filter(Boolean))];
-    const [, waClicks, reviews] = await Promise.all([
-      Promise.all(sellerIds.map(fetchSellerInfo)),
+    const [waClicks, reviews] = await Promise.all([
       fetchWaClickCounts(),
       fetchAllReviews(),
     ]);
 
     return products.map((raw: any) => {
-      const info = sellerCache[raw.seller_id];
       const categories = raw.product_categories?.map((pc: any) => pc.category_id) || [];
       const primaryCategory = categories[0] || "general";
 
@@ -361,11 +321,6 @@ export async function getFeaturedProducts(): Promise<Product[]> {
         ...raw,
         category: primaryCategory,
         categories,
-        _sellerName: info?.name,
-        _sellerPhone: info?.phone,
-        _sellerAddress: info?.address,
-        _sellerLat: info?.lat,
-        _sellerLng: info?.lng,
         _waClicks: waClicks[raw.id] ?? 0,
         rating: calculatedRating
       });
