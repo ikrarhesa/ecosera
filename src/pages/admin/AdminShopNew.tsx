@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Upload, Save, Store, Phone, Mail, MapPin, Navigation, ArrowLeft } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { compressImage } from "../../lib/imageCompression";
+import LocationPickerModal from "../../components/LocationPickerModal";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 
@@ -21,6 +22,7 @@ export default function AdminShopNew() {
 
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
+    const [showMap, setShowMap] = useState(false);
 
     useEffect(() => {
         if (!logoFile) { setLogoPreview(null); return; }
@@ -135,16 +137,21 @@ export default function AdminShopNew() {
                             <input type="number" step="any" value={latitude} onChange={(e) => setLatitude(e.target.value)} className={inputCls} placeholder="Latitude" />
                             <input type="number" step="any" value={longitude} onChange={(e) => setLongitude(e.target.value)} className={inputCls} placeholder="Longitude" />
                         </div>
-                        <button type="button" onClick={() => {
-                            if (navigator.geolocation) {
-                                navigator.geolocation.getCurrentPosition(
-                                    (pos) => { setLatitude(pos.coords.latitude.toFixed(6)); setLongitude(pos.coords.longitude.toFixed(6)); },
-                                    () => alert("Gagal mendapatkan lokasi.")
-                                );
-                            }
-                        }} className="inline-flex items-center gap-1.5 text-xs font-medium hover:opacity-80" style={{ color: C.blue }}>
-                            <Navigation className="h-3.5 w-3.5" /> Gunakan Lokasi Saya
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button type="button" onClick={() => setShowMap(true)} className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors">
+                                <MapPin className="h-3.5 w-3.5 text-blue-600" /> Pilih di Peta
+                            </button>
+                            <button type="button" onClick={() => {
+                                if (navigator.geolocation) {
+                                    navigator.geolocation.getCurrentPosition(
+                                        (pos) => { setLatitude(pos.coords.latitude.toFixed(6)); setLongitude(pos.coords.longitude.toFixed(6)); },
+                                        () => alert("Gagal mendapatkan lokasi.")
+                                    );
+                                }
+                            }} className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors">
+                                <Navigation className="h-3.5 w-3.5" /> Gunakan GPS
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -183,6 +190,20 @@ export default function AdminShopNew() {
                     {submitting ? "Menyimpan…" : "Buat Toko"}
                 </button>
             </form>
+
+            {showMap && (
+                <LocationPickerModal
+                    initialLat={latitude ? parseFloat(latitude) : null}
+                    initialLng={longitude ? parseFloat(longitude) : null}
+                    onSelect={(lat, lng) => {
+                        setLatitude(lat.toFixed(6));
+                        setLongitude(lng.toFixed(6));
+                        setShowMap(false);
+                    }}
+                    onClose={() => setShowMap(false)}
+                />
+            )}
         </div>
+
     );
 }

@@ -15,6 +15,7 @@ import {
 import { supabase } from "../../lib/supabase";
 import ImageCropperModal from "../../components/ImageCropperModal";
 import { compressImage } from "../../lib/imageCompression";
+import LocationPickerModal from "../../components/LocationPickerModal";
 
 const C = { blue: "#0071DC", navy: "#041E42" };
 
@@ -47,6 +48,7 @@ export default function AdminShopEdit() {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+    const [showMap, setShowMap] = useState(false);
 
     // Cropper state
     const [cropSrc, setCropSrc] = useState<string | null>(null);
@@ -411,34 +413,42 @@ export default function AdminShopEdit() {
                                 placeholder="Longitude"
                             />
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                if (navigator.geolocation) {
-                                    navigator.geolocation.getCurrentPosition(
-                                        (pos) => {
-                                            setLatitude(
-                                                pos.coords.latitude.toFixed(6)
-                                            );
-                                            setLongitude(
-                                                pos.coords.longitude.toFixed(6)
-                                            );
-                                        },
-                                        () =>
-                                            alert(
-                                                "Gagal mendapatkan lokasi."
-                                            )
-                                    );
-                                }
-                            }}
-                            className="inline-flex items-center gap-1.5 text-xs font-medium hover:opacity-80 transition-opacity"
-                            style={{ color: C.blue }}
-                        >
-                            <Navigation className="h-3.5 w-3.5" /> Gunakan
-                            Lokasi Saya
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setShowMap(true)}
+                                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
+                            >
+                                <MapPin className="h-3.5 w-3.5 text-blue-600" /> Pilih di Peta
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (navigator.geolocation) {
+                                        navigator.geolocation.getCurrentPosition(
+                                            (pos) => {
+                                                setLatitude(
+                                                    pos.coords.latitude.toFixed(6)
+                                                );
+                                                setLongitude(
+                                                    pos.coords.longitude.toFixed(6)
+                                                );
+                                            },
+                                            () =>
+                                                alert(
+                                                    "Gagal mendapatkan lokasi."
+                                                )
+                                        );
+                                    }
+                                }}
+                                className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
+                            >
+                                <Navigation className="h-3.5 w-3.5" /> Gunakan GPS
+                            </button>
+                        </div>
                     </div>
                 </div>
+
 
                 {/* Contact */}
                 <div className="bg-white rounded-xl border border-slate-200/80 p-5 md:p-6 space-y-4">
@@ -615,6 +625,20 @@ export default function AdminShopEdit() {
                     aspect={cropAspect}
                     onCropComplete={handleCropComplete}
                     onCancel={handleCropCancel}
+                />
+            )}
+
+            {/* Location Picker Modal */}
+            {showMap && (
+                <LocationPickerModal
+                    initialLat={latitude ? parseFloat(latitude) : null}
+                    initialLng={longitude ? parseFloat(longitude) : null}
+                    onSelect={(lat, lng) => {
+                        setLatitude(lat.toFixed(6));
+                        setLongitude(lng.toFixed(6));
+                        setShowMap(false);
+                    }}
+                    onClose={() => setShowMap(false)}
                 />
             )}
         </div>

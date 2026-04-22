@@ -9,11 +9,11 @@ const sellerCache: Record<string, { name: string; phone: string; address: string
 const productCache: Record<string, Product> = {};
 let waClickCache: Record<string, number> | null = null;
 let waClickCacheTime = 0;
-const WA_CLICK_CACHE_TTL = 60_000; // 1 minute
+const WA_CLICK_CACHE_TTL = 300_000; // 5 minutes
 
 let reviewsCache: Record<string, { count: number, totalRating: number }> | null = null;
 let reviewsCacheTime = 0;
-const REVIEWS_CACHE_TTL = 60_000; // 1 minute
+const REVIEWS_CACHE_TTL = 300_000; // 5 minutes
 
 export function getCachedProductBySlug(slug: string): Product | null {
   return productCache[slug] || null;
@@ -43,6 +43,34 @@ async function fetchSellerInfo(sellerId: string) {
 }
 
 /**
+ * Batch-fetch seller info for multiple IDs in a single query.
+ * Much faster than N individual queries on first load.
+ */
+async function fetchSellersBatch(sellerIds: string[]): Promise<void> {
+  const uncachedIds = sellerIds.filter(id => id && !sellerCache[id]);
+  if (uncachedIds.length === 0) return;
+
+  const { data } = await supabase
+    .from("sellers")
+    .select("id, name, phone, address, latitude, longitude, social_media")
+    .in("id", uncachedIds);
+
+  if (data) {
+    for (const d of data) {
+      const social = (d.social_media as Record<string, string> | null) ?? {};
+      const waPhone = social.whatsapp?.trim() || d.phone || "";
+      sellerCache[d.id] = {
+        name: d.name,
+        phone: waPhone,
+        address: d.address || "",
+        lat: d.latitude ?? undefined,
+        lng: d.longitude ?? undefined,
+      };
+    }
+  }
+}
+
+/**
  * Fetch wa_click counts from event_logs grouped by product_id.
  * Results are cached for 1 minute to avoid excessive queries.
  */
@@ -55,7 +83,8 @@ async function fetchWaClickCounts(forceRefresh = false): Promise<Record<string, 
     const { data, error } = await supabase
       .from("event_logs")
       .select("product_id")
-      .eq("event_type", "wa_click");
+      .eq("event_type", "wa_click")
+      .limit(5000);
 
     if (error) {
       console.error("[Products] Error fetching wa_click counts:", error);
@@ -85,7 +114,8 @@ async function fetchAllReviews(forceRefresh = false): Promise<Record<string, { c
   try {
     const { data, error } = await supabase
       .from("reviews")
-      .select("product_id, rating");
+      .select("product_id, rating")
+      .limit(5000);
 
     if (error) {
       console.error("[Products] Error fetching reviews:", error);
@@ -176,7 +206,7 @@ export async function getAllProducts(): Promise<Product[]> {
     const products = data || [];
     const sellerIds = [...new Set(products.map((p: any) => p.seller_id).filter(Boolean))];
     const [, waClicks, reviews] = await Promise.all([
-      Promise.all(sellerIds.map(fetchSellerInfo)),
+      fetchSellersBatch(sellerIds),
       fetchWaClickCounts(),
       fetchAllReviews(),
     ]);
@@ -342,7 +372,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
     const products = data || [];
     const sellerIds = [...new Set(products.map((p: any) => p.seller_id).filter(Boolean))];
     const [, waClicks, reviews] = await Promise.all([
-      Promise.all(sellerIds.map(fetchSellerInfo)),
+      fetchSellersBatch(sellerIds),
       fetchWaClickCounts(),
       fetchAllReviews(),
     ]);
