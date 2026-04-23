@@ -1,453 +1,460 @@
-import { useState, useEffect, useRef } from "react";
-import "./Landing.css";
 import { Link } from "react-router-dom";
-import { ArrowRight, Leaf, ShoppingBag, BookOpen, Globe, ChevronDown } from "lucide-react";
-import { getActiveLandingSections } from "../services/landing";
-import type { LandingSection } from "../types/landing";
+import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { Storefront, Leaf, Handshake, Heart, Lightbulb, Package, ShoppingCart } from "@phosphor-icons/react";
 
+export default function Landing() {
 
-/* ── Intersection observer hook for scroll animations ───────────────  */
-function useInView(threshold = 0.15) {
-    const ref = useRef<HTMLDivElement>(null);
-    const [isVisible, setIsVisible] = useState(false);
+  return (
+    <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-brand-primary selection:text-white">
+      {/* Section 1: Navigation (Navbar) */}
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            {/* Left: Logo */}
+            <div className="flex-shrink-0 flex items-center">
+              <Link to="/" className="flex items-center gap-2">
+                <img src="/images/ecosera-logo.svg" alt="Ecosera Logo" className="h-8 w-auto" />
+              </Link>
+            </div>
 
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsVisible(true);
-                    observer.unobserve(el);
-                }
-            },
-            { threshold }
-        );
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, [threshold]);
+            {/* Center: Links (Hidden on Mobile) */}
+            <div className="hidden md:flex space-x-8">
+              <Link to="/" className="text-slate-600 hover:text-brand-primary font-medium transition-colors">Beranda</Link>
+              <Link to="/etalase" className="text-slate-600 hover:text-brand-primary font-medium transition-colors">Katalog</Link>
+              <Link to="/about" className="text-slate-600 hover:text-brand-primary font-medium transition-colors">Tentang Kami</Link>
+            </div>
 
-    return { ref, isVisible };
-}
-
-/* ── Animated section wrapper ───────────────────────────────────────  */
-function AnimatedSection({
-    children,
-    className = "",
-    delay = 0,
-}: {
-    children: React.ReactNode;
-    className?: string;
-    delay?: number;
-}) {
-    const { ref, isVisible } = useInView();
-    return (
-        <div
-            ref={ref}
-            className={className}
-            style={{
-                opacity: isVisible ? 1 : 0,
-                transform: isVisible ? "translateY(0)" : "translateY(40px)",
-                transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
-            }}
-        >
-            {children}
+            {/* Right: CTA */}
+            <div className="flex items-center">
+              <Link
+                to="/etalase"
+                className="bg-brand-primary text-white px-5 py-2.5 rounded-full font-medium hover:bg-brand-primary/90 transition-all hover:shadow-lg hover:-translate-y-0.5"
+              >
+                Mulai Belanja
+              </Link>
+            </div>
+          </div>
         </div>
-    );
-}
+      </nav>
 
-/* ── Icon Renderer Helper ──────────────────────────────────────────  */
-const ICON_MAP: Record<string, any> = {
-    Leaf,
-    ShoppingBag,
-    BookOpen,
-    Globe,
-    ArrowRight,
-    ChevronDown,
-};
+      {/* Section 2: Hero Section (Split Layout) */}
+      <section className="relative pt-28 pb-32 overflow-hidden bg-brand-bg/30">
+        {/* Animated Background Gradients */}
+        <motion.div 
+          animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.6, 0.4] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-0 right-0 w-[40vw] h-[40vw] bg-brand-primary/10 rounded-full mix-blend-multiply filter blur-[100px]"
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute bottom-0 left-[-10%] w-[50vw] h-[50vw] bg-sky-400/10 rounded-full mix-blend-multiply filter blur-[100px]"
+        />
 
-function IconRenderer({ name, className }: { name?: string | null; className?: string }) {
-    if (!name) return null;
-    const IconComponent = ICON_MAP[name] || Leaf;
-    return <IconComponent className={className} />;
-}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            
+            {/* Left Content */}
+            <div className="text-left z-10">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="mb-6 inline-flex"
+              >
+                <span className="py-1.5 px-4 rounded-full bg-white/80 backdrop-blur-md border border-brand-primary/20 text-brand-primary text-sm font-bold tracking-wide shadow-sm flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-primary"></span>
+                  </span>
+                  Membangun Ekonomi Mandiri
+                </span>
+              </motion.div>
 
-/* ── Section renderers ──────────────────────────────────────────────  */
-function HeroSection({ section }: { section: LandingSection }) {
-    return (
-        <section className="landing-hero">
-            {/* Background image + overlay */}
-            <div className="landing-hero__bg">
-                {section.image_url && (
-                    <img
-                        src={section.image_url}
-                        alt={section.title || "Ecosera"}
-                        className="landing-hero__bg-img"
-                    />
-                )}
-                <div className="landing-hero__overlay" />
-            </div>
+              <motion.h1 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
+                className="text-4xl md:text-5xl lg:text-6xl font-poppins font-bold text-brand-navy tracking-tight leading-[1.1] mb-8"
+              >
+                Menghubungkan <span className="text-brand-primary relative whitespace-nowrap">
+                  Nilai Lokal
+                  <svg className="absolute w-full h-3 -bottom-1 left-0 text-brand-primary/20" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none"/></svg>
+                </span> <br className="hidden lg:block"/> 
+                dengan Peluang <br className="hidden lg:block"/> yang Lebih Luas.
+              </motion.h1>
 
-            <div className="landing-hero__content">
-                <AnimatedSection>
-                    <div className="landing-hero__badge">
-                        <IconRenderer 
-                            name={section.badge_icon || "Leaf"} 
-                            className="landing-hero__badge-icon" 
-                        />
-                        <span>{section.badge_text || "Platform UMKM Pedesaan #1"}</span>
-                    </div>
-                </AnimatedSection>
+              <motion.p 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+                className="text-lg md:text-xl text-slate-600 mb-10 max-w-xl leading-relaxed"
+              >
+                Di banyak wilayah Indonesia, kehidupan bertumbuh dari tangan-tangan terampil dan hasil bumi yang berharga. Ecosera hadir untuk membukakan jalan agar produk lokal tidak hanya berhenti di tempat asalnya, tapi menjangkau pasar yang lebih adil.
+              </motion.p>
 
-                <AnimatedSection delay={0.15}>
-                    <h1 className="landing-hero__title">
-                        {section.title || "Dari Desa untuk Dunia"}
-                    </h1>
-                </AnimatedSection>
-
-                <AnimatedSection delay={0.3}>
-                    <p className="landing-hero__subtitle">
-                        {section.subtitle ||
-                            "Memberdayakan UMKM pedesaan menuju masa depan digital"}
-                    </p>
-                </AnimatedSection>
-
-                {section.cta_text && (
-                    <AnimatedSection delay={0.45}>
-                        <Link
-                            to={section.cta_link || "/etalase"}
-                            className="landing-hero__cta"
-                        >
-                            {section.cta_text}
-                            <ArrowRight className="landing-hero__cta-icon" />
-                        </Link>
-                    </AnimatedSection>
-                )}
-
-                <AnimatedSection delay={0.6}>
-                    <div className="landing-hero__scroll-hint">
-                        <ChevronDown className="landing-hero__scroll-icon" />
-                    </div>
-                </AnimatedSection>
-            </div>
-        </section>
-    );
-}
-
-function ChallengeSection({ section }: { section: LandingSection }) {
-    return (
-        <section className="landing-challenge">
-            <div className="landing-section-container">
-                <AnimatedSection className="landing-challenge__grid">
-                    <div className="landing-challenge__text">
-                        <span className="landing-section-tag">Masalah</span>
-                        <h2 className="landing-section-title">
-                            {section.title || "Potensi Besar, Jangkauan Terbatas"}
-                        </h2>
-                        <p className="landing-section-body">
-                            {section.content ||
-                                "Jutaan pelaku UMKM di pedesaan Indonesia memiliki produk berkualitas tinggi—mulai dari kerajinan tangan, makanan olahan, hingga hasil pertanian. Namun, keterbatasan akses digital dan pasar membuat potensi mereka tidak terjangkau."}
-                        </p>
-                        {section.subtitle && (
-                            <p className="landing-challenge__highlight">
-                                {section.subtitle}
-                            </p>
-                        )}
-                    </div>
-                    {section.image_url && (
-                        <div className="landing-challenge__image-wrap">
-                            <img
-                                src={section.image_url}
-                                alt={section.title || "Challenge"}
-                                className="landing-challenge__image"
-                            />
-                        </div>
-                    )}
-                </AnimatedSection>
-            </div>
-        </section>
-    );
-}
-
-function SolutionSection({ section }: { section: LandingSection }) {
-    const features = [
-        {
-            icon: <ShoppingBag />,
-            title: "Etalase Digital",
-            desc: "Toko online yang dirancang khusus untuk UMKM pedesaan — mudah dikelola tanpa keahlian teknis.",
-        },
-        {
-            icon: <BookOpen />,
-            title: "E-Learning",
-            desc: "Modul pelatihan bisnis digital yang memberdayakan penjual agar bisa berkembang secara mandiri.",
-        },
-        {
-            icon: <Globe />,
-            title: "Jangkauan Luas",
-            desc: "Menghubungkan produk lokal dengan pembeli di seluruh Indonesia — dari desa ke kota.",
-        },
-    ];
-
-    return (
-        <section className="landing-solution">
-            <div className="landing-section-container">
-                <AnimatedSection className="landing-solution__header">
-                    <span className="landing-section-tag landing-section-tag--light">
-                        Solusi Kami
-                    </span>
-                    <h2 className="landing-section-title landing-section-title--light">
-                        {section.title || "Ecosera Menjembatani Kesenjangan"}
-                    </h2>
-                    {section.subtitle && (
-                        <p className="landing-solution__subtitle">
-                            {section.subtitle}
-                        </p>
-                    )}
-                </AnimatedSection>
-
-                <div className="landing-solution__cards">
-                    {features.map((f, i) => (
-                        <AnimatedSection
-                            key={i}
-                            className="landing-solution__card"
-                            delay={i * 0.15}
-                        >
-                            <div className="landing-solution__card-icon">
-                                {f.icon}
-                            </div>
-                            <h3 className="landing-solution__card-title">
-                                {f.title}
-                            </h3>
-                            <p className="landing-solution__card-desc">
-                                {f.desc}
-                            </p>
-                        </AnimatedSection>
-                    ))}
-                </div>
-
-                {section.image_url && (
-                    <AnimatedSection className="landing-solution__image-wrap">
-                        <img
-                            src={section.image_url}
-                            alt={section.title || "Solution"}
-                            className="landing-solution__image"
-                        />
-                    </AnimatedSection>
-                )}
-            </div>
-        </section>
-    );
-}
-
-function ImpactSection({ section }: { section: LandingSection }) {
-    const stats = [
-        { value: "100+", label: "UMKM Terbantu" },
-        { value: "50+", label: "Desa Terjangkau" },
-        { value: "1000+", label: "Produk Lokal" },
-    ];
-
-    return (
-        <section className="landing-impact">
-            <div className="landing-section-container">
-                <AnimatedSection className="landing-impact__header">
-                    <span className="landing-section-tag">Dampak Nyata</span>
-                    <h2 className="landing-section-title">
-                        {section.title || "Bersama, Kita Membuat Perubahan"}
-                    </h2>
-                    {section.content && (
-                        <p className="landing-section-body landing-impact__body">
-                            {section.content}
-                        </p>
-                    )}
-                </AnimatedSection>
-
-                <div className="landing-impact__stats">
-                    {stats.map((s, i) => (
-                        <AnimatedSection
-                            key={i}
-                            className="landing-impact__stat"
-                            delay={i * 0.15}
-                        >
-                            <span className="landing-impact__stat-value">
-                                {s.value}
-                            </span>
-                            <span className="landing-impact__stat-label">
-                                {s.label}
-                            </span>
-                        </AnimatedSection>
-                    ))}
-                </div>
-
-                {section.image_url && (
-                    <AnimatedSection className="landing-impact__image-wrap">
-                        <img
-                            src={section.image_url}
-                            alt={section.title || "Impact"}
-                            className="landing-impact__image"
-                        />
-                    </AnimatedSection>
-                )}
-            </div>
-        </section>
-    );
-}
-
-function CtaSection({ section }: { section: LandingSection }) {
-    return (
-        <section className="landing-cta">
-            <div className="landing-cta__glow" />
-            <div className="landing-section-container landing-cta__inner">
-                <AnimatedSection>
-                    <IconRenderer 
-                        name={section.badge_icon || "Leaf"} 
-                        className="landing-cta__leaf" 
-                    />
-                    <h2 className="landing-cta__title">
-                        {section.title ||
-                            "Jadilah Bagian dari Perubahan"}
-                    </h2>
-                    <p className="landing-cta__subtitle">
-                        {section.subtitle ||
-                            "Dukung produk lokal dengan setiap transaksi. Bersama Ecosera, kemajuan dimulai dari desa."}
-                    </p>
-                    {section.cta_text && (
-                        <Link
-                            to={section.cta_link || "/etalase"}
-                            className="landing-cta__button"
-                        >
-                            {section.cta_text}
-                            <ArrowRight className="landing-cta__button-icon" />
-                        </Link>
-                    )}
-                </AnimatedSection>
-            </div>
-        </section>
-    );
-}
-
-function CustomSection({ section }: { section: LandingSection }) {
-    return (
-        <section className="landing-custom">
-            <div className="landing-section-container">
-                <AnimatedSection>
-                    {section.title && (
-                        <h2 className="landing-section-title">
-                            {section.title}
-                        </h2>
-                    )}
-                    {section.subtitle && (
-                        <p className="landing-section-body" style={{ marginTop: "0.5rem" }}>
-                            {section.subtitle}
-                        </p>
-                    )}
-                    {section.content && (
-                        <p className="landing-section-body" style={{ marginTop: "1rem" }}>
-                            {section.content}
-                        </p>
-                    )}
-                    {section.image_url && (
-                        <div className="landing-custom__image-wrap">
-                            <img
-                                src={section.image_url}
-                                alt={section.title || ""}
-                                className="landing-custom__image"
-                            />
-                        </div>
-                    )}
-                    {section.cta_text && (
-                        <div style={{ marginTop: "2rem", textAlign: "center" }}>
-                            <Link
-                                to={section.cta_link || "/"}
-                                className="landing-hero__cta"
-                            >
-                                {section.cta_text}
-                                <ArrowRight className="landing-hero__cta-icon" />
-                            </Link>
-                        </div>
-                    )}
-                </AnimatedSection>
-            </div>
-        </section>
-    );
-}
-
-/* ── Renderer map ───────────────────────────────────────────────────  */
-const RENDERERS: Record<
-    string,
-    (props: { section: LandingSection }) => JSX.Element
-> = {
-    hero: HeroSection,
-    challenge: ChallengeSection,
-    solution: SolutionSection,
-    impact: ImpactSection,
-    cta: CtaSection,
-};
-
-/* ── Main component ─────────────────────────────────────────────────  */
-export default function Landing({ previewSections }: { previewSections?: LandingSection[] }) {
-    const [sections, setSections] = useState<LandingSection[]>([]);
-    const [loading, setLoading] = useState(!previewSections);
-
-    useEffect(() => {
-        if (previewSections) {
-            setSections(previewSections);
-            setLoading(false);
-            return;
-        }
-        getActiveLandingSections()
-            .then(setSections)
-            .finally(() => setLoading(false));
-    }, [previewSections]);
-
-    if (loading) {
-        return (
-            <div className="landing-loading">
-                <div className="landing-loading__spinner" />
-                <p className="landing-loading__text">Memuat...</p>
-            </div>
-        );
-    }
-
-    if (sections.length === 0) {
-        return (
-            <div className="landing-empty">
-                <Leaf className="landing-empty__icon" />
-                <h2 className="landing-empty__title">Segera Hadir</h2>
-                <p className="landing-empty__subtitle">
-                    Halaman landing sedang dalam pengembangan.
-                </p>
-                <Link to="/" className="landing-hero__cta" style={{ marginTop: "1.5rem" }}>
-                    Kembali ke Beranda
-                    <ArrowRight className="landing-hero__cta-icon" />
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.45 }}
+                className="flex flex-col sm:flex-row items-start sm:items-center gap-4"
+              >
+                <Link
+                  to="/etalase"
+                  className="w-full sm:w-auto bg-brand-primary text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-brand-primary/90 transition-all hover:shadow-[0_8px_30px_rgb(34,84,197,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2"
+                >
+                  Jelajahi Produk Lokal
                 </Link>
+                <Link
+                  to="/about"
+                  className="w-full sm:w-auto bg-white border border-slate-200 text-brand-navy px-8 py-4 rounded-full font-semibold text-lg hover:bg-slate-50 transition-all hover:shadow-sm flex items-center justify-center gap-2 group"
+                >
+                  Baca Cerita Kami 
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-slate-400 group-hover:text-brand-primary" />
+                </Link>
+              </motion.div>
             </div>
-        );
-    }
 
-    return (
-        <div className="landing-page">
-            {sections.map((section) => {
-                const Renderer = RENDERERS[section.section_key] || CustomSection;
-                return <Renderer key={section.id} section={section} />;
-            })}
+            {/* Right Content: Image Composition */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+              className="relative h-[400px] sm:h-[500px] lg:h-[600px] w-full max-w-md mx-auto lg:max-w-none mt-12 lg:mt-0"
+            >
+              {/* Main Background Image (Tall) */}
+              <motion.div 
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute top-0 right-0 lg:top-4 lg:right-4 w-[75%] lg:w-[380px] h-[320px] sm:h-[420px] lg:h-[520px] rounded-[1.5rem] lg:rounded-[2rem] overflow-hidden shadow-2xl border-4 lg:border-[6px] border-white z-10"
+              >
+                <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=800&q=80" alt="Petani dan Alam" className="w-full h-full object-cover" />
+              </motion.div>
 
-            {/* Footer */}
-            <footer className="landing-footer">
-                <div className="landing-section-container">
-                    <div className="landing-footer__inner">
-                        <div className="landing-footer__brand">
-                            <Leaf className="landing-footer__leaf" />
-                            <span className="landing-footer__name">
-                                Ecosera
-                            </span>
-                        </div>
-                        <p className="landing-footer__copy">
-                            &copy; {new Date().getFullYear()} Ecosera.
-                            Dari desa untuk dunia.
-                        </p>
-                    </div>
+              {/* Overlapping Foreground Image (Square) */}
+              <motion.div 
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute bottom-0 left-0 lg:bottom-4 lg:left-0 w-[60%] lg:w-[300px] aspect-square lg:h-[300px] rounded-[1.5rem] lg:rounded-[2rem] overflow-hidden shadow-2xl border-4 lg:border-[6px] border-white z-20"
+              >
+                <img src="https://images.unsplash.com/photo-1471193945509-9ad0617afabf?auto=format&fit=crop&w=600&q=80" alt="Produk Rempah" className="w-full h-full object-cover" />
+              </motion.div>
+
+              {/* Floating Glassmorphism Badge */}
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 1 }}
+                className="absolute -top-4 -left-2 sm:-left-6 lg:top-24 lg:-left-12 bg-white/90 backdrop-blur-xl p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl border border-white z-30 flex items-center gap-3 sm:gap-4 scale-90 sm:scale-100 origin-top-left"
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-lg sm:rounded-xl flex items-center justify-center text-emerald-600">
+                  <Leaf weight="duotone" className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
-            </footer>
+                <div>
+                  <p className="text-xl sm:text-2xl font-black text-brand-navy leading-none">100+</p>
+                  <p className="text-xs sm:text-sm font-bold text-slate-500">UMKM Tergabung</p>
+                </div>
+              </motion.div>
+
+              {/* Decorative dots */}
+              <div className="absolute -bottom-4 -right-4 lg:-bottom-6 lg:-right-6 w-24 h-24 lg:w-32 lg:h-32 bg-[radial-gradient(#2254c5_2px,transparent_2px)] [background-size:16px_16px] opacity-20 z-0"></div>
+            </motion.div>
+          </div>
         </div>
-    );
+      </section>
+
+      {/* Section 3: The "Why" (Feature Cards) */}
+      <section className="py-32 relative overflow-hidden">
+        {/* Background Image with Light Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img src="https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&w=2000&q=80" alt="Pasar Tradisional dan UMKM" className="w-full h-full object-cover object-center" />
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm"></div>
+        </div>
+
+        {/* Subtle Background Elements */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand-primary/10 rounded-[100%] blur-[80px] pointer-events-none z-0"></div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-primary/10 text-brand-primary font-bold text-sm tracking-wide mb-6"
+            >
+              <Heart weight="fill" className="w-4 h-4" /> Visi & Misi
+            </motion.div>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-4xl md:text-5xl font-extrabold text-brand-navy tracking-tight"
+            >
+              Mengapa Ecosera Hadir?
+            </motion.h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+            {/* Card 1 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="relative overflow-hidden p-10 rounded-[2.5rem] bg-white/95 backdrop-blur-md border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgb(34,84,197,0.12)] hover:-translate-y-2 transition-all duration-500 group"
+            >
+              {/* Watermark Icon */}
+              <Storefront weight="fill" className="absolute -right-8 -bottom-8 w-56 h-56 text-slate-50 group-hover:text-brand-primary/[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-700 pointer-events-none" />
+              
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-blue-50 text-brand-primary rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:bg-brand-primary group-hover:text-white transition-colors duration-500">
+                  <Storefront weight="duotone" className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-bold text-brand-navy mb-4">Akses Pasar Nyata</h3>
+                <p className="text-slate-600 leading-relaxed text-lg">
+                  Banyak produk lokal berkualitas yang tidak memiliki akses pasar. Kami membukakan pintunya, mulai dari komunitas terdekat hingga pembeli yang lebih luas.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Card 2 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
+              className="relative overflow-hidden p-10 rounded-[2.5rem] bg-white/95 backdrop-blur-md border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgb(16,185,129,0.12)] hover:-translate-y-2 transition-all duration-500 group"
+            >
+              <Leaf weight="fill" className="absolute -right-8 -bottom-8 w-56 h-56 text-slate-50 group-hover:text-emerald-500/[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-700 pointer-events-none" />
+              
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-500">
+                  <Leaf weight="duotone" className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-bold text-brand-navy mb-4">Transisi Ekonomi</h3>
+                <p className="text-slate-600 leading-relaxed text-lg">
+                  Membantu daerah yang bergantung pada satu sumber daya (seperti tambang) untuk membangun ekonomi baru yang mandiri dan berkelanjutan.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Card 3 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, ease: "easeOut", delay: 0.3 }}
+              className="relative overflow-hidden p-10 rounded-[2.5rem] bg-white/95 backdrop-blur-md border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgb(245,158,11,0.12)] hover:-translate-y-2 transition-all duration-500 group"
+            >
+              <Handshake weight="fill" className="absolute -right-8 -bottom-8 w-56 h-56 text-slate-50 group-hover:text-amber-500/[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-700 pointer-events-none" />
+              
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:bg-amber-500 group-hover:text-white transition-colors duration-500">
+                  <Handshake weight="duotone" className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-bold text-brand-navy mb-4">Perdagangan Adil</h3>
+                <p className="text-slate-600 leading-relaxed text-lg">
+                  Memotong jarak antara pembuat dan pembeli. Menjadikan perdagangan lebih transparan dan memberdayakan komunitas langsung.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 4: How It Works */}
+      <section className="py-32 bg-slate-50/50 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-24">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-primary/10 text-brand-primary font-bold text-sm tracking-wide mb-6"
+            >
+              <Lightbulb weight="fill" className="w-4 h-4" /> Cara Kerja
+            </motion.div>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-4xl md:text-5xl font-poppins font-bold text-brand-navy tracking-tight"
+            >
+              Bagaimana Ecosera Bekerja?
+            </motion.h2>
+          </div>
+
+          <div className="space-y-32">
+            {/* Row 1: Seller */}
+            <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+              <motion.div 
+                initial={{ opacity: 0, x: -40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="lg:w-1/2 space-y-8"
+              >
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-brand-primary font-semibold text-sm tracking-wide">
+                  <Storefront weight="bold" className="w-4 h-4"/> Untuk Pembuat (Seller)
+                </span>
+                <h3 className="text-3xl md:text-4xl font-poppins font-bold text-brand-navy leading-tight">
+                  Mulai dari Langkah Sederhana.
+                </h3>
+                <p className="text-lg text-slate-600 leading-relaxed">
+                  Tidak perlu sistem yang rumit. Penjual di daerah bisa mulai menawarkan produknya dengan cara yang sudah mereka kenal, seperti WhatsApp. Ecosera membantu merapikan katalog dan menghubungkannya dengan pembeli yang tepat.
+                </p>
+                <div className="flex items-center gap-4 text-brand-navy font-semibold">
+                  <div className="w-12 h-12 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center">
+                    <span className="text-xl">1</span>
+                  </div>
+                  <span>Daftar via WhatsApp</span>
+                </div>
+              </motion.div>
+              <motion.div 
+                initial={{ opacity: 0, x: 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+                className="lg:w-1/2 w-full relative"
+              >
+                <div className="relative aspect-[4/3] rounded-[2.5rem] shadow-[0_20px_50px_rgb(0,0,0,0.1)] overflow-hidden group">
+                  <img src="https://images.unsplash.com/photo-1556740758-90de374c12ad?auto=format&fit=crop&w=800&q=80" alt="Penjual UMKM" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/60 via-transparent to-transparent opacity-60"></div>
+                </div>
+                {/* Floating Element */}
+                <motion.div 
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -bottom-4 -left-4 sm:-bottom-6 sm:-left-6 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl shadow-xl border border-white/50 flex items-center gap-3 sm:gap-4 scale-90 sm:scale-100 origin-bottom-left"
+                >
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 text-brand-primary rounded-xl flex items-center justify-center">
+                    <Package weight="duotone" className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-brand-navy text-sm sm:text-base">Katalog Rapi</p>
+                    <p className="text-xs sm:text-sm text-slate-500">Siap Jual</p>
+                  </div>
+                </motion.div>
+              </motion.div>
+            </div>
+
+            {/* Row 2: Buyer */}
+            <div className="flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-24">
+              <motion.div 
+                initial={{ opacity: 0, x: 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="lg:w-1/2 space-y-8"
+              >
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 font-semibold text-sm tracking-wide">
+                  <ShoppingCart weight="bold" className="w-4 h-4"/> Untuk Pembeli (Buyer)
+                </span>
+                <h3 className="text-3xl md:text-4xl font-poppins font-bold text-brand-navy leading-tight">
+                  Temukan Karya & Rasa Autentik.
+                </h3>
+                <p className="text-lg text-slate-600 leading-relaxed">
+                  Mencari oleh-oleh khas langsung dari perajinnya? Atau hasil panen segar dari petani lokal? Ecosera memudahkan Anda menemukan dan mendukung mereka secara langsung tanpa perantara yang panjang.
+                </p>
+                <div className="flex items-center gap-4 text-brand-navy font-semibold">
+                  <div className="w-12 h-12 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center">
+                    <span className="text-xl">2</span>
+                  </div>
+                  <span>Dukung UMKM Lokal</span>
+                </div>
+              </motion.div>
+              <motion.div 
+                initial={{ opacity: 0, x: -40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+                className="lg:w-1/2 w-full relative"
+              >
+                <div className="relative aspect-[4/3] rounded-[2.5rem] shadow-[0_20px_50px_rgb(0,0,0,0.1)] overflow-hidden group">
+                  <img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=800&q=80" alt="Produk Autentik" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/60 via-transparent to-transparent opacity-60"></div>
+                </div>
+                {/* Floating Element */}
+                <motion.div 
+                  animate={{ y: [0, 10, 0] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl shadow-xl border border-white/50 flex items-center gap-3 sm:gap-4 scale-90 sm:scale-100 origin-bottom-right"
+                >
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+                    <Heart weight="duotone" className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-brand-navy text-sm sm:text-base">Produk Asli</p>
+                    <p className="text-xs sm:text-sm text-slate-500">Terpercaya</p>
+                  </div>
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 5: Highlight / Quote */}
+      <section className="py-32 bg-brand-navy">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <blockquote className="text-2xl md:text-4xl leading-relaxed text-white font-merriweather font-normal italic mb-12">
+            "Ecosera bukan semata tentang perdagangan digital. Ini tentang memastikan orang yang menanam makanan kita dan menjaga tradisi kita, akhirnya mendapat kesempatan yang adil."
+          </blockquote>
+          <Link
+            to="/about"
+            className="inline-block bg-transparent border-2 border-white/30 text-white px-8 py-3.5 rounded-full font-semibold text-lg hover:bg-white hover:text-brand-navy transition-all"
+          >
+            Pelajari Visi Kami
+          </Link>
+        </div>
+      </section>
+
+      {/* Section 6: Footer */}
+      <footer className="bg-white border-t border-slate-200 pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            {/* Left */}
+            <div className="space-y-4">
+              <Link to="/" className="inline-block">
+                <img src="/images/ecosera-logo.svg" alt="Ecosera Logo" className="h-8 w-auto" />
+              </Link>
+              <p className="text-slate-500">
+                Produk Lokal. Akses Nyata. Ekonomi yang Adil.
+              </p>
+            </div>
+
+            {/* Middle */}
+            <div>
+              <h4 className="font-bold text-brand-navy mb-4">Tautan</h4>
+              <ul className="space-y-3">
+                <li><Link to="/etalase" className="text-slate-500 hover:text-brand-primary transition-colors">Katalog</Link></li>
+                <li><Link to="/about" className="text-slate-500 hover:text-brand-primary transition-colors">Tentang Kami</Link></li>
+                <li><Link to="/terms" className="text-slate-500 hover:text-brand-primary transition-colors">Syarat & Ketentuan</Link></li>
+              </ul>
+            </div>
+
+            {/* Right */}
+            <div>
+              <h4 className="font-bold text-brand-navy mb-4">Kontak</h4>
+              <ul className="space-y-3">
+                <li><a href="#" className="text-slate-500 hover:text-brand-primary transition-colors">WhatsApp Kami</a></li>
+                <li><a href="#" className="text-slate-500 hover:text-brand-primary transition-colors">Instagram</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between">
+            <p className="text-sm text-slate-400">
+              © 2026 Ecosera. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 }

@@ -13,6 +13,10 @@ export default {
           navy: '#041E42',
           bg: '#F5F6F8',
         }
+      },
+      fontFamily: {
+        poppins: ['"Poppins"', 'sans-serif'],
+        merriweather: ['"Merriweather"', 'serif'],
       }
     },
   },
