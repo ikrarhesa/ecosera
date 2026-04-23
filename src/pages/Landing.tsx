@@ -39,19 +39,7 @@ export default function Landing() {
       </nav>
 
       {/* Section 2: Hero Section (Split Layout) */}
-      <section className="relative pt-28 pb-32 overflow-hidden bg-brand-bg/30">
-        {/* Animated Background Gradients */}
-        <motion.div 
-          animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.6, 0.4] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-0 right-0 w-[40vw] h-[40vw] bg-brand-primary/10 rounded-full mix-blend-multiply filter blur-[100px]"
-        />
-        <motion.div 
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-0 left-[-10%] w-[50vw] h-[50vw] bg-sky-400/10 rounded-full mix-blend-multiply filter blur-[100px]"
-        />
-
+      <section className="relative pt-28 pb-32 overflow-hidden bg-slate-50/50">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             
@@ -129,7 +117,7 @@ export default function Landing() {
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute top-0 right-0 lg:top-4 lg:right-4 w-[75%] lg:w-[380px] h-[320px] sm:h-[420px] lg:h-[520px] rounded-[1.5rem] lg:rounded-[2rem] overflow-hidden shadow-2xl border-4 lg:border-[6px] border-white z-10"
               >
-                <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=800&q=80" alt="Petani dan Alam" className="w-full h-full object-cover" />
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Gianyar-Regency_Bali_Indonesia_A-rice-farmer-working-in-his-paddy-01.jpg" alt="Petani Bali" className="w-full h-full object-cover" />
               </motion.div>
 
               {/* Overlapping Foreground Image (Square) */}
@@ -168,12 +156,9 @@ export default function Landing() {
       <section className="py-32 relative overflow-hidden">
         {/* Background Image with Light Overlay */}
         <div className="absolute inset-0 z-0">
-          <img src="https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&w=2000&q=80" alt="Pasar Tradisional dan UMKM" className="w-full h-full object-cover object-center" />
-          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm"></div>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/Jukung_Pasar_Terapung.jpg" alt="Pasar Terapung" className="w-full h-full object-cover object-center" />
+          <div className="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
         </div>
-
-        {/* Subtle Background Elements */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand-primary/10 rounded-[100%] blur-[80px] pointer-events-none z-0"></div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
@@ -376,7 +361,7 @@ export default function Landing() {
                 className="lg:w-1/2 w-full relative"
               >
                 <div className="relative aspect-[4/3] rounded-[2.5rem] shadow-[0_20px_50px_rgb(0,0,0,0.1)] overflow-hidden group">
-                  <img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=800&q=80" alt="Produk Autentik" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Intergenerational_Batik_Making_in_Trusmi_Cirebon_-_Mother_and_Daughter_Practicing_Batik_Tulis.jpg" alt="Produk Autentik" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/60 via-transparent to-transparent opacity-60"></div>
                 </div>
                 {/* Floating Element */}
