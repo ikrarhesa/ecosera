@@ -14,8 +14,20 @@ export const SellerInfo: React.FC<SellerInfoProps> = ({ product }) => {
         to={product.seller_id ? `/shop/${product.seller_id}` : "#"} 
         className="flex items-center gap-2 hover:opacity-80 transition-opacity min-w-0"
       >
-        <div className="h-9 w-9 rounded-full bg-gray-100 grid place-items-center font-medium shrink-0">
-          {(product.sellerName ?? "UMKM")[0]}
+        <div className="h-9 w-9 rounded-full bg-gray-100 grid place-items-center font-medium shrink-0 overflow-hidden">
+          {product.sellerLogo ? (
+            <img 
+              src={product.sellerLogo} 
+              alt={product.sellerName} 
+              className="h-full w-full object-cover"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = 'none';
+                (e.currentTarget.parentElement as HTMLElement).innerText = (product.sellerName ?? "UMKM")[0];
+              }}
+            />
+          ) : (
+            (product.sellerName ?? "UMKM")[0]
+          )}
         </div>
         <div className="min-w-0">
           <p className="text-sm font-semibold truncate">{product.sellerName ?? "UMKM Lokal"}</p>

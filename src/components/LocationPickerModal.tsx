@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { X, Search, MapPin, Navigation, Check, Copy, Loader2 } from "lucide-react";
+import { X, Search, Navigation, Check, Copy, Loader2 } from "lucide-react";
 
 // Fix Leaflet icon issue
 // @ts-ignore
@@ -22,7 +22,7 @@ interface LocationPickerModalProps {
 
 function MapEvents({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
     useMapEvents({
-        click(e) {
+        click(e: L.LeafletMouseEvent) {
             onLocationSelect(e.latlng.lat, e.latlng.lng);
         },
     });

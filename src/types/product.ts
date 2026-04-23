@@ -29,5 +29,6 @@ export type Product = {
   sellerLat?: number;
   sellerLng?: number;
   seller_id?: string | null;
+  sellerLogo?: string;
   variants?: ProductVariant[];
 };

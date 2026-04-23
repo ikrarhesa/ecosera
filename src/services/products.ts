@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabase";
 const PLACEHOLDER = "https://placehold.co/800x800/png?text=Ecosera";
 
 // Cache seller names to avoid repeated lookups
-const sellerCache: Record<string, { name: string; phone: string; address: string; lat?: number; lng?: number }> = {};
+const sellerCache: Record<string, { name: string; phone: string; address: string; logo?: string; lat?: number; lng?: number }> = {};
 const productCache: Record<string, Product> = {};
 let waClickCache: Record<string, number> | null = null;
 let waClickCacheTime = 0;
@@ -24,7 +24,7 @@ async function fetchSellerInfo(sellerId: string) {
   if (sellerCache[sellerId]) return sellerCache[sellerId];
   const { data } = await supabase
     .from("sellers")
-    .select("name, phone, address, latitude, longitude, social_media")
+    .select("name, phone, address, latitude, longitude, social_media, logo_url")
     .eq("id", sellerId)
     .single();
   if (data) {
@@ -35,6 +35,7 @@ async function fetchSellerInfo(sellerId: string) {
       name: data.name,
       phone: waPhone,
       address: data.address || "",
+      logo: data.logo_url || "",
       lat: data.latitude ?? undefined,
       lng: data.longitude ?? undefined,
     };
@@ -52,7 +53,7 @@ async function fetchSellersBatch(sellerIds: string[]): Promise<void> {
 
   const { data } = await supabase
     .from("sellers")
-    .select("id, name, phone, address, latitude, longitude, social_media")
+    .select("id, name, phone, address, latitude, longitude, social_media, logo_url")
     .in("id", uncachedIds);
 
   if (data) {
@@ -63,6 +64,7 @@ async function fetchSellersBatch(sellerIds: string[]): Promise<void> {
         name: d.name,
         phone: waPhone,
         address: d.address || "",
+        logo: d.logo_url || "",
         lat: d.latitude ?? undefined,
         lng: d.longitude ?? undefined,
       };
@@ -163,6 +165,7 @@ function normalize(raw: any): Product {
     sellerName: raw._sellerName ?? raw.sellerName ?? "UMKM Lokal",
     sellerPhone: raw._sellerPhone ?? raw.sellerPhone ?? "",
     location: raw._sellerAddress ?? raw.location ?? "",
+    sellerLogo: raw._sellerLogo ?? undefined,
     sellerLat: raw._sellerLat ?? undefined,
     sellerLng: raw._sellerLng ?? undefined,
     rating: Number(raw.rating ?? 0),  // 0 = no real reviews yet
@@ -228,6 +231,7 @@ export async function getAllProducts(): Promise<Product[]> {
         _sellerName: info?.name,
         _sellerPhone: info?.phone,
         _sellerAddress: info?.address,
+        _sellerLogo: info?.logo,
         _sellerLat: info?.lat,
         _sellerLng: info?.lng,
         _waClicks: waClicks[raw.id] ?? 0,
@@ -290,6 +294,7 @@ export async function getProductBySlug(slugOrId: string): Promise<Product | null
       _sellerName: info?.name,
       _sellerPhone: info?.phone,
       _sellerAddress: info?.address,
+      _sellerLogo: info?.logo,
       _sellerLat: info?.lat,
       _sellerLng: info?.lng,
       _waClicks: waClicks[data.id] ?? 0,
@@ -394,6 +399,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
         _sellerName: info?.name,
         _sellerPhone: info?.phone,
         _sellerAddress: info?.address,
+        _sellerLogo: info?.logo,
         _sellerLat: info?.lat,
         _sellerLng: info?.lng,
         _waClicks: waClicks[raw.id] ?? 0,
