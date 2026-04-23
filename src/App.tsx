@@ -12,6 +12,7 @@ import ELearning from "./pages/ELearning";
 import ModuleDetail from "./pages/ModuleDetail";
 import Wishlist from "./pages/Wishlist";
 import Search from "./pages/Search";
+import Landing from "./pages/Landing";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminShops from "./pages/admin/AdminShops";
@@ -24,6 +25,7 @@ import AdminMarketing from "./pages/admin/AdminMarketing";
 import AdminMarketingNew from "./pages/admin/AdminMarketingNew";
 import AdminMarketingEdit from "./pages/admin/AdminMarketingEdit";
 import AdminTrending from "./pages/admin/AdminTrending";
+import AdminLanding from "./pages/admin/AdminLanding";
 import PublicLayout from "./layouts/PublicLayout";
 
 export default function App() {
@@ -40,6 +42,7 @@ export default function App() {
         <Route path="/shop/:seller_id" element={<PublicLayout><SellerShop /></PublicLayout>} />
         <Route path="/e-learning" element={<PublicLayout><ELearning /></PublicLayout>} />
         <Route path="/e-learning/:moduleId" element={<PublicLayout><ModuleDetail /></PublicLayout>} />
+        <Route path="/landing" element={<Landing />} />
 
         {/* Admin login (public) */}
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -63,6 +66,7 @@ export default function App() {
           <Route path="/admin/marketing/new" element={<AdminMarketingNew />} />
           <Route path="/admin/marketing/:id/edit" element={<AdminMarketingEdit />} />
           <Route path="/admin/trending" element={<AdminTrending />} />
+          <Route path="/admin/landing" element={<AdminLanding />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -6,6 +6,7 @@ import {
     Store,
     Megaphone,
     TrendingUp,
+    Layout,
     LogOut,
     Menu,
     X,
@@ -28,6 +29,7 @@ const navItems = [
     { label: "Kelola Toko", to: "/admin/shops", icon: Store },
     { label: "Kelola Promo", to: "/admin/marketing", icon: Megaphone },
     { label: "Kelola Trending", to: "/admin/trending", icon: TrendingUp },
+    { label: "Kelola Landing", to: "/admin/landing", icon: Layout },
 ];
 
 export default function AdminLayout() {
