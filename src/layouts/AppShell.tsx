@@ -12,8 +12,8 @@ import { useLocation } from "react-router-dom";
 export default function AppShell({ children }: { children: ReactNode }) {
     const { pathname } = useLocation();
 
-    // Admin pages and landing page manage their own full-width responsive layouts
-    if (pathname.startsWith("/admin") || pathname === "/landing") {
+    // Admin pages, landing page, and about page manage their own full-width responsive layouts
+    if (pathname.startsWith("/admin") || pathname === "/landing" || pathname === "/about") {
         return <>{children}</>;
     }
 

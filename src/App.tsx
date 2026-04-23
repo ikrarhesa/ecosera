@@ -13,6 +13,7 @@ import ModuleDetail from "./pages/ModuleDetail";
 import Wishlist from "./pages/Wishlist";
 import Search from "./pages/Search";
 import Landing from "./pages/Landing";
+import About from "./pages/About";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminShops from "./pages/admin/AdminShops";
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="/e-learning" element={<PublicLayout><ELearning /></PublicLayout>} />
         <Route path="/e-learning/:moduleId" element={<PublicLayout><ModuleDetail /></PublicLayout>} />
         <Route path="/landing" element={<Landing />} />
+        <Route path="/about" element={<About />} />
 
         {/* Admin login (public) */}
         <Route path="/admin/login" element={<AdminLogin />} />

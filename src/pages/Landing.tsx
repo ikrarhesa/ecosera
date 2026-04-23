@@ -8,7 +8,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-brand-primary selection:text-white">
       {/* Section 1: Navigation (Navbar) */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 transition-all">
+      <nav className="sticky top-0 z-50 bg-gradient-to-r from-brand-primary/90 to-blue-500/90 backdrop-blur-md border-b border-white/10 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Left: Logo */}
@@ -20,16 +20,16 @@ export default function Landing() {
 
             {/* Center: Links (Hidden on Mobile) */}
             <div className="hidden md:flex space-x-8">
-              <Link to="/" className="text-slate-600 hover:text-brand-primary font-medium transition-colors">Beranda</Link>
-              <Link to="/etalase" className="text-slate-600 hover:text-brand-primary font-medium transition-colors">Katalog</Link>
-              <Link to="/about" className="text-slate-600 hover:text-brand-primary font-medium transition-colors">Tentang Kami</Link>
+              <Link to="/" className="text-white/80 hover:text-white font-medium transition-colors">Beranda</Link>
+              <Link to="/etalase" className="text-white/80 hover:text-white font-medium transition-colors">Katalog</Link>
+              <Link to="/about" className="text-white/80 hover:text-white font-medium transition-colors">Tentang Kami</Link>
             </div>
 
             {/* Right: CTA */}
             <div className="flex items-center">
               <Link
                 to="/etalase"
-                className="bg-brand-primary text-white px-5 py-2.5 rounded-full font-medium hover:bg-brand-primary/90 transition-all hover:shadow-lg hover:-translate-y-0.5"
+                className="bg-white text-brand-navy px-5 py-2.5 rounded-full font-bold hover:bg-slate-100 transition-all hover:shadow-lg hover:-translate-y-0.5"
               >
                 Mulai Belanja
               </Link>
