@@ -43,6 +43,15 @@ const SECTION_KEY_OPTIONS = [
     { value: "custom", label: "Custom (Lainnya)" },
 ];
 
+const ICON_OPTIONS = [
+    { value: "Leaf", label: "Daun (Leaf)" },
+    { value: "ShoppingBag", label: "Tas Belanja (ShoppingBag)" },
+    { value: "BookOpen", label: "Buku (BookOpen)" },
+    { value: "Globe", label: "Dunia (Globe)" },
+    { value: "ArrowRight", label: "Panah (ArrowRight)" },
+    { value: "ChevronDown", label: "Panah Bawah (ChevronDown)" },
+];
+
 export default function AdminLanding() {
     const [sections, setSections] = useState<LandingSection[]>([]);
     const [draftSections, setDraftSections] = useState<LandingSection[]>([]);
@@ -107,6 +116,8 @@ export default function AdminLanding() {
                 image_url: null,
                 cta_text: null,
                 cta_link: null,
+                badge_text: null,
+                badge_icon: "Leaf",
                 is_active: true,
                 sort_order: draftSections.length,
             };
@@ -253,6 +264,33 @@ export default function AdminLanding() {
                                         placeholder="Deskripsi singkat..."
                                     />
                                 </div>
+
+                                {(selectedSection.section_key === 'hero' || selectedSection.section_key === 'cta') && (
+                                    <div className="grid grid-cols-2 gap-4 p-4 bg-blue-50/50 rounded-2xl border border-blue-100">
+                                        <div className="col-span-2">
+                                            <label className="block text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Tagline Badge</label>
+                                            <input 
+                                                type="text"
+                                                value={selectedSection.badge_text || ""}
+                                                onChange={(e) => handleUpdateDraft(selectedSection.id, { badge_text: e.target.value })}
+                                                className="w-full bg-white border border-blue-100 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                                placeholder="Platform UMKM Pedesaan #1"
+                                            />
+                                        </div>
+                                        <div className="col-span-2">
+                                            <label className="block text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Icon Badge</label>
+                                            <select 
+                                                value={selectedSection.badge_icon || "Leaf"}
+                                                onChange={(e) => handleUpdateDraft(selectedSection.id, { badge_icon: e.target.value })}
+                                                className="w-full bg-white border border-blue-100 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                            >
+                                                {ICON_OPTIONS.map(opt => (
+                                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {selectedSection.section_key !== 'hero' && (
                                     <div>

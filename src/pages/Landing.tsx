@@ -56,6 +56,22 @@ function AnimatedSection({
     );
 }
 
+/* ── Icon Renderer Helper ──────────────────────────────────────────  */
+const ICON_MAP: Record<string, any> = {
+    Leaf,
+    ShoppingBag,
+    BookOpen,
+    Globe,
+    ArrowRight,
+    ChevronDown,
+};
+
+function IconRenderer({ name, className }: { name?: string | null; className?: string }) {
+    if (!name) return null;
+    const IconComponent = ICON_MAP[name] || Leaf;
+    return <IconComponent className={className} />;
+}
+
 /* ── Section renderers ──────────────────────────────────────────────  */
 function HeroSection({ section }: { section: LandingSection }) {
     return (
@@ -75,8 +91,11 @@ function HeroSection({ section }: { section: LandingSection }) {
             <div className="landing-hero__content">
                 <AnimatedSection>
                     <div className="landing-hero__badge">
-                        <Leaf className="landing-hero__badge-icon" />
-                        <span>Platform UMKM Pedesaan #1</span>
+                        <IconRenderer 
+                            name={section.badge_icon || "Leaf"} 
+                            className="landing-hero__badge-icon" 
+                        />
+                        <span>{section.badge_text || "Platform UMKM Pedesaan #1"}</span>
                     </div>
                 </AnimatedSection>
 
@@ -279,7 +298,10 @@ function CtaSection({ section }: { section: LandingSection }) {
             <div className="landing-cta__glow" />
             <div className="landing-section-container landing-cta__inner">
                 <AnimatedSection>
-                    <Leaf className="landing-cta__leaf" />
+                    <IconRenderer 
+                        name={section.badge_icon || "Leaf"} 
+                        className="landing-cta__leaf" 
+                    />
                     <h2 className="landing-cta__title">
                         {section.title ||
                             "Jadilah Bagian dari Perubahan"}
