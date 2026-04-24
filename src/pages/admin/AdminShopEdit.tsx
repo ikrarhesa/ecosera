@@ -35,8 +35,7 @@ export default function AdminShopEdit() {
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [address, setAddress] = useState("");
-    const [latitude, setLatitude] = useState("");
-    const [longitude, setLongitude] = useState("");
+    const [coordinates, setCoordinates] = useState("");
     const [social, setSocial] = useState<SocialMedia>({});
     const [currentLogo, setCurrentLogo] = useState<string | null>(null);
     const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -72,12 +71,15 @@ export default function AdminShopEdit() {
                 setPhone(data.phone || "");
                 setEmail(data.email || "");
                 setAddress(data.address || "");
-                setLatitude(
-                    data.latitude != null ? String(data.latitude) : ""
-                );
-                setLongitude(
-                    data.longitude != null ? String(data.longitude) : ""
-                );
+                if (data.latitude != null && data.longitude != null) {
+                    setCoordinates(`${data.latitude}, ${data.longitude}`);
+                } else if (data.latitude != null) {
+                    setCoordinates(String(data.latitude));
+                } else if (data.longitude != null) {
+                    setCoordinates(String(data.longitude));
+                } else {
+                    setCoordinates("");
+                }
                 setCurrentLogo(data.logo_url || null);
                 setCurrentBanner(data.banner_url || null);
                 setSocial((data.social_media as SocialMedia) || {});
@@ -220,8 +222,8 @@ export default function AdminShopEdit() {
                     phone: phone.trim() || null,
                     email: email.trim() || null,
                     address: address.trim() || null,
-                    latitude: latitude.trim() ? parseFloat(latitude) : null,
-                    longitude: longitude.trim() ? parseFloat(longitude) : null,
+                    latitude: coordinates.split(',')[0]?.trim() ? parseFloat(coordinates.split(',')[0].trim()) : null,
+                    longitude: coordinates.split(',')[1]?.trim() ? parseFloat(coordinates.split(',')[1].trim()) : null,
                     logo_url: logoUrl,
                     banner_url: bannerUrl,
                     social_media: cleanSocial,
@@ -391,26 +393,15 @@ export default function AdminShopEdit() {
 
                     <div>
                         <label className={labelCls}>Koordinat Lokasi</label>
-                        <div className="grid grid-cols-2 gap-2 mb-2">
+                        <div className="mb-2">
                             <input
-                                type="number"
-                                step="any"
-                                value={latitude}
+                                type="text"
+                                value={coordinates}
                                 onChange={(e) =>
-                                    setLatitude(e.target.value)
+                                    setCoordinates(e.target.value)
                                 }
                                 className={inputCls}
-                                placeholder="Latitude"
-                            />
-                            <input
-                                type="number"
-                                step="any"
-                                value={longitude}
-                                onChange={(e) =>
-                                    setLongitude(e.target.value)
-                                }
-                                className={inputCls}
-                                placeholder="Longitude"
+                                placeholder="Contoh: -3.654703, 103.876221"
                             />
                         </div>
                         <div className="flex items-center gap-3">
@@ -427,12 +418,7 @@ export default function AdminShopEdit() {
                                     if (navigator.geolocation) {
                                         navigator.geolocation.getCurrentPosition(
                                             (pos) => {
-                                                setLatitude(
-                                                    pos.coords.latitude.toFixed(6)
-                                                );
-                                                setLongitude(
-                                                    pos.coords.longitude.toFixed(6)
-                                                );
+                                                setCoordinates(`${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`);
                                             },
                                             () =>
                                                 alert(
@@ -631,11 +617,10 @@ export default function AdminShopEdit() {
             {/* Location Picker Modal */}
             {showMap && (
                 <LocationPickerModal
-                    initialLat={latitude ? parseFloat(latitude) : null}
-                    initialLng={longitude ? parseFloat(longitude) : null}
+                    initialLat={coordinates.split(',')[0]?.trim() ? parseFloat(coordinates.split(',')[0].trim()) : null}
+                    initialLng={coordinates.split(',')[1]?.trim() ? parseFloat(coordinates.split(',')[1].trim()) : null}
                     onSelect={(lat, lng) => {
-                        setLatitude(lat.toFixed(6));
-                        setLongitude(lng.toFixed(6));
+                        setCoordinates(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
                         setShowMap(false);
                     }}
                     onClose={() => setShowMap(false)}

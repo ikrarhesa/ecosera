@@ -15,8 +15,7 @@ export default function AdminShopNew() {
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [address, setAddress] = useState("");
-    const [latitude, setLatitude] = useState("");
-    const [longitude, setLongitude] = useState("");
+    const [coordinates, setCoordinates] = useState("");
     const [logoFile, setLogoFile] = useState<File | null>(null);
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
@@ -46,8 +45,8 @@ export default function AdminShopNew() {
                     phone: phone.trim() || null,
                     email: email.trim() || null,
                     address: address.trim() || null,
-                    latitude: latitude.trim() ? parseFloat(latitude) : null,
-                    longitude: longitude.trim() ? parseFloat(longitude) : null,
+                    latitude: coordinates.split(',')[0]?.trim() ? parseFloat(coordinates.split(',')[0].trim()) : null,
+                    longitude: coordinates.split(',')[1]?.trim() ? parseFloat(coordinates.split(',')[1].trim()) : null,
                     whatsapp_number: phone.trim() || "",
                 })
                 .select("id")
@@ -133,9 +132,8 @@ export default function AdminShopNew() {
 
                     <div>
                         <label className={labelCls}>Koordinat Lokasi</label>
-                        <div className="grid grid-cols-2 gap-2 mb-2">
-                            <input type="number" step="any" value={latitude} onChange={(e) => setLatitude(e.target.value)} className={inputCls} placeholder="Latitude" />
-                            <input type="number" step="any" value={longitude} onChange={(e) => setLongitude(e.target.value)} className={inputCls} placeholder="Longitude" />
+                        <div className="mb-2">
+                            <input type="text" value={coordinates} onChange={(e) => setCoordinates(e.target.value)} className={inputCls} placeholder="Contoh: -3.654703, 103.876221" />
                         </div>
                         <div className="flex items-center gap-3">
                             <button type="button" onClick={() => setShowMap(true)} className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors">
@@ -144,7 +142,7 @@ export default function AdminShopNew() {
                             <button type="button" onClick={() => {
                                 if (navigator.geolocation) {
                                     navigator.geolocation.getCurrentPosition(
-                                        (pos) => { setLatitude(pos.coords.latitude.toFixed(6)); setLongitude(pos.coords.longitude.toFixed(6)); },
+                                        (pos) => { setCoordinates(`${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`); },
                                         () => alert("Gagal mendapatkan lokasi.")
                                     );
                                 }
@@ -193,11 +191,10 @@ export default function AdminShopNew() {
 
             {showMap && (
                 <LocationPickerModal
-                    initialLat={latitude ? parseFloat(latitude) : null}
-                    initialLng={longitude ? parseFloat(longitude) : null}
+                    initialLat={coordinates.split(',')[0]?.trim() ? parseFloat(coordinates.split(',')[0].trim()) : null}
+                    initialLng={coordinates.split(',')[1]?.trim() ? parseFloat(coordinates.split(',')[1].trim()) : null}
                     onSelect={(lat, lng) => {
-                        setLatitude(lat.toFixed(6));
-                        setLongitude(lng.toFixed(6));
+                        setCoordinates(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
                         setShowMap(false);
                     }}
                     onClose={() => setShowMap(false)}
