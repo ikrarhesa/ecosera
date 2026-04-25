@@ -39,7 +39,7 @@ export default function Landing() {
       </nav>
 
       {/* Section 2: Hero Section (Split Layout) */}
-      <section className="relative pt-28 pb-32 overflow-hidden bg-slate-50/50">
+      <section className="relative pt-20 pb-24 overflow-hidden bg-slate-50/50">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             
@@ -153,11 +153,12 @@ export default function Landing() {
       </section>
 
       {/* Section 3: The "Why" (Feature Cards) */}
-      <section className="py-32 relative overflow-hidden">
-        {/* Background Image with Light Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/Jukung_Pasar_Terapung.jpg" alt="Pasar Terapung" className="w-full h-full object-cover object-center" />
-          <div className="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
+      <section className="py-24 relative overflow-hidden">
+        {/* Subtle Blue Gradient Background */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#f8faff] via-[#e6f0ff] to-[#f0f5ff]">
+          {/* Subtle Ambient Glows for Depth */}
+          <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-blue-200/20 rounded-full blur-[120px] pointer-events-none"></div>
+          <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-indigo-200/20 rounded-full blur-[120px] pointer-events-none"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -251,7 +252,7 @@ export default function Landing() {
       </section>
 
       {/* Section 4: How It Works */}
-      <section className="py-32 bg-slate-50/50 relative overflow-hidden">
+      <section className="py-24 bg-slate-50/50 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-24">
             <motion.div
@@ -385,7 +386,7 @@ export default function Landing() {
       </section>
 
       {/* Section 5: Highlight / Quote */}
-      <section className="py-32 bg-brand-navy">
+      <section className="py-24 bg-brand-navy">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <blockquote className="text-2xl md:text-4xl leading-relaxed text-white font-merriweather font-normal italic mb-12">
             "Ecosera bukan semata tentang perdagangan digital. Ini tentang memastikan orang yang menanam makanan kita dan menjaga tradisi kita, akhirnya mendapat kesempatan yang adil."
