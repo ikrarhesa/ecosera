@@ -13,14 +13,14 @@ export default function Landing() {
           <div className="flex justify-between items-center h-20">
             {/* Left: Logo */}
             <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="flex items-center gap-2">
+              <Link to="/landing" className="flex items-center gap-2">
                 <img src="/images/ecosera-logo.svg" alt="Ecosera Logo" className="h-8 w-auto" />
               </Link>
             </div>
 
             {/* Center: Links (Hidden on Mobile) */}
             <div className="hidden md:flex space-x-8">
-              <Link to="/" className="text-white/80 hover:text-white font-medium transition-colors">Beranda</Link>
+              <Link to="/landing" className="text-white/80 hover:text-white font-medium transition-colors">Beranda</Link>
               <Link to="/etalase" className="text-white/80 hover:text-white font-medium transition-colors">Katalog</Link>
               <Link to="/about" className="text-white/80 hover:text-white font-medium transition-colors">Tentang Kami</Link>
             </div>
@@ -42,7 +42,7 @@ export default function Landing() {
       <section className="relative pt-20 pb-24 overflow-hidden bg-slate-50/50">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            
+
             {/* Left Content */}
             <div className="text-left z-10">
               <motion.div
@@ -60,7 +60,7 @@ export default function Landing() {
                 </span>
               </motion.div>
 
-              <motion.h1 
+              <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
@@ -68,12 +68,12 @@ export default function Landing() {
               >
                 Menghubungkan <span className="text-brand-primary relative whitespace-nowrap">
                   Nilai Lokal
-                  <svg className="absolute w-full h-3 -bottom-1 left-0 text-brand-primary/20" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none"/></svg>
-                </span> <br className="hidden lg:block"/> 
-                dengan Peluang <br className="hidden lg:block"/> yang Lebih Luas.
+                  <svg className="absolute w-full h-3 -bottom-1 left-0 text-brand-primary/20" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" /></svg>
+                </span> <br className="hidden lg:block" />
+                dengan Peluang <br className="hidden lg:block" /> yang Lebih Luas.
               </motion.h1>
 
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
@@ -82,7 +82,7 @@ export default function Landing() {
                 Di banyak wilayah Indonesia, kehidupan bertumbuh dari tangan-tangan terampil dan hasil bumi yang berharga. Ecosera hadir untuk membukakan jalan agar produk lokal tidak hanya berhenti di tempat asalnya, tapi menjangkau pasar yang lebih adil.
               </motion.p>
 
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.45 }}
@@ -98,21 +98,21 @@ export default function Landing() {
                   to="/about"
                   className="w-full sm:w-auto bg-white border border-slate-200 text-brand-navy px-8 py-4 rounded-full font-semibold text-lg hover:bg-slate-50 transition-all hover:shadow-sm flex items-center justify-center gap-2 group"
                 >
-                  Baca Cerita Kami 
+                  Baca Cerita Kami
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-slate-400 group-hover:text-brand-primary" />
                 </Link>
               </motion.div>
             </div>
 
             {/* Right Content: Image Composition */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
               className="relative h-[400px] sm:h-[500px] lg:h-[600px] w-full max-w-md mx-auto lg:max-w-none mt-12 lg:mt-0"
             >
               {/* Main Background Image (Tall) */}
-              <motion.div 
+              <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute top-0 right-0 lg:top-4 lg:right-4 w-[75%] lg:w-[380px] h-[320px] sm:h-[420px] lg:h-[520px] rounded-[1.5rem] lg:rounded-[2rem] overflow-hidden shadow-2xl border-4 lg:border-[6px] border-white z-10"
@@ -121,7 +121,7 @@ export default function Landing() {
               </motion.div>
 
               {/* Overlapping Foreground Image (Square) */}
-              <motion.div 
+              <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                 className="absolute bottom-0 left-0 lg:bottom-4 lg:left-0 w-[60%] lg:w-[300px] aspect-square lg:h-[300px] rounded-[1.5rem] lg:rounded-[2rem] overflow-hidden shadow-2xl border-4 lg:border-[6px] border-white z-20"
@@ -130,7 +130,7 @@ export default function Landing() {
               </motion.div>
 
               {/* Floating Glassmorphism Badge */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 1 }}
@@ -172,7 +172,7 @@ export default function Landing() {
             >
               <Heart weight="fill" className="w-4 h-4" /> Visi & Misi
             </motion.div>
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
@@ -182,10 +182,10 @@ export default function Landing() {
               Mengapa Ecosera Hadir?
             </motion.h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
             {/* Card 1 */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
@@ -194,7 +194,7 @@ export default function Landing() {
             >
               {/* Watermark Icon */}
               <Storefront weight="fill" className="absolute -right-8 -bottom-8 w-56 h-56 text-slate-50 group-hover:text-brand-primary/[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-700 pointer-events-none" />
-              
+
               <div className="relative z-10">
                 <div className="w-16 h-16 bg-blue-50 text-brand-primary rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:bg-brand-primary group-hover:text-white transition-colors duration-500">
                   <Storefront weight="duotone" className="w-8 h-8" />
@@ -207,7 +207,7 @@ export default function Landing() {
             </motion.div>
 
             {/* Card 2 */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
@@ -215,7 +215,7 @@ export default function Landing() {
               className="relative overflow-hidden p-10 rounded-[2.5rem] bg-white/95 backdrop-blur-md border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgb(16,185,129,0.12)] hover:-translate-y-2 transition-all duration-500 group"
             >
               <Leaf weight="fill" className="absolute -right-8 -bottom-8 w-56 h-56 text-slate-50 group-hover:text-emerald-500/[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-700 pointer-events-none" />
-              
+
               <div className="relative z-10">
                 <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-500">
                   <Leaf weight="duotone" className="w-8 h-8" />
@@ -228,7 +228,7 @@ export default function Landing() {
             </motion.div>
 
             {/* Card 3 */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
@@ -236,7 +236,7 @@ export default function Landing() {
               className="relative overflow-hidden p-10 rounded-[2.5rem] bg-white/95 backdrop-blur-md border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgb(245,158,11,0.12)] hover:-translate-y-2 transition-all duration-500 group"
             >
               <Handshake weight="fill" className="absolute -right-8 -bottom-8 w-56 h-56 text-slate-50 group-hover:text-amber-500/[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-700 pointer-events-none" />
-              
+
               <div className="relative z-10">
                 <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:bg-amber-500 group-hover:text-white transition-colors duration-500">
                   <Handshake weight="duotone" className="w-8 h-8" />
@@ -264,7 +264,7 @@ export default function Landing() {
             >
               <Lightbulb weight="fill" className="w-4 h-4" /> Cara Kerja
             </motion.div>
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
@@ -278,7 +278,7 @@ export default function Landing() {
           <div className="space-y-32">
             {/* Row 1: Seller */}
             <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -40 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -286,7 +286,7 @@ export default function Landing() {
                 className="lg:w-1/2 space-y-8"
               >
                 <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-brand-primary font-semibold text-sm tracking-wide">
-                  <Storefront weight="bold" className="w-4 h-4"/> Untuk Pembuat (Seller)
+                  <Storefront weight="bold" className="w-4 h-4" /> Untuk Pembuat (Seller)
                 </span>
                 <h3 className="text-3xl md:text-4xl font-poppins font-bold text-brand-navy leading-tight">
                   Mulai dari Langkah Sederhana.
@@ -301,7 +301,7 @@ export default function Landing() {
                   <span>Daftar via WhatsApp</span>
                 </div>
               </motion.div>
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: 40 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -313,7 +313,7 @@ export default function Landing() {
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/60 via-transparent to-transparent opacity-60"></div>
                 </div>
                 {/* Floating Element */}
-                <motion.div 
+                <motion.div
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute -bottom-4 -left-4 sm:-bottom-6 sm:-left-6 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl shadow-xl border border-white/50 flex items-center gap-3 sm:gap-4 scale-90 sm:scale-100 origin-bottom-left"
@@ -331,7 +331,7 @@ export default function Landing() {
 
             {/* Row 2: Buyer */}
             <div className="flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-24">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: 40 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -339,7 +339,7 @@ export default function Landing() {
                 className="lg:w-1/2 space-y-8"
               >
                 <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 font-semibold text-sm tracking-wide">
-                  <ShoppingCart weight="bold" className="w-4 h-4"/> Untuk Pembeli (Buyer)
+                  <ShoppingCart weight="bold" className="w-4 h-4" /> Untuk Pembeli (Buyer)
                 </span>
                 <h3 className="text-3xl md:text-4xl font-poppins font-bold text-brand-navy leading-tight">
                   Temukan Karya & Rasa Autentik.
@@ -354,7 +354,7 @@ export default function Landing() {
                   <span>Dukung UMKM Lokal</span>
                 </div>
               </motion.div>
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -40 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -366,7 +366,7 @@ export default function Landing() {
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/60 via-transparent to-transparent opacity-60"></div>
                 </div>
                 {/* Floating Element */}
-                <motion.div 
+                <motion.div
                   animate={{ y: [0, 10, 0] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl shadow-xl border border-white/50 flex items-center gap-3 sm:gap-4 scale-90 sm:scale-100 origin-bottom-right"
@@ -389,7 +389,7 @@ export default function Landing() {
       <section className="py-24 bg-brand-navy">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <blockquote className="text-2xl md:text-4xl leading-relaxed text-white font-merriweather font-normal italic mb-12">
-            "Ecosera bukan semata tentang perdagangan digital. Ini tentang memastikan orang yang menanam makanan kita dan menjaga tradisi kita, akhirnya mendapat kesempatan yang adil."
+            "Ecosera bukan hanya tentang pasar digital. Ini tentang memastikan orang yang menanam makanan kita dan menjaga tradisi kita, akhirnya mendapat kesempatan yang adil."
           </blockquote>
           <Link
             to="/about"
@@ -406,7 +406,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
             {/* Left */}
             <div className="space-y-4">
-              <Link to="/" className="inline-block">
+              <Link to="/landing" className="inline-block">
                 <img src="/images/ecosera-logo.svg" alt="Ecosera Logo" className="h-8 w-auto" />
               </Link>
               <p className="text-slate-500">

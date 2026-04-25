@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 export default function About() {
   return (
     <div className="min-h-screen bg-[#F9F8F6] font-sans text-neutral-800 selection:bg-brand-primary selection:text-white overflow-x-hidden">
-      {/* Navigation / Header Minimalist */}
-      <nav className="absolute top-0 w-full z-50 py-6">
+      {/* Navigation / Header - Navy background to make white logo visible */}
+      <nav className="sticky top-0 w-full z-50 bg-brand-navy backdrop-blur-md border-b border-white/10 py-4 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
-          <Link to="/" className="inline-block transition-transform hover:scale-105">
-            <img src="/images/ecosera-logo.svg" alt="Ecosera Logo" className="h-8 w-auto opacity-80" />
+          <Link to="/landing" className="inline-block transition-transform hover:scale-105">
+            <img src="/images/ecosera-logo.svg" alt="Ecosera Logo" className="h-8 w-auto" />
           </Link>
         </div>
       </nav>
@@ -17,9 +17,9 @@ export default function About() {
       <section className="relative min-h-[80vh] flex flex-col items-center justify-center px-4 md:px-8">
         {/* Subtle background texture/image behind text */}
         <div className="absolute inset-0 z-0 opacity-10">
-           <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Rice_terraces%2C_Bali.jpg" 
-            alt="Tegalalang Rice Terraces" 
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Rice_terraces%2C_Bali.jpg"
+            alt="Tegalalang Rice Terraces"
             className="w-full h-full object-cover grayscale"
           />
         </div>
@@ -42,7 +42,7 @@ export default function About() {
             "Banyak produk lokal berhenti di tempat asalnya. Bukan karena kurang bernilai, tapi karena tidak ada jalannya."
           </motion.h1>
         </div>
-        
+
         {/* Scroll Indicator */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -75,7 +75,7 @@ export default function About() {
                 Di banyak wilayah Indonesia, kehidupan bertumbuh dari tanah yang subur, tangan-tangan yang terampil, dan tradisi yang diwariskan dengan tekun. Ada petani yang merawat hasil bumi dengan ketekunan, ada perajin yang menjaga mutu karyanya, dan keluarga kecil yang menghasilkan produk lokal bernilai.
               </p>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -83,9 +83,9 @@ export default function About() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative aspect-[4/5] lg:aspect-square rounded-2xl overflow-hidden shadow-2xl"
             >
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Gianyar-Regency_Bali_Indonesia_A-rice-farmer-working-in-his-paddy-01.jpg" 
-                alt="Petani Indonesia" 
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Gianyar-Regency_Bali_Indonesia_A-rice-farmer-working-in-his-paddy-01.jpg"
+                alt="Petani Indonesia"
                 className="w-full h-full object-cover"
               />
             </motion.div>
@@ -99,9 +99,9 @@ export default function About() {
             transition={{ duration: 1 }}
             className="w-full h-[40vh] md:h-[60vh] rounded-2xl overflow-hidden mb-24 shadow-xl relative"
           >
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Mount_Bromo_closeup_on_sunrise.jpg" 
-              alt="Pemandangan Bromo" 
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Mount_Bromo_closeup_on_sunrise.jpg"
+              alt="Pemandangan Bromo"
               className="w-full h-full object-cover"
             />
           </motion.div>
@@ -120,17 +120,17 @@ export default function About() {
         </div>
       </section>
 
-      {/* Section 3: The Pull-Quote Break */}
-      <section className="relative py-32 px-4 md:px-8 bg-[#2A3439] text-[#F9F8F6] overflow-hidden">
+      {/* Section 3: The Pull-Quote Break - Navy Background */}
+      <section className="relative py-32 px-4 md:px-8 bg-brand-navy text-[#F9F8F6] overflow-hidden">
         {/* Parallax Background overlay */}
         <div className="absolute inset-0 z-0 opacity-20">
-          <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/3/36/Batik_pattern_-_garuda.jpg" 
-            alt="Tekstur Batik" 
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/3/36/Batik_pattern_-_garuda.jpg"
+            alt="Tekstur Batik"
             className="w-full h-full object-cover"
           />
         </div>
-        
+
         <div className="relative z-10 max-w-5xl mx-auto text-center">
           <motion.blockquote
             initial={{ opacity: 0, scale: 0.95 }}
@@ -148,7 +148,7 @@ export default function About() {
       <section className="py-24 px-4 md:px-8 lg:px-16">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
-            
+
             {/* Image Column */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -158,16 +158,16 @@ export default function About() {
               className="lg:col-span-5 relative space-y-8"
             >
               <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
-                <img 
-                  src="https://upload.wikimedia.org/wikipedia/commons/8/86/Intergenerational_Batik_Making_in_Trusmi_Cirebon_-_Mother_and_Daughter_Practicing_Batik_Tulis.jpg" 
-                  alt="Pembuatan Batik Tradisional" 
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/8/86/Intergenerational_Batik_Making_in_Trusmi_Cirebon_-_Mother_and_Daughter_Practicing_Batik_Tulis.jpg"
+                  alt="Pembuatan Batik Tradisional"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hidden md:block">
-                <img 
-                  src="https://upload.wikimedia.org/wikipedia/commons/3/36/Jukung_Pasar_Terapung.jpg" 
-                  alt="Pasar Terapung" 
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/3/36/Jukung_Pasar_Terapung.jpg"
+                  alt="Pasar Terapung"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -189,7 +189,7 @@ export default function About() {
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.8, delay: 0.1 }}
               >
-                Melalui Ecosera, hasil pertanian, kerajinan, makanan olahan, dan berbagai karya daerah dapat ditemukan oleh lebih banyak orang. Oleh pembeli yang mencari kualitas autentik, oleh wisatawan yang menginginkan buah tangan nyata, dan oleh masyarakat yang ingin mendukung ekonomi lokal.
+                Melalui Ecosera, hasil pertanian, kerajinan, makanan olahan, dan berbagai karya daerah dapat ditemukan oleh lebih banyak orang. Oleh pembeli yang mencari kualitas autentik, oleh wisatawan yang menginginkan buah tangan terbaik, dan oleh masyarakat yang ingin mendukung ekonomi lokal.
               </motion.p>
               <motion.p
                 initial={{ opacity: 0, x: 20 }}
@@ -198,26 +198,26 @@ export default function About() {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="font-normal text-neutral-800"
               >
-                Kami tidak datang untuk memutus cara lama. Kami menguatkannya. Membantu penjual yang mulai dari pesanan kecil tumbuh menjadi pasar yang mapan dengan martabat. Ecosera adalah upaya memastikan masyarakat di daerah tertinggal memiliki kesempatan yang adil.
+                Kami tidak datang untuk memutus cara lama. Kami menguatkan dan membantu penjual yang mulai dari pesanan kecil tumbuh menjadi pasar yang mapan dengan martabat. Ecosera adalah upaya memastikan masyarakat di daerah tertinggal memiliki kesempatan yang sama.
               </motion.p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Section 5: The Closing Statement & CTA */}
-      <section className="py-24 px-4 md:px-8 bg-white border-t border-slate-200/60">
+      {/* Section 5: The Closing Statement & CTA - Navy Background */}
+      <section className="py-24 px-4 md:px-8 bg-brand-navy border-t border-white/10">
         <div className="max-w-4xl mx-auto text-center space-y-12">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
-            className="text-2xl sm:text-3xl lg:text-4xl font-merriweather text-neutral-800 leading-relaxed"
+            className="text-2xl sm:text-3xl lg:text-4xl font-merriweather text-white leading-relaxed"
           >
-            Itulah Ecosera: sebuah jembatan bagi produk lokal, bagi harapan yang ingin bertumbuh, dan bagi ekonomi yang lebih tangguh.
+            Itulah Ecosera: sebuah jembatan bagi produk lokal, bagi harapan yang terus bertumbuh, dan bagi ekonomi yang lebih tangguh.
           </motion.p>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -227,13 +227,13 @@ export default function About() {
           >
             <Link
               to="/etalase"
-              className="w-full sm:w-auto bg-neutral-800 text-[#F9F8F6] px-10 py-4 rounded-full font-semibold text-lg hover:bg-neutral-900 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center"
+              className="w-full sm:w-auto bg-white text-brand-navy px-10 py-4 rounded-full font-semibold text-lg hover:bg-neutral-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center"
             >
               Lihat Produk Lokal
             </Link>
             <Link
-              to="/"
-              className="w-full sm:w-auto bg-transparent border-2 border-neutral-300 text-neutral-700 px-10 py-4 rounded-full font-semibold text-lg hover:bg-neutral-100 hover:border-neutral-400 transition-all flex items-center justify-center"
+              to="/landing"
+              className="w-full sm:w-auto bg-transparent border-2 border-white/30 text-white px-10 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-brand-navy transition-all flex items-center justify-center"
             >
               Kembali ke Beranda
             </Link>
@@ -247,11 +247,12 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
             {/* Left */}
             <div className="space-y-4 text-center md:text-left">
-              <Link to="/" className="inline-block">
-                <img src="/images/ecosera-logo.svg" alt="Ecosera Logo" className="h-8 w-auto mx-auto md:mx-0" />
+              <Link to="/landing" className="inline-block">
+                {/* Logo in footer - likely needs dark bg if it's white, but keeping white for now as per landing */}
+                <img src="/images/ecosera-logo.svg" alt="Ecosera Logo" className="h-8 w-auto mx-auto md:mx-0 opacity-20 hover:opacity-100 transition-opacity" />
               </Link>
               <p className="text-slate-500 max-w-xs mx-auto md:mx-0">
-                Produk Lokal. Akses Nyata. Ekonomi yang Adil.
+                Ekonomi Digital untuk Semua
               </p>
             </div>
 
