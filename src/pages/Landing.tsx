@@ -140,7 +140,7 @@ export default function Landing() {
                   <Leaf weight="duotone" className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <div>
-                  <p className="text-xl sm:text-2xl font-black text-brand-navy leading-none">100+</p>
+                  <p className="text-xl sm:text-2xl font-black text-brand-navy leading-none">50+</p>
                   <p className="text-xs sm:text-sm font-bold text-slate-500">UMKM Tergabung</p>
                 </div>
               </motion.div>
